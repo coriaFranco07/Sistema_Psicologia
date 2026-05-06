@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Estaditicas de Socios{% endblock %}
+
+{% block content %}
+<body class="dashboard-socios">
+
+    <h1>Cantidad de Socios</h1>
+    <div class="estado-container">
+        <div class="estado-circle-wrapper" title="Total de usuarios">
+            <div class="estado-progress-circle"
+                style="--percent: 360deg; --color: #6dca9f;"
+                data-tipo="total">
+                <span>{{ total_usuarios }}</span>
+            </div>
+        </div>
+    </div>
+
+    <br><br>
+
+    <h1>Socios por Estado</h1>
+    <div class="estado-container">
+        {% for item in data %}
+        <div class="estado-circle-wrapper" title="Total: {{ item.total }}">
+            <div class="estado-progress-circle"
+                style="--percent: calc({{ item.total }} * 10deg); 
+                        --color: {% if item.id_std_socio__dsc_std_socio == 'BAJA' %}#FF0000{% else %}#4CAF50{% endif %};"
+                data-tipo="estado"
+                data-id="{{ item.id_std_socio }}"
+                data-nombre="{{ item.id_std_socio__dsc_std_socio }}">
+                <span>{{ item.total }}</span>
+            </div>
+            <div class="estado-label">{{ item.id_std_socio__dsc_std_socio }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <br><br>
+
+    <h1>Socios por Tipo</h1>
+    <div class="tipo-container">
+        {% for item in data2 %}
+        <div class="tipo-circle-wrapper" title="Total: {{ item.total }}">
+            <div class="tipo-progress-circle"
+                style="--percent: calc({{ item.total }} * 10deg); --color: #2196F3;"
+                data-tipo="tipo"
+                data-id="{{ item.id_tipo_socio }}"
+                data-nombre="{{ item.id_tipo_socio__dsc_tipo_socio }}">
+                <span>{{ item.total }}</span>
+            </div>
+            <div class="tipo-label">{{ item.id_tipo_socio__dsc_tipo_socio }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 🟢 Modal -->
+    <div id="modal" class="modal" style="display:none;">
+        <div class="modal-content"
+            style="
+                width: 90%;
+                max-width: 1200px;
+                height: 85vh;
+                margin: 3% auto;
+                overflow-y: auto;
+                border-radius: 10px;
+            ">
+
+            <span id="closeModal" class="close">&times;</span>
+           
+            <h2 id="modalTitle" style="color: black; font-weight: 600;"></h2>
+
+
+            <input type="text" id="filtroUsuarios" placeholder="Buscar por nombre, dni o email..."
+                style="width:100%; padding:6px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
+
+            <div id="modalBody">Cargando...</div>
+        </div>
+    </div>
+
+
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const circles = document.querySelectorAll(".estado-progress-circle, .tipo-progress-circle");
+        const modal = document.getElementById("modal");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalBody = document.getElementById("modalBody");
+        const closeModal = document.getElementById("closeModal");
+
+        let currentUrl = "";
+        let currentPage = 1;
+        const pageSize = 12;
+
+        const filtroInput = document.getElementById("filtroUsuarios");
+
+        filtroInput.addEventListener("input", () => {
+            const filtro = filtroInput.value.toLowerCase();
+            const rows = modalBody.querySelectorAll("tbody tr");
+            rows.forEach(row => {
+                const nombre = row.cells[0].textContent.toLowerCase();
+                const dni = row.cells[1].textContent.toLowerCase();
+                const email = row.cells[2].textContent.toLowerCase();
+                row.style.display = (nombre.includes(filtro) || dni.includes(filtro) || email.includes(filtro)) ? "" : "none";
+            });
+        });
+
+        async function cargarUsuarios() {
+            modalBody.innerHTML = "Cargando...";
+            try {
+                const response = await fetch(`${currentUrl}?page=${currentPage}&size=${pageSize}`);
+                const data = await response.json();
+
+                if (data.results.length === 0) {
+                    modalBody.innerHTML = "<p>No hay usuarios disponibles.</p>";
+                    return;
+                }
+
+                modalBody.innerHTML = `
+                    <table id="tablaUsuarios" class="table table-striped table-bordered">
+                        <thead class="table-primary">
+                            <tr style="text-aling: center">
+                                <th>Nombre</th>
+                                <th>DNI</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.results.map(u => `
+                                <tr>
+                                    <td>${u.nombres}</td>
+                                    <td>${u.dni}</td>
+                                    <td>${u.email}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        <button id="prevPage" ${!data.has_previous ? "disabled" : ""}>⟵ Anterior</button>
+                        <span>Página ${data.page} de ${data.total_pages}</span>
+                        <button id="nextPage" ${!data.has_next ? "disabled" : ""}>Siguiente ⟶</button>
+                    </div>
+                `;
+
+                inicializarExportadores();
+
+                document.getElementById("prevPage")?.addEventListener("click", () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        cargarUsuarios();
+                    }
+                });
+
+                document.getElementById("nextPage")?.addEventListener("click", () => {
+                    currentPage++;
+                    cargarUsuarios();
+                });
+
+            } catch (err) {
+                modalBody.innerHTML = "<p>Error al cargar los datos.</p>";
+            }
+        }
+
+        function inicializarExportadores() {
+            $('#tablaUsuarios').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                ordering: false,
+                dom: '<"d-flex justify-content-between align-items-center mb-3"B>t',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="bi bi-file-earmark-excel-fill me-1"></i> Excel',
+                        className: 'btn btn-success btn-sm me-1 shadow-sm text-white',
+                        titleAttr: 'Exportar a Excel',
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="bi bi-filetype-pdf me-1"></i> PDF',
+                        className: 'btn btn-danger btn-sm shadow-sm text-white',
+                        titleAttr: 'Exportar a PDF',
+                        exportOptions: { columns: ':visible' }
+                    }
+                ]
+            });
+        }
+
+        circles.forEach(circle => {
+            circle.addEventListener("click", () => {
+                const tipo = circle.dataset.tipo;
+                const id = circle.dataset.id;
+                const nombre = circle.dataset.nombre;
+
+                if (tipo === "total") {
+                    modalTitle.textContent = "Todos los usuarios";
+                    currentUrl = "{% url 'usuario:usuarios-total' %}";
+                } else if (tipo === "estado") {
+                    modalTitle.textContent = `Usuarios con estado: ${nombre}`;
+                    currentUrl = `{% url 'usuario:usuarios-por-estado' 0 %}`.replace("0", id);
+                } else if (tipo === "tipo") {
+                    modalTitle.textContent = `Usuarios del tipo: ${nombre}`;
+                    currentUrl = `{% url 'usuario:usuarios-por-tipo' 0 %}`.replace("0", id);
+                }
+
+                currentPage = 1;
+                modal.style.display = "block";
+                cargarUsuarios();
+            });
+        });
+
+        closeModal.addEventListener("click", () => modal.style.display = "none");
+        window.addEventListener("click", e => {
+            if (e.target === modal) modal.style.display = "none";
+        });
+    });
+    </script>
+
+
+</body>
+{% endblock %}

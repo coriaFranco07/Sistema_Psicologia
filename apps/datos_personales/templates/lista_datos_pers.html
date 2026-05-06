@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Perfil de Socio | Mis Datos {% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #003087;
+        --light-blue: #0072ce;
+        --dark-navy: #001a41;
+        --glass: rgba(255, 255, 255, 0.95);
+    }
+
+    .dashboard-wrapper {
+        background: radial-gradient(circle at top right, #f8fafc, #e2e8f0);
+        min-height: 100vh;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .fw-black { font-weight: 800; }
+    
+    .text-blue-gradient {
+        background: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Botón con estilo Glassmorphism */
+    .btn-action-glass {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        padding: 0.8rem 1.8rem;
+        border-radius: 12px;
+        color: #1e293b;
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .btn-action-glass:hover {
+        transform: translateY(-2px);
+        background: var(--primary-blue);
+        color: white !important;
+    }
+
+    /* Visual del Perfil */
+    .profile-visual-short {
+        height: 120px;
+        background: linear-gradient(135deg, var(--dark-navy), var(--primary-blue));
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .badge-status-light {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        backdrop-filter: blur(5px);
+    }
+
+    /* Contenedores de información */
+    .info-group-card {
+        background: #f8fafc;
+        border-radius: 20px;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+        height: 100%;
+    }
+
+    .info-group-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-group-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: var(--dark-navy);
+        font-size: 1.1rem;
+    }
+
+    .info-item-boxed {
+        background: white;
+        padding: 12px 16px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        border: 1px solid #edf2f7;
+    }
+
+    .info-item-boxed label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin-bottom: 2px;
+    }
+
+    .info-item-boxed span {
+        display: block;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .bg-soft-primary { background-color: #eff6ff; }
+
+    /* Forzar 3 columnas en Web */
+    @media (min-width: 992px) {
+        .col-lg-4 {
+            flex: 0 0 33.333% !important;
+            max-width: 33.333% !important;
+        }
+    }
+
+    /* Ajuste Móvil */
+    @media (max-width: 991px) {
+        .profile-visual-short { height: auto; padding: 1.5rem; }
+        .info-group-card { margin-bottom: 1rem; }
+        .display-5 { font-size: 2rem; }
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <div class="container py-5">
+        
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+            <div>
+                <h1 class="display-5 fw-black text-blue-gradient mb-0">DATOS PERSONALES</h1>
+                <p class="text-muted fw-medium">Información oficial del registro de socios</p>
+            </div>
+            <a href="{% url 'usuario:usuarios_list' %}" class="btn-action-glass">
+                <i class="fas fa-chevron-left me-2"></i> Volver al Inicio
+            </a>
+        </div>
+
+        {% if usuardatos_pers %}
+            {% for usuario in usuardatos_pers %}
+            <div class="card shadow-sm border-0 overflow-hidden mb-5" style="border-radius: 28px;">
+                <div class="profile-visual-short">
+                    <div class="user-header-info">
+                        <span class="badge-status-light">Socio N° {{ usuario.nro_socio }}</span>
+                        <h2 class="text-white fw-bold mb-0 mt-2 text-uppercase">{{ usuario.username.username }}</h2>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="row g-4 justify-content-center flex-wrap flex-lg-nowrap">
+                        
+                        <div class="col-12 col-lg-4">
+                            <div class="info-group-card">
+                                <div class="info-group-header">
+                                    <i class="fas fa-address-book text-primary"></i>
+                                    <h5>Contacto</h5>
+                                </div>
+                                <div class="info-item-boxed">
+                                    <label>Teléfono / Celular</label>
+                                    <span>{{ usuario.telefono|default:"No registrado" }}</span>
+                                </div>
+                                <div class="info-item-boxed">
+                                    <label>Domicilio</label>
+                                    <span>{{ usuario.domicilio }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <div class="info-group-card">
+                                <div class="info-group-header">
+                                    <i class="fas fa-map-marker-alt text-danger"></i>
+                                    <h5>Ubicación</h5>
+                                </div>
+                                <div class="info-item-boxed">
+                                    <label>Localidad</label>
+                                    <span>{{ usuario.id_localidad }}</span>
+                                </div>
+                                <div class="info-item-boxed">
+                                    <label>Provincia / País</label>
+                                    <span>{{ usuario.id_provincia }}, {{ usuario.id_pais }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <div class="info-group-card">
+                                <div class="info-group-header">
+                                    <i class="fas fa-info-circle text-success"></i>
+                                    <h5>Información General</h5>
+                                </div>
+                                <div class="info-item-boxed">
+                                    <label>Estado Civil</label>
+                                    <span>{{ usuario.id_std_civil }}</span>
+                                </div>
+                                <div class="info-item-boxed bg-soft-primary">
+                                    <label class="text-primary">Membresía</label>
+                                    <span class="fw-bold">Socio Activo</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

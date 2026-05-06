@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completar Relación - Usuario Pendiente</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="{% static 'css/form_relacion_usuario_pendiente.css' %}" />
+</head>
+<body>
+    <!-- Contenedor principal -->
+    <div class="main-container fade-in">
+        <!-- Header de la página -->
+        <div class="card main-card">
+            <div class="page-header">
+                <div class="d-flex align-items-center">
+                    <div class="icon-badge">
+                        <i class="bi bi-person-check fs-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="mb-2 fw-bold">Completar Relación Familiar</h3>
+                        <p class="mb-0 opacity-75">
+                            Seleccione el tipo de relación familiar
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <!-- Tarjeta de información del usuario -->
+                <div class="card info-card mb-4 slide-in-up">
+                    <div class="card-header bg-light card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-badge text-primary fs-5 me-2"></i>
+                            <h5 class="mb-0 fw-bold text-primary">Datos del Nuevo Socio</h5>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <ul class="data-list">
+                            <li>
+                                <strong><i class="bi bi-person-circle me-2"></i>Username:</strong>
+                                <span>{{ usuario_data.username }}</span>
+                            </li>
+                            <li>
+                                <strong><i class="bi bi-card-text me-2"></i>DNI:</strong>
+                                <span>{{ usuario_data.dni }}</span>
+                            </li>
+                            <li>
+                                <strong><i class="bi bi-envelope me-2"></i>Email:</strong>
+                                <span>{{ usuario_data.email }}</span>
+                            </li>
+                            <li>
+                                <strong><i class="bi bi-person me-2"></i>Nombre:</strong>
+                                <span>{{ usuario_data.nombres }}</span>
+                            </li>
+                            <li>
+                                <strong><i class="bi bi-calendar me-2"></i>Fecha Nacimiento:</strong>
+                                <span>{{ usuario_data.fch_nacimiento }}</span>
+                            </li>
+                            {% if usuario_relacion %}
+                            <li>
+                                <strong><i class="bi bi-link-45deg me-2"></i>Se relacionará con:</strong>
+                                <span>{{ usuario_relacion.nombres }} - DNI: {{ usuario_relacion.dni }}</span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Separador visual -->
+                <div class="section-divider"></div>
+
+                <!-- Tarjeta del formulario -->
+                <div class="card form-card slide-in-up" style="animation-delay: 0.2s;">
+                    <div class="card-header bg-success bg-opacity-10 card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-link-45deg text-success fs-5 me-2"></i>
+                            <h5 class="mb-0 fw-bold text-success">Seleccionar Tipo de Relación</h5>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Mensaje informativo -->
+                        {% if usuario_relacion %}
+                        <div class="alert alert-info mb-4">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <div>
+                                    <strong>Relación automática:</strong> 
+                                    Este nuevo socio se asociará automáticamente con 
+                                    <strong>{{ usuario_relacion.nombres }} - DNI: {{ usuario_relacion.dni }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Mensaje de error si existe -->
+                        {% if mensaje_error %}
+                        <div class="alert alert-danger alert-custom fade-in mb-4">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                                <div>
+                                    <h6 class="alert-heading mb-1">Error al procesar</h6>
+                                    <p class="mb-0">{{ mensaje_error }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Formulario SIMPLIFICADO - solo id_relacion -->
+                        <form method="post" id="relacionForm" class="needs-validation">
+                            {% csrf_token %}
+
+                            <!-- Solo el campo de Tipo de Relación -->
+                            <div class="mb-4">
+                                <label for="{{ form.id_relacion.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-diagram-3 me-2"></i>Tipo de Relación Familiar
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.id_relacion }}
+                                {% if form.id_relacion.help_text %}
+                                <div class="form-text text-muted mt-2">
+                                    <strong><h5 style="color: blue;">{{ form.id_relacion.help_text }}</h5></strong>   
+                                </div>
+                                {% endif %}
+                                {% if form.id_relacion.errors %}
+                                <div class="invalid-feedback d-block mt-2">
+                                    {% for error in form.id_relacion.errors %}
+                                    <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Botón de envío -->
+                            <div class="mt-5 pt-3 border-top">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                                    <div>
+                                        <button type="submit" class="btn btn-primary btn-lg px-4">
+                                            <i class="bi bi-check-circle me-2"></i>
+                                            Confirmar Relación
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript personalizado CORREGIDO -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Añadir clases personalizadas a los campos del formulario
+            const selects = document.querySelectorAll('select');
+            
+            selects.forEach(select => {
+                // Añadir clase personalizada
+                select.classList.add('form-control-custom');
+                
+                // Validación visual en tiempo real
+                select.addEventListener('change', function() {
+                    validateFieldVisual(this);
+                });
+                
+                // Limpiar validación visual al cambiar
+                select.addEventListener('input', function() {
+                    if (this.classList.contains('is-invalid')) {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            });
+            
+            // Función para validación visual (solo para UI)
+            function validateFieldVisual(field) {
+                if (field.hasAttribute('required') && field.value.trim() === '') {
+                    field.classList.add('is-invalid');
+                    field.classList.remove('is-valid');
+                    return false;
+                } else if (field.value.trim() !== '') {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                    return true;
+                }
+                return true;
+            }
+            
+            // Validación y envío del formulario
+            const form = document.getElementById('relacionForm');
+            form.addEventListener('submit', function(e) {
+                let hasErrors = false;
+                
+                // Validar campos visualmente
+                selects.forEach(select => {
+                    if (!validateFieldVisual(select)) {
+                        hasErrors = true;
+                    }
+                });
+                
+                // Si hay errores, prevenir envío y mostrar mensaje
+                if (hasErrors) {
+                    e.preventDefault();
+                    showErrorMessage();
+                    return false;
+                }
+                
+                // Si no hay errores, mostrar spinner y permitir envío
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Procesando...';
+                submitBtn.disabled = true;
+                
+                // El formulario se enviará normalmente a Django
+            });
+            
+            // Mostrar mensaje de error
+            function showErrorMessage() {
+                // Remover mensajes anteriores
+                const existingAlert = document.querySelector('.alert-danger.temp-alert');
+                if (existingAlert) existingAlert.remove();
+                
+                // Crear nuevo mensaje
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3 temp-alert';
+                alertDiv.innerHTML = `
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Error:</strong> Por favor, seleccione un tipo de relación.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                // Insertar en el formulario
+                const formCard = document.querySelector('.form-card .card-body');
+                const firstAlert = formCard.querySelector('.alert');
+                if (firstAlert) {
+                    firstAlert.parentNode.insertBefore(alertDiv, firstAlert.nextSibling);
+                } else {
+                    formCard.prepend(alertDiv);
+                }
+                
+                // Auto-cerrar después de 5 segundos
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        const bsAlert = new bootstrap.Alert(alertDiv);
+                        bsAlert.close();
+                    }
+                }, 5000);
+            }
+            
+            // Añadir clase a los selects para mejor apariencia
+            selects.forEach(select => {
+                if (select.value.trim() !== '') {
+                    select.classList.add('is-valid');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

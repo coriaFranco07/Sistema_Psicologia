@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %} Panel de Usuarios {% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 px-md-5 main-wrapper">
+    
+    <div class="row mb-5 p-4 rounded-5 align-items-center shadow-lg bg-header-vibrant">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-black text-white mb-2">
+                Panel de <span class="text-warning">Socios</span>
+            </h1>
+            <p class="text-white-50 lead fw-medium">Gestiona y visualiza la actividad de los socios con datos en tiempo real.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'usuario:usuario_create' %}" class="btn btn-warning btn-lg rounded-pill px-5 py-3 fw-bold shadow-glow text-dark">
+                <i class="fas fa-plus-circle me-2"></i> Crear Usuario
+            </a>
+        </div>
+    </div>
+
+    <div class="glass-card shadow-2xl rounded-5 border-0 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="table-usuarios" class="table table-hover align-middle mb-0 w-100">
+                    <thead class="header-azul-profundo">
+                        <tr>
+                            <th class="ps-5 py-4">Usuario</th>
+                            <th>CUIL</th>
+                            <th>T. Socio</th>
+                            <th class="text-center">Estado</th>
+                            <th style="min-width: 250px;">Relación Administrativa</th>
+                            <th class="text-end pe-4">Saldo</th>
+                            <th class="pe-5 text-center">Gestión</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+    
+    body { 
+        background: #f0f4f8;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* HEADER VIBRANTE */
+    .bg-header-vibrant {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #7c3aed 100%);
+        background-size: 200% 200%;
+        animation: gradientBG 10s ease infinite;
+    }
+
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .fw-black { font-weight: 800; }
+
+    /* CABECERA AZUL PROFUNDO */
+    .header-azul-profundo {
+        background-color: #0f172a;
+        color: #fbbf24;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+    }
+
+    /* GLASS CARD EFECTO */
+    .glass-card {
+        background: white;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* BUSCADOR MÁS GRANDE */
+    .dataTables_filter input {
+        width: 450px !important;
+        height: 55px;
+        border-radius: 12px !important;
+        border: 2px solid #3b82f6 !important;
+        padding-left: 20px !important;
+        font-size: 1.1rem !important;
+        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.1);
+        margin-bottom: 10px;
+    }
+
+    /* BOTÓN CON BRILLO */
+    .shadow-glow {
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        transition: all 0.3s ease;
+    }
+    .shadow-glow:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
+    }
+
+    .badge-vibrant {
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* FILAS E ILUMINACIÓN */
+    .table tbody tr {
+        border-left: 5px solid transparent;
+        transition: all 0.3s ease;
+    }
+    .table tbody tr:hover {
+        border-left: 5px solid #3b82f6;
+        background-color: #f8fbff !important;
+    }
+
+    .btn-acciones-premium {
+        background: #f1f5f9;
+        border: 2px solid #cbd5e1;
+        color: #1e293b;
+        font-weight: 800;
+        padding: 8px 20px;
+        border-radius: 14px;
+        transition: all 0.3s ease;
+    }
+    .btn-acciones-premium:hover {
+        background: #1e293b;
+        color: white;
+        border-color: #1e293b;
+    }
+
+    .dropdown-menu-vibrant {
+        border: none;
+        border-radius: 20px;
+        background: #ffffff;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        padding: 12px;
+    }
+
+    .dropdown-item-vibrant {
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .dropdown-item-vibrant:hover {
+        background: #3b82f6;
+        color: white !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const NEXT_URL = "{{ request.get_full_path|urlencode }}";
+
+$(document).ready(function() {
+    $('#table-usuarios').DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/usuario/datatable/",
+            data: function (d) { d.next = NEXT_URL; },
+            type: "GET"
+        },
+        dom: '<"d-flex justify-content-between align-items-center px-5 py-4 border-bottom"Bf>rt<"d-flex justify-content-between align-items-center px-5 py-4"ip>',
+        buttons: [{
+            extend: 'excelHtml5',
+            text: '<i class="fas fa-file-excel me-2"></i> Reporte Global',
+            className: 'btn btn-success border-0 shadow-sm fw-bold rounded-pill px-4',
+            exportOptions: { columns: ':not(:last-child)' }
+        }],
+        columns: [
+            { 
+                data: null,
+                render: function(data) {
+                    return `<div class="ps-2">
+                                <div class="fw-bold text-dark fs-5 mb-0">${data.nombres}</div>
+                                <div class="text-primary fw-bold" style="font-size: 0.9rem;">${data.email}</div>
+                            </div>`;
+                },
+                className: "ps-5"
+            },
+            { 
+                data: null, 
+                render: function(data) {
+                    return `<div>
+                                <span class="badge text-dark fs-6 d-inline-block">${data.cuil}</span>
+                            </div>`;
+                }
+            },
+            {
+                data: "tipo",
+                render: function(data) {
+                    return `<div class="fw-bold text-primary fs-8">${data}</div>`;
+                }
+            },
+            { 
+                data: null,
+                render: function(data) {
+                    let st = data.estado.toLowerCase();
+                    let badgeColor = st.includes('alta') ? 'bg-success text-white' : 'bg-danger text-white';
+                    return `<div class="text-center">
+                                <span class="badge-vibrant ${badgeColor}">${data.estado.toUpperCase()}</span>
+                            </div>`;
+                }
+            },
+            { 
+                data: "relacion",
+                render: function(data) {
+                    return `<div class="p-3 bg-light rounded-4 border-start border-warning border-4 fw-medium text-muted" style="line-height: 1.4; font-size: 0.85rem;">${data}</div>`;
+                }
+            },
+            {
+                data: "saldo",
+                className: "text-end pe-4",
+                render: function(data) {
+                    let saldo = parseFloat(data);
+                    let color = saldo < 0 ? "#ef4444" : (saldo > 0 ? "#10b981" : "#1e293b");
+
+                    return `
+                        <span class="fw-bold fs-5" style="color:${color};">
+                            $${saldo.toLocaleString('es-AR')}
+                        </span>
+                    `;
+                }
+            },
+            { 
+                data: "acciones",
+                className: "text-center pe-5",
+                orderable: false,
+                searchable: false,
+                render: function(data) {
+                    let mod = data.replace('btn btn-primary dropdown-toggle btn-sm', 'btn-acciones-premium dropdown-toggle');
+                    mod = mod.replace('dropdown-menu', 'dropdown-menu dropdown-menu-vibrant');
+                    mod = mod.replace(/dropdown-item/g, 'dropdown-item dropdown-item-vibrant');
+                    return mod.replace('Acciones', '<i class="fas fa-bolt me-2 text-warning"></i> Operar');
+                }
+            }
+        ],
+        language: {
+            search: "",
+            searchPlaceholder: "🔍 BUSCAR SOCIO POR NOMBRE, DNI O EMAIL...",
+            paginate: {
+                next: '<i class="fas fa-arrow-right text-primary"></i>',
+                previous: '<i class="fas fa-arrow-left text-primary"></i>'
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

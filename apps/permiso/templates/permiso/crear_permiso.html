@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Asignar Permisos{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+  <h3 class="mb-3"><i class="fa fa-shield-alt"></i> Asignar Permiso a Usuario  en Crear</h3>
+  <div class="card">
+    <div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_usuario" class="form-label">Usuario</label>
+            {{ form.usuario }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="id_modulo" class="form-label">Módulo</label>
+            {{ form.modulo }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-4 form-check">
+            {{ form.puede_ver }} <label class="form-check-label" for="id_puede_ver">Puede ver</label>
+          </div>
+          <div class="col-md-4 form-check">
+            {{ form.puede_editar }} <label class="form-check-label" for="id_puede_editar">Puede editar</label>
+          </div>
+          <div class="col-md-4 form-check">
+            {{ form.puede_eliminar }} <label class="form-check-label" for="id_puede_eliminar">Puede eliminar</label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Guardar</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

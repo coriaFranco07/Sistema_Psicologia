@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Listado de Permisos por Usuario{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="w-75 mx-auto">
+    <h2><i class="fas fa-lock"></i> Permisos por Usuario</h2>
+
+    <!-- Botón para ir a asignar permisos -->
+    <div class="mb-3">
+      <a href="{% url 'permiso:asignar_permisos' %}" class="btn btn-outline-success btn-sm">
+        <i class="fas fa-user-plus"></i> Asignar nuevos permisos
+      </a>
+    </div>
+
+    <!-- Mensajes -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Filtro por usuario -->
+    <form method="get" class="row g-3 align-items-center mb-4">
+      <div class="col-md-6">
+        <label for="usuario_id" class="form-label">Filtrar por Usuario:</label>
+        <select name="usuario_id" id="usuario_id" class="form-select select2">
+          <option value="">-- Todos los usuarios --</option>
+          {% for usuario in usuarios %}
+            <option value="{{ usuario.id }}" {% if usuario.id == usuario_id %}selected{% endif %}>
+              {{ usuario.username }} - {{ usuario.nombres }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3 mt-4">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-filter"></i> Filtrar
+        </button>
+        <a href="{% url 'permiso:listar_permisos' %}" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Limpiar
+        </a>
+      </div>
+    </form>
+
+    <!-- Tabla de permisos -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle" id="tablaPermisos">
+        <thead class="table-dark">
+          <tr>
+            <th>Usuario</th>
+            <th>Módulo</th>
+            <th class="text-center">Ver</th>
+            <th class="text-center">Editar</th>
+            <th class="text-center">Eliminar</th>
+            <th class="text-center">Guardar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for permiso in permisos %}
+          <tr>
+            <form method="post" action="{% url 'permiso:listar_permisos' %}">
+              {% csrf_token %}
+              <input type="hidden" name="permiso_id" value="{{ permiso.id }}">
+              <td>{{ permiso.usuario.username }}</td>
+              <td>{{ permiso.modulo.nombre }}</td>
+              <td class="text-center">
+                <input type="checkbox" name="puede_ver" {% if permiso.puede_ver %}checked{% endif %}>
+              </td>
+              <td class="text-center">
+                <input type="checkbox" name="puede_editar" {% if permiso.puede_editar %}checked{% endif %}>
+              </td>
+              <td class="text-center">
+                <input type="checkbox" name="puede_eliminar" {% if permiso.puede_eliminar %}checked{% endif %}>
+              </td>
+              <td class="text-center">
+                <button type="submit" class="btn btn-sm btn-primary">
+                  <i class="fas fa-save"></i>
+                </button>
+              </td>
+            </form>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center">No hay permisos asignados aún.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function () {
+    $('.select2').select2({
+      theme: 'bootstrap4',
+      width: '100%',
+      placeholder: 'Seleccionar usuario',
+      allowClear: true
+    });
+
+    $('#tablaPermisos').DataTable({
+      dom: 'Bfrtip',
+      buttons: [
+        {
+          extend: 'excelHtml5',
+          title: 'Permisos_Usuarios',
+          className: 'btn btn-success btn-sm',
+          text: '<i class="fas fa-file-excel"></i> Excel'
+        },
+        {
+          extend: 'pdfHtml5',
+          title: 'Permisos_Usuarios',
+          orientation: 'landscape',
+          pageSize: 'A4',
+          className: 'btn btn-danger btn-sm',
+          text: '<i class="fas fa-file-pdf"></i> PDF',
+          customize: function (doc) {
+            doc.styles.tableHeader.alignment = 'left';
+            doc.defaultStyle.fontSize = 10;
+          }
+        }
+      ],
+      language: {
+        url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+      },
+      pageLength: 10,
+      lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+      ordering: true,
+      responsive: true
+    });
+  });
+</script>
+{% endblock %}

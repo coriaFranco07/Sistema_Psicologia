@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% load permisos_tags %}
+
+{% block title %}Gestionar Permisos{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Alinear botones de exportar con el select de cantidad de registros */
+  .dataTables_wrapper .dt-buttons {
+    float: left;
+    margin-right: 1rem;
+  }
+
+  .dataTables_wrapper .dataTables_length {
+    float: left;
+    margin-top: 0.25rem;
+  }
+
+  /* Limpia el layout en pantallas pequeñas */
+  @media (max-width: 768px) {
+    .dataTables_wrapper .dt-buttons,
+    .dataTables_wrapper .dataTables_length {
+      float: none;
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+    /* Agrupar botones y select en la misma línea */
+  div.dataTables_wrapper div.dt-buttons,
+  div.dataTables_wrapper div.dataTables_length {
+    float: none;
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 1rem;
+  }
+
+  thead.custom-header th {
+    background-color: #0d6efd; /* azul Bootstrap */
+    color: white;
+  }
+  /* Contenedor para alinear horizontalmente */
+  .datatable-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+</style>
+
+
+{% endblock extra_css %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <h1 class="mb-0">Gestionar Permisos</h1>
+    
+    <!-- Formulario en card a la derecha -->
+    <div class="card border shadow-sm" style="width: 280px;">
+      <div class="card-body">
+
+        {% tiene_permiso user 'modulos' 'puede_agregar' as puede_asignar_modulo %}
+        {% if puede_asignar_modulo %}
+          <h6 class="card-title">Asignar Módulo</h6>
+          
+          <a href="{% url 'permiso:lista_modulo' %}" class="btn btn-primary btn-sm">
+            Administrar Módulos
+          </a> <br><br>
+        {% endif %}
+
+        {% tiene_permiso user 'permisos' 'puede_agregar' as puede_asignar_permiso %}
+        {% if puede_asignar_permiso %}
+          <form method="post" class="d-flex flex-column gap-2">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="agregar_modulo" />
+            <select name="usuario_select" class="form-select select2" required>
+              <option value="">-- Usuario --</option>
+              {% for u in usuarios %}
+                <option value="{{ u.id }}">{{ u.username }}</option>
+              {% endfor %}
+            </select>
+            <select name="modulo_select" class="form-select select2" required>
+              <option value="">-- Módulo --</option>
+              {% for m in modulos %}
+                <option value="{{ m.id }}">{{ m.nombre }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-success w-100">
+              <i class="fas fa-plus me-1"></i> Asignar
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtro de usuario -->
+  <form method="get" class="d-flex align-items-center mb-3" style="gap: 0.5rem;">
+    <select id="usuarioSelect" name="usuario_id" class="form-select select2" style="width: 250px;" data-placeholder="Seleccione usuario">
+      <option value="">-- Usuario --</option>
+      {% for u in usuarios %}
+        <option value="{{ u.id }}" {% if usuario_id == u.id %}selected{% endif %}>{{ u.username }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-outline-primary">Filtrar</button>
+    <a href="{% url 'permiso:gestionar_permisos' %}" class="btn btn-outline-secondary">Limpiar filtro</a>
+  </form>
+
+  <!-- Tabla -->
+  <div class="table-responsive">
+    <table id="permisosTable" class="table table-striped table-bordered align-middle w-90">
+      <thead class="custom-header-permisos">
+        <tr>
+          <th>Usuario</th>
+          <th>Módulo</th>
+          <th>Agregar</th>
+          <th>Ver</th>
+          <th>Editar</th>
+          <th>Eliminar</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+        {% tiene_permiso user 'permisos' 'puede_agregar' as puede_agregar_permiso %}
+        {% tiene_permiso user 'permisos' 'puede_eliminar' as puede_eliminar_permiso %}
+        {% for permiso in permisos %}
+
+        <tr data-usuario-id="{{ permiso.usuario.id }}">
+          <td>{{ permiso.usuario.username }}</td>
+          <td>{{ permiso.modulo.nombre }}</td>
+
+
+          
+          {% if puede_agregar_permiso %}
+            <td class="text-center">
+              <div class="form-check form-switch">
+                <input class="form-check-input permiso-switch" type="checkbox"
+                      data-permiso-id="{{ permiso.id }}" data-field="puede_agregar"
+                      {% if permiso.puede_agregar %}checked{% endif %}>
+              </div>
+            </td>
+          {% else %}
+          <td class="text-center">—</td>
+          {% endif %}
+
+          {% if puede_agregar_permiso %}
+            <td class="text-center">
+              <div class="form-check form-switch">
+                <input class="form-check-input permiso-switch" type="checkbox"
+                      data-permiso-id="{{ permiso.id }}" data-field="puede_ver"
+                      {% if permiso.puede_ver %}checked{% endif %}>
+              </div>
+            </td>
+          {% else %}
+          <td class="text-center">—</td>
+          {% endif %}
+
+          {% if puede_agregar_permiso %}
+            <td class="text-center">
+              <div class="form-check form-switch">
+                <input class="form-check-input permiso-switch" type="checkbox"
+                      data-permiso-id="{{ permiso.id }}" data-field="puede_editar"
+                      {% if permiso.puede_editar %}checked{% endif %}>
+              </div>
+            </td>
+          {% else %}
+            <td class="text-center">—</td>
+          {% endif %}
+
+
+          {% if puede_eliminar_permiso %}
+            <td class="text-center">
+              <div class="form-check form-switch">
+                <input class="form-check-input permiso-switch" type="checkbox"
+                      data-permiso-id="{{ permiso.id }}" data-field="puede_eliminar"
+                      {% if permiso.puede_eliminar %}checked{% endif %}>
+              </div>
+            </td>
+          {% else %}
+            <td class="text-center">—</td>
+          {% endif %}
+
+        </tr>
+        
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Toast -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="toastMensaje" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastMensajeTexto"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- TOAST -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+  <div id="toastMensaje" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="toastMensajeTexto"></div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    $('.select2').select2({ theme: 'bootstrap4', allowClear: true });
+
+    let table = $('#permisosTable').DataTable({
+      lengthChange: true,
+      pageLength: 10,
+      info: true,
+      order: [[0, 'asc'], [1, 'asc']],
+      language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+      dom: "lfrtip",
+      buttons: [
+        {
+          extend: 'excelHtml5',
+          text: '<i class="fas fa-file-excel"></i> Excel',
+          className: 'btn btn-success btn-sm me-2'
+        },
+        {
+          extend: 'pdfHtml5',
+          text: '<i class="fas fa-file-pdf"></i> PDF',
+          className: 'btn btn-danger btn-sm'
+        }
+      ]
+    });
+
+    const toast = new bootstrap.Toast(document.getElementById('toastMensaje'));
+
+    $('.permiso-switch').on('change', function() {
+      let checkbox = $(this);
+      let permisoId = checkbox.data('permiso-id');
+      let field = checkbox.data('field');
+      let value = checkbox.is(':checked');
+      let fila = checkbox.closest('tr');
+
+      $.ajax({
+        url: window.location.pathname,
+        method: 'POST',
+        headers: { 'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val() },
+        data: {
+          action: 'toggle_permiso',
+          permiso_id: permisoId,
+          field: field,
+          value: value
+        },
+        success: function(response) {
+          if (response.success) {
+            fila.toggleClass('switch-row-checked', value)
+                .toggleClass('switch-row-unchecked', !value);
+            $('#toastMensaje').removeClass('bg-danger bg-warning').addClass(value ? 'bg-success text-white' : 'bg-danger text-white');
+            $('#toastMensajeTexto').text(value ? 'Permiso activado correctamente.' : 'Permiso desactivado correctamente.');
+          } else {
+            checkbox.prop('checked', !value);
+            $('#toastMensaje').removeClass('bg-success bg-danger').addClass('bg-warning text-dark');
+            $('#toastMensajeTexto').text('Error al guardar el permiso.');
+          }
+          toast.show();
+        },
+        error: function() {
+          checkbox.prop('checked', !value);
+          $('#toastMensaje').removeClass('bg-success bg-danger').addClass('bg-warning text-dark');
+          $('#toastMensajeTexto').text('Error en la comunicación con el servidor.');
+          toastBootstrap.show();
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

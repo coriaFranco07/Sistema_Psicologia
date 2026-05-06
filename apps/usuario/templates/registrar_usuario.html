@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Registrar Usuario{% endblock %}
+
+{% block extra_css %}
+
+<style>
+.flatpickr-current-month .numInputWrapper {
+    width: 100px;
+}
+
+.flatpickr-current-month .numInputWrapper input {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Mostrar flechas del año siempre */
+.flatpickr-current-month .numInputWrapper span {
+    opacity: 1 !important;
+}
+
+.flatpickr-current-month .numInputWrapper span {
+    width: 18px;
+    height: 18px;
+}
+
+.flatpickr-current-month .numInputWrapper span:after {
+    border-width: 6px;
+}
+</style>
+
+{% endblock %}
+ 
+
+{% block content %}
+<br>
+
+<div class="container-fluid py-2 fade-in">
+<div class="row justify-content-center">
+<div class="col-xxl-10 col-xl-11 col-lg-12">
+
+<div class="card main-card shadow-sm">
+
+<!-- HEADER -->
+<div class="card-header bg-gradient-primary text-white main-header py-3 position-relative">
+
+    <!-- BOTÓN VOLVER (izquierda) -->
+    <a href="{% url 'usuario:usuarios_list' %}"
+       class="btn btn-secondary btn-sm position-absolute start-0 ms-3 top-50 translate-middle-y">
+        <i class="fas fa-arrow-left me-1"></i> Volver
+    </a>
+
+    <!-- TITULO CENTRADO -->
+    <div class="text-center">
+        <h1 class="h6 mb-0 fw-bold">Registrar Usuario</h1>
+        <p class="mb-0 small opacity-75">
+            Complete los datos del nuevo usuario
+        </p>
+    </div>
+
+    <!-- LOGO DERECHA -->
+    <img src="{% static 'images/logo_COP-2.png' %}"
+         class="img-fluid rounded position-absolute end-0 me-3 top-50 translate-middle-y"
+         style="max-height:30px">
+
+</div>
+
+
+<div class="card-body p-3">
+
+<form method="post" id="socioForm">
+{% csrf_token %}
+
+<!-- PROGRESS -->
+<div class="progress mb-4">
+<div class="progress-bar" id="progressBar" style="width:25%"></div>
+</div>
+
+
+<!-- STEP 1 -->
+<!-- STEP 1 -->
+<div class="form-step">
+
+<h5 class="fw-semibold mb-3">
+<i class="bi bi-person"></i> Datos de Usuario
+</h5>
+
+<div class="row g-3">
+
+<!-- ELIMINA ESTE BLOQUE COMPLETO (campo username) -->
+<!-- 
+<div class="col-md-6">
+<label class="form-label">{{ form.username.label }}</label>
+{{ form.username }}
+{% if form.username.errors %}
+<div class="text-danger small">{{ form.username.errors }}</div>
+{% endif %}
+</div>
+-->
+
+<!-- El campo username se incluye automáticamente como hidden, no lo muestres -->
+{{ form.username }}  <!-- Esto agregará el input hidden -->
+
+<div class="col-md-6">
+<label class="form-label">{{ form.dni.label }}</label>
+{{ form.dni }}
+{% if form.dni.errors %}
+<div class="text-danger small">{{ form.dni.errors }}</div>
+{% endif %}
+</div>
+
+<div class="col-md-6">
+<label class="form-label">{{ form.cuil.label }}</label>
+{{ form.cuil }}
+{% if form.cuil.errors %}
+<div class="text-danger small">{{ form.cuil.errors }}</div>
+{% endif %}
+</div>
+
+<div class="col-md-6">
+<label class="form-label">{{ form.email.label }}</label>
+{{ form.email }}
+</div>
+
+<div class="col-md-6">
+<label class="form-label">{{ form.nombres.label }}</label>
+{{ form.nombres }}
+</div>
+
+<div class="col-md-3">
+<label class="form-label">{{ form.fch_nacimiento.label }}</label>
+{{ form.fch_nacimiento }}
+</div>
+
+<div class="col-md-3">
+<label class="form-label">{{ form.id_tipo_socio.label }}</label>
+{{ form.id_tipo_socio }}
+</div>
+
+<div class="col-md-6">
+<label class="form-label">{{ form.id_jerarquia.label }}</label>
+{{ form.id_jerarquia }}
+</div>
+
+<div class="col-md-4">
+    <label class="form-label">
+        Fecha de alta como socio
+    </label>
+
+    <input type="text"
+           name="fecha_socio_alta"
+           id="fecha_socio_alta"
+           class="form-control"
+           placeholder="Año/Mes/Día">
+
+    <div class="form-text">
+        <strong>
+            Si es un socio antiguo, indique la fecha de alta.  
+            Si lo deja vacío, se usará la fecha actual.
+        </strong>
+    </div>
+</div>
+
+</div>
+
+<div class="mt-4 text-end">
+<button type="button" class="btn btn-primary next-step">
+Siguiente →
+</button>
+</div>
+
+</div>
+
+<!-- STEP 2 -->
+<div class="form-step d-none">
+
+<h5 class="fw-semibold mb-3">
+<i class="bi bi-shield-lock"></i> Seguridad
+</h5>
+
+<div class="row g-3">
+
+<div class="col-md-6">
+<label class="form-label">{{ form.password1.label }}</label>
+<div class="input-group">
+{{ form.password1 }}
+<button class="btn btn-outline-secondary"
+type="button"
+onclick="togglePassword('password1')">
+👁
+</button>
+</div>
+</div>
+
+<div class="col-md-6">
+<label class="form-label">{{ form.password2.label }}</label>
+<div class="input-group">
+{{ form.password2 }}
+<button class="btn btn-outline-secondary"
+type="button"
+onclick="togglePassword('password2')">
+👁
+</button>
+</div>
+</div>
+
+</div>
+
+<div class="mt-4 d-flex justify-content-between">
+<button type="button" class="btn btn-secondary prev-step">
+← Anterior
+</button>
+
+<button type="button" class="btn btn-primary next-step">
+Siguiente →
+</button>
+</div>
+
+</div>
+
+
+
+<!-- STEP 3 -->
+<div class="form-step d-none">
+
+<h5 class="fw-semibold mb-3">
+<i class="bi bi-telephone"></i> Contacto
+</h5>
+
+<div class="row g-3">
+
+<div class="col-md-6">
+<label class="form-label">{{ datos_form.telefono.label }}</label>
+{{ datos_form.telefono }}
+</div>
+
+<div class="col-md-6">
+<label class="form-label">{{ datos_form.id_std_civil.label }}</label>
+{{ datos_form.id_std_civil }}
+</div>
+
+
+</div>
+
+<div class="mt-4 d-flex justify-content-between">
+<button type="button" class="btn btn-secondary prev-step">
+← Anterior
+</button>
+
+<button type="button" class="btn btn-primary next-step">
+Siguiente →
+</button>
+</div>
+
+</div>
+
+
+
+<!-- STEP 4 -->
+<div class="form-step d-none">
+
+<h5 class="fw-semibold mb-3">
+<i class="bi bi-geo-alt"></i> Ubicación
+</h5>
+
+<div class="row g-3">
+
+<div class="col-md-6">
+<label class="form-label">{{ datos_form.domicilio.label }}</label>
+{{ datos_form.domicilio }}
+</div>
+
+<div class="col-md-6">
+<label class="form-label">{{ datos_form.id_pais.label }}</label>
+{{ datos_form.id_pais }}
+</div>
+
+<div class="col-md-6">
+<label class="form-label">{{ datos_form.id_provincia.label }}</label>
+{{ datos_form.id_provincia }}
+</div>
+
+<div class="col-md-6">
+<label class="form-label">{{ datos_form.id_localidad.label }}</label>
+{{ datos_form.id_localidad }}
+</div>
+
+<div class="col-md-6">
+<label class="form-label">{{ datos_form.id_zona.label }}</label>
+{{ datos_form.id_zona }}
+</div>
+
+</div>
+
+<div class="mt-4 d-flex justify-content-between">
+
+<button type="button" class="btn btn-secondary prev-step">
+← Anterior
+</button>
+
+<button type="submit" class="btn btn-success px-4">
+Guardar Usuario
+</button>
+
+</div>
+
+</div>
+
+</form>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(id) {
+    const input = document.getElementById(id)
+
+    if (input.type === "password") {
+        input.type = "text"
+    } else {
+        input.type = "password"
+    }
+}
+
+flatpickr("#fch_nacimiento", {
+    dateFormat: "Y-m-d",
+    maxDate: "today",
+    locale: "es",
+    allowInput: true,
+    yearSelectorType: "dropdown",
+});
+
+flatpickr("#fecha_socio_alta", {
+    dateFormat: "Y-m-d",
+    maxDate: "today",
+    locale: "es",
+    allowInput: true,
+    yearSelectorType: "dropdown",
+});
+
+            
+const steps = document.querySelectorAll(".form-step")
+const nextBtns = document.querySelectorAll(".next-step")
+const prevBtns = document.querySelectorAll(".prev-step")
+const progress = document.getElementById("progressBar")
+
+let currentStep = 0
+
+function showStep(index){
+    steps.forEach((step,i)=>{
+        step.classList.toggle("d-none", i !== index)
+    })
+
+    progress.style.width = ((index+1)/steps.length*100) + "%"
+}
+
+function validateStep(stepIndex){
+
+    const step = steps[stepIndex]
+    const inputs = step.querySelectorAll("input, select, textarea")
+
+    let valid = true
+
+    inputs.forEach(input => {
+
+        if (input.hasAttribute("required") && input.value.trim() === "") {
+            input.classList.add("is-invalid")
+            valid = false
+        } else {
+            input.classList.remove("is-invalid")
+        }
+
+    })
+
+    return valid
+}
+
+
+nextBtns.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+
+        if(!validateStep(currentStep)){
+            return
+        }
+
+        currentStep++
+        showStep(currentStep)
+    })
+})
+
+
+prevBtns.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+        currentStep--
+        showStep(currentStep)
+    })
+})
+
+showStep(0)
+</script>
+{% endblock %}
