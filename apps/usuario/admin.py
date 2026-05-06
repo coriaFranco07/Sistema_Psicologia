@@ -1,59 +1,50 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import DocumentoRelacion, Usuario, UsuarioPendiente, DocumentoUsuario, TipoDocumento, DocumentoTipoSocio
-from .forms import UsuarioAdminCreationForm, UsuarioAdminChangeForm
-from django.utils.html import format_html
+
+from apps.datos_personales.models import DatosPersonales
+
+from .models import Paciente, Psicologo
 
 
-class UsuarioAdmin(UserAdmin):
-    form = UsuarioAdminChangeForm   # Para editar usuario en admin
-    add_form = UsuarioAdminCreationForm  # Para crear usuario desde admin
+class PsicologoDatosPersonalesInline(admin.StackedInline):
+    model = DatosPersonales
+    fk_name = "psicologo"
+    extra = 0
+    max_num = 1
 
-    model = Usuario
+
+class PacienteDatosPersonalesInline(admin.StackedInline):
+    model = DatosPersonales
+    fk_name = "paciente"
+    extra = 0
+    max_num = 1
+
+
+@admin.register(Psicologo)
+class PsicologoAdmin(admin.ModelAdmin):
+    list_display = ("nombres", "dni", "email", "id_estado", "tiene_foto")
+    search_fields = ("nombres", "dni", "email", "cuil")
+    list_filter = ("id_estado",)
+    list_select_related = ("id_estado",)
+    autocomplete_fields = ("id_estado",)
+    inlines = [PsicologoDatosPersonalesInline]
+
+    @admin.display(boolean=True, description="Foto")
+    def tiene_foto(self, obj):
+        return bool(obj.foto)
+
+
+@admin.register(Paciente)
+class PacienteAdmin(admin.ModelAdmin):
     list_display = (
-        'foto_preview',
-        'username','email','nombres','dni'
+        "nombres",
+        "dni",
+        "email",
+        "id_estado",
+        "id_ocupacion",
+        "id_ciclo_vida",
     )
-    list_filter = ('is_staff','is_active')
-    fieldsets = (
-        (None, {
-            'fields': (
-                'username','email','nombres','dni', 'cuil', 'foto',
-                'password','saldo','saldo_gral_flia',
-                'es_admin_local','id_std_socio','id_tipo_socio','id_jerarquia', 'operador_sistema'
-            )
-        }),
-        ('Permisos', {
-            'fields': (
-                'is_staff','is_active','is_superuser',
-                'groups','user_permissions'
-            )
-        }),
-        ('Fechas', {'fields': ('last_login',)}),
-    )
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username','email','nombres','dni', 'cuil', 'fch_nacimiento','password1','password2','is_staff','is_active')}
-        ),
-    )
-    search_fields = ('nombres', 'email', 'dni')
-    ordering = ('nombres',)
-
-    def foto_preview(self, obj):
-        if obj.foto:
-            return format_html(
-                '<img src="{}" style="width:50px;height:50px;border-radius:50%;" />',
-                obj.foto_url
-            )
-        return "Sin foto"
-
-    foto_preview.short_description = "Foto"
-
-
-admin.site.register(Usuario, UsuarioAdmin)
-admin.site.register(UsuarioPendiente)
-admin.site.register(DocumentoUsuario)
-admin.site.register(TipoDocumento)
-admin.site.register(DocumentoTipoSocio)
-admin.site.register(DocumentoRelacion)
+    search_fields = ("nombres", "dni", "email", "cuil")
+    list_filter = ("id_estado", "id_ocupacion", "id_ciclo_vida", "id_grado_estudio")
+    list_select_related = ("id_estado", "id_ocupacion", "id_ciclo_vida", "id_grado_estudio")
+    autocomplete_fields = ("id_estado", "id_ocupacion", "id_ciclo_vida", "id_grado_estudio")
+    inlines = [PacienteDatosPersonalesInline]

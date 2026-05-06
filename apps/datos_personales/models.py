@@ -1,55 +1,76 @@
-from django.db import IntegrityError, models
-from apps.parametro.models.localidad import Localidad
-from apps.parametro.models.pais import Pais
-from apps.parametro.models.provincia import Provincia
-from apps.parametro.models.tipo_civil import TipoCivil
-from apps.parametro.models.zona import Zona
-from apps.usuario.models import Usuario
-from django.core.validators import MinValueValidator, MaxValueValidator
-from simple_history.models import HistoricalRecords
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import Q
+
+from apps.parametro.models import Localidad, Pais, Provincia, Sexo, TipoCivil, Zona
+from apps.usuario.models import Paciente, Psicologo
 
 
 class DatosPersonales(models.Model):
-   username = models.ForeignKey(Usuario, on_delete=models.RESTRICT,related_name="usuario_datos")
-   nro_socio = models.PositiveBigIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(999999)],
-        unique=True,
+    psicologo = models.OneToOneField(
+        Psicologo,
+        on_delete=models.CASCADE,
+        related_name="datos_personales",
         null=True,
         blank=True,
-        db_index=True
-   )
-   telefono=models.CharField(null=False, blank=False,max_length=25)
-   domicilio=models.CharField(null=False, blank=False,max_length=200)
-   id_std_civil=models.ForeignKey(TipoCivil, null=False, blank=False,on_delete=models.RESTRICT)
-   id_pais=models.ForeignKey(Pais, null=False, blank=False,on_delete=models.RESTRICT)
-   id_provincia=models.ForeignKey(Provincia, null=False, blank=False,on_delete=models.RESTRICT)
-   id_localidad=models.ForeignKey(Localidad, null=False, blank=False,on_delete=models.RESTRICT)
-   id_zona=models.ForeignKey(Zona, null=False, blank=False, on_delete=models.RESTRICT)
+    )
+    paciente = models.OneToOneField(
+        Paciente,
+        on_delete=models.CASCADE,
+        related_name="datos_personales",
+        null=True,
+        blank=True,
+    )
+    telefono = models.CharField(max_length=25)
+    domicilio = models.CharField(max_length=200)
+    id_sexo = models.ForeignKey(Sexo, on_delete=models.RESTRICT, verbose_name="Sexo")
+    id_std_civil = models.ForeignKey(
+        TipoCivil,
+        on_delete=models.RESTRICT,
+        verbose_name="Estado civil",
+    )
+    id_pais = models.ForeignKey(Pais, on_delete=models.RESTRICT, verbose_name="Pais")
+    id_provincia = models.ForeignKey(
+        Provincia,
+        on_delete=models.RESTRICT,
+        verbose_name="Provincia",
+    )
+    id_localidad = models.ForeignKey(
+        Localidad,
+        on_delete=models.RESTRICT,
+        verbose_name="Localidad",
+    )
+    id_zona = models.ForeignKey(Zona, on_delete=models.RESTRICT, verbose_name="Zona")
+    fch_creacion = models.DateTimeField(auto_now_add=True)
+    fch_actualizacion = models.DateTimeField(auto_now=True)
 
-   history = HistoricalRecords()
-   
-   class Meta:
-        verbose_name='Dato Personal'
-        verbose_name_plural='Datos Personales'
-        ordering=['-nro_socio']
-        
+    class Meta:
+        verbose_name = "Dato personal"
+        verbose_name_plural = "Datos personales"
+        ordering = ("-fch_actualizacion",)
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    (Q(psicologo__isnull=False) & Q(paciente__isnull=True))
+                    | (Q(psicologo__isnull=True) & Q(paciente__isnull=False))
+                ),
+                name="datos_personales_una_sola_persona",
+            )
+        ]
 
-   def __str__(self) -> str:
-       return f"DNI: {self.username.dni} - Nombres: {self.username.nombres} - Socio: {self.nro_socio} "
-   
+    def clean(self):
+        super().clean()
+        if bool(self.psicologo) == bool(self.paciente):
+            raise ValidationError(
+                "Los datos personales deben estar asociados a un psicologo o a un paciente."
+            )
 
-   def save(self, *args, **kwargs):
-        if self.nro_socio:
-            return super().save(*args, **kwargs)
+    @property
+    def persona(self):
+        return self.psicologo or self.paciente
 
-        from apps.usuario.utils import obtener_nro_socio_disponible
-
-        for _ in range(10):
-            try:
-                self.nro_socio = obtener_nro_socio_disponible()
-                return super().save(*args, **kwargs)
-            except IntegrityError:
-                self.nro_socio = None
-
-        raise IntegrityError("No se pudo generar nro_socio único")
-   
+    def __str__(self):
+        persona = self.persona
+        if not persona:
+            return "Datos personales sin asociar"
+        return f"{persona.nombres} - DNI {persona.dni}"

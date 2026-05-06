@@ -1,22 +1,48 @@
 from django.contrib import admin
-from .models import DatosPersonales, DatosPersonalesPendiente, Jerarquia, Pais,Provincia, Localidad,EstadoCivil
 
-from apps.usuario.models import Usuario
-from .models import EstadoCivil, Pais, Localidad, Provincia, Zona
+from .models import DatosPersonales
 
 
-class DatosPersonalesAdmin(DatosPersonales):
-    model = DatosPersonales
-    list_display = ('username','nro_socio', 'telefono','id_std_civil', 'domicilio','id_localidad','id_provincia','id_pais','id_zona')
-    search_fields = ('username__dni',)
-    ordering = ('username__nombres',)
+@admin.register(DatosPersonales)
+class DatosPersonalesAdmin(admin.ModelAdmin):
+    list_display = (
+        "persona_display",
+        "telefono",
+        "id_sexo",
+        "id_std_civil",
+        "id_localidad",
+        "id_provincia",
+        "id_pais",
+    )
+    search_fields = (
+        "psicologo__nombres",
+        "psicologo__dni",
+        "paciente__nombres",
+        "paciente__dni",
+        "telefono",
+        "domicilio",
+    )
+    list_select_related = (
+        "psicologo",
+        "paciente",
+        "id_sexo",
+        "id_std_civil",
+        "id_localidad",
+        "id_provincia",
+        "id_pais",
+        "id_zona",
+    )
+    autocomplete_fields = (
+        "psicologo",
+        "paciente",
+        "id_sexo",
+        "id_std_civil",
+        "id_pais",
+        "id_provincia",
+        "id_localidad",
+        "id_zona",
+    )
 
-
-@admin.register(Jerarquia)
-class JerarquiaAdmin(admin.ModelAdmin):
-    list_display = ('dsc_jerarquia', 'nivel')
-    ordering = ('nivel',)
-
-
-# Register your models here.
-admin.site.register([DatosPersonales, Pais, Localidad, Provincia, EstadoCivil, Zona, DatosPersonalesPendiente])
+    @admin.display(description="Persona")
+    def persona_display(self, obj):
+        return obj.persona

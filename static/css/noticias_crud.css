@@ -1,0 +1,133 @@
+/* ===============================
+   Estilos generales para noticias
+   =============================== */
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 960px;
+    margin: 40px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* ===============================
+   Títulos
+   =============================== */
+h2 {
+    text-align: center;
+    font-size: 2rem;
+    color: #222;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+/* ===============================
+   Botones
+   =============================== */
+a.button, button {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 12px 28px;
+    background-color: #007BFF;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+a.button:hover, button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* ===============================
+   Listado de noticias
+   =============================== */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    padding: 20px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+li:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+li img {
+    margin-top: 10px;
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+/* Separador */
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #ddd;
+    margin: 20px 0;
+}
+
+/* ===============================
+   Formularios
+   =============================== */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+input, textarea, select {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 8px rgba(0,123,255,0.2);
+    outline: none;
+}
+
+/* Botón submit del formulario */
+form button {
+    align-self: flex-start;
+}
+
+/* ===============================
+   Responsividad
+   =============================== */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+    a.button, button {
+        width: 100%;
+        text-align: center;
+    }
+}

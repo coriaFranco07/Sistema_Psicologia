@@ -1,0 +1,698 @@
+/* Variables de color específicas para datos de usuario */
+:root {
+    --datos-primary-color: #2c3e50;
+    --datos-secondary-color: #3498db;
+    --datos-success-color: #27ae60;
+    --datos-warning-color: #f39c12;
+    --datos-danger-color: #e74c3c;
+    --datos-light-color: #ecf0f1;
+    --datos-dark-color: #2c3e50;
+    --datos-border-radius: 12px;
+    --datos-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    --datos-transition: all 0.3s ease;
+}
+
+.botones-perfil {
+    display: flex;
+    gap: 18px; /* separación entre botones */
+}
+
+/* Añade esto al final de tu archivo CSS */
+
+/* Estilos para la foto de perfil */
+.foto-perfil-container {
+    background: linear-gradient(135deg, #00106d, #00179b);
+    border-radius: var(--datos-border-radius);
+    padding: 35px;
+    margin-bottom: 40px;
+    box-shadow: var(--datos-box-shadow);
+    border: 2px solid #2980b9;
+}
+
+.foto-perfil-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.foto-perfil-circle {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    position: relative;
+    background: linear-gradient(45deg, #2c3e50, #34495e);
+    flex-shrink: 0;
+}
+
+.foto-perfil-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.foto-perfil-circle:hover .foto-perfil-img {
+    transform: scale(1.05);
+}
+
+.foto-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(45deg, #2c3e50, #34495e);
+}
+
+.foto-placeholder i {
+    font-size: 70px;
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.foto-perfil-info {
+    flex: 1;
+    min-width: 300px;
+}
+
+.foto-perfil-nombre {
+    color: white;
+    font-size: 2.8rem;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.foto-perfil-username {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.4rem;
+    margin: 0 0 30px 0;
+    font-weight: 400;
+}
+
+.btn-actualizar-foto {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #27ae60, #219653);
+    color: white;
+    padding: 16px 35px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 15px rgba(39, 174, 96, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-actualizar-foto:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 25px rgba(39, 174, 96, 0.5);
+    background: linear-gradient(135deg, #219653, #1e8449);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-actualizar-foto i {
+    font-size: 1.2rem;
+}
+
+.foto-perfil-desc {
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 15px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.foto-perfil-desc i {
+    font-size: 1rem;
+}
+
+/* Responsive para foto de perfil */
+@media (max-width: 768px) {
+    .foto-perfil-wrapper {
+        flex-direction: column;
+        text-align: center;
+        gap: 30px;
+    }
+    
+    .foto-perfil-circle {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .foto-perfil-nombre {
+        font-size: 2.2rem;
+    }
+    
+    .foto-perfil-username {
+        font-size: 1.2rem;
+        margin-bottom: 25px;
+    }
+    
+    .btn-actualizar-foto {
+        padding: 14px 30px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .foto-perfil-container {
+        padding: 25px 20px;
+    }
+    
+    .foto-perfil-circle {
+        width: 130px;
+        height: 130px;
+        border-width: 5px;
+    }
+    
+    .foto-perfil-nombre {
+        font-size: 1.9rem;
+    }
+    
+    .foto-perfil-username {
+        font-size: 1.1rem;
+    }
+    
+    .btn-actualizar-foto {
+        width: 100%;
+        justify-content: center;
+        padding: 15px;
+    }
+}
+
+/* Ajuste para el grid con foto de perfil */
+.datos-grid-1 {
+    margin-top: 20px;
+}
+
+/* Contenedor principal */
+.datos-container-1 {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 25px 30px;
+    min-height: calc(100vh - 200px);
+}
+
+/* Header */
+.datos-header-1 {
+    text-align: center;
+    margin-bottom: 50px;
+    padding-bottom: 25px;
+    border-bottom: 3px solid var(--datos-light-color);
+}
+
+.datos-titulo-1 {
+    color: var(--datos-primary-color);
+    font-size: 3.2rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-weight: 700;
+}
+
+.subtitulo-1 {
+    color: #7f8c8d;
+    font-size: 1.4rem;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+/* Grid de tarjetas */
+.datos-grid-1 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 35px;
+    margin-bottom: 50px;
+}
+
+/* Tarjetas individuales */
+.datos-card-1 {
+    background: white;
+    border-radius: var(--datos-border-radius);
+    box-shadow: var(--datos-box-shadow);
+    overflow: hidden;
+    transition: var(--datos-transition);
+    border: 2px solid #e1e8ed;
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+}
+
+.datos-card-1:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
+    border-color: var(--datos-secondary-color);
+}
+
+/* Header de tarjeta */
+.card-header-1 {
+    padding: 25px 30px;
+    border-bottom: 2px solid #e1e8ed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #00106d, #1d32ac);
+    color: white;
+    min-height: 90px;
+}
+
+.card-titulo-1 {
+    font-size: 1.8rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 600;
+}
+
+.card-header-1 i {
+    font-size: 1.6rem;
+}
+
+/* Badges */
+.badge-1 {
+    padding: 8px 18px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    min-width: 120px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.badge-activo-1 {
+    background-color: var(--datos-success-color);
+    color: white;
+    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+}
+
+.badge-inactivo-1 {
+    background-color: var(--datos-danger-color);
+    color: white;
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.badge-socio-1 {
+    background-color: var(--datos-warning-color);
+    color: var(--datos-dark-color);
+    font-weight: 700;
+    box-shadow: 0 4px 8px rgba(243, 156, 18, 0.3);
+}
+
+/* Cuerpo de tarjeta */
+.card-body-1 {
+    padding: 30px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.info-row-1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 18px 0;
+    border-bottom: 1px solid #f0f0f0;
+    min-height: 65px;
+}
+
+.info-row-1:last-child {
+    border-bottom: none;
+}
+
+.info-row-1.destacado-1 {
+    background-color: #f8fafc;
+    margin: -10px -30px;
+    padding: 20px 30px;
+    border-radius: 8px;
+    border: 2px solid #e3f2fd;
+}
+
+.info-label-1 {
+    color: #555;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 220px;
+    font-size: 1.1rem;
+    line-height: 1.4;
+}
+
+.info-label-1 i {
+    font-size: 1.3rem;
+    min-width: 30px;
+    text-align: center;
+}
+
+.info-value-1 {
+    color: var(--datos-dark-color);
+    font-weight: 600;
+    text-align: right;
+    flex: 1;
+    word-break: break-word;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    padding-left: 20px;
+    max-width: 400px;
+}
+
+/* Para valores largos como "COMISARI" */
+.info-value-1.largo-1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--datos-primary-color);
+    line-height: 1.6;
+    word-break: normal;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+.info-value-1.saldo-1 {
+    font-size: 1.8rem;
+    color: var(--datos-success-color);
+    font-weight: 800;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones de acción */
+.datos-actions-1 {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 3px solid #e1e8ed;
+}
+
+.btn-1 {
+    padding: 18px 45px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--datos-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    text-decoration: none;
+    min-width: 250px;
+}
+
+.btn-imprimir-1 {
+    background: linear-gradient(135deg, #5d6d7e, #7f8c8d);
+    color: white;
+    box-shadow: 0 6px 15px rgba(95, 109, 126, 0.3);
+}
+
+.btn-imprimir-1:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 25px rgba(95, 109, 126, 0.5);
+}
+
+.btn-login-1 {
+    background: linear-gradient(135deg, var(--datos-success-color), #219653);
+    color: white;
+    padding: 20px 50px;
+    font-size: 1.3rem;
+    box-shadow: 0 6px 15px rgba(39, 174, 96, 0.3);
+}
+
+.btn-login-1:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 25px rgba(39, 174, 96, 0.5);
+}
+
+/* Estado no autenticado */
+.datos-no-auth-1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 500px;
+}
+
+.no-auth-content-1 {
+    text-align: center;
+    max-width: 500px;
+    padding: 50px;
+    background: white;
+    border-radius: var(--datos-border-radius);
+    box-shadow: var(--datos-box-shadow);
+    border: 3px solid var(--datos-warning-color);
+}
+
+.icono-alerta-1 {
+    font-size: 5rem;
+    color: var(--datos-warning-color);
+    margin-bottom: 30px;
+}
+
+.no-auth-titulo-1 {
+    color: var(--datos-dark-color);
+    margin-bottom: 20px;
+    font-size: 2.2rem;
+}
+
+.no-auth-texto-1 {
+    color: #666;
+    margin-bottom: 35px;
+    line-height: 1.8;
+    font-size: 1.2rem;
+}
+
+/* Responsive Design - TABLET */
+@media (max-width: 1200px) {
+    .datos-grid-1 {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+    
+    .datos-container-1 {
+        max-width: 1200px;
+        padding: 20px;
+    }
+    
+    .datos-titulo-1 {
+        font-size: 2.8rem;
+    }
+    
+    .info-value-1 {
+        max-width: 300px;
+    }
+}
+
+/* Responsive Design - MOVIL (768px) */
+@media (max-width: 768px) {
+    .datos-grid-1 {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    .datos-container-1 {
+        padding: 15px;
+        min-height: auto;
+    }
+    
+    .datos-header-1 {
+        margin-bottom: 35px;
+    }
+    
+    .datos-titulo-1 {
+        font-size: 2.4rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .subtitulo-1 {
+        font-size: 1.2rem;
+    }
+    
+    .card-header-1 {
+        padding: 20px;
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        min-height: auto;
+    }
+    
+    .card-titulo-1 {
+        font-size: 1.6rem;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .badge-1 {
+        padding: 6px 15px;
+        font-size: 0.9rem;
+        min-width: 100px;
+    }
+    
+    .card-body-1 {
+        padding: 20px;
+    }
+    
+    .info-row-1 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 15px 0;
+        min-height: auto;
+    }
+    
+    .info-row-1.destacado-1 {
+        margin: -5px -20px;
+        padding: 15px 20px;
+    }
+    
+    .info-label-1 {
+        min-width: auto;
+        font-size: 1rem;
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .info-value-1 {
+        text-align: left;
+        font-size: 1.1rem;
+        padding-left: 0;
+        width: 100%;
+        max-width: none;
+        font-weight: 700;
+    }
+    
+    .info-value-1.saldo-1 {
+        font-size: 1.5rem;
+    }
+    
+    .info-value-1.largo-1 {
+        font-size: 1.2rem;
+    }
+    
+    .datos-actions-1 {
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 40px;
+        padding-top: 30px;
+    }
+    
+    .btn-1 {
+        width: 100%;
+        padding: 20px;
+        font-size: 1.1rem;
+        min-width: auto;
+    }
+}
+
+/* Responsive Design - MOVIL PEQUEÑO (480px) */
+@media (max-width: 480px) {
+    .datos-titulo-1 {
+        font-size: 2rem;
+    }
+    
+    .subtitulo-1 {
+        font-size: 1.1rem;
+    }
+    
+    .card-titulo-1 {
+        font-size: 1.4rem;
+    }
+    
+    .card-body-1 {
+        padding: 15px;
+    }
+    
+    .info-row-1 {
+        padding: 12px 0;
+    }
+    
+    .info-row-1.destacado-1 {
+        margin: -5px -15px;
+        padding: 12px 15px;
+    }
+    
+    .info-label-1 {
+        font-size: 0.95rem;
+    }
+    
+    .info-label-1 i {
+        font-size: 1.1rem;
+    }
+    
+    .info-value-1 {
+        font-size: 1.05rem;
+    }
+    
+    .info-value-1.saldo-1 {
+        font-size: 1.3rem;
+    }
+    
+    .no-auth-content-1 {
+        padding: 30px 20px;
+        margin: 0 15px;
+    }
+    
+    .no-auth-titulo-1 {
+        font-size: 1.8rem;
+    }
+    
+    .no-auth-texto-1 {
+        font-size: 1.1rem;
+    }
+}
+
+/* Ajustes especiales para texto largo */
+@media (max-width: 992px) {
+    .info-value-1.largo-1 {
+        font-size: 1.15rem;
+        line-height: 1.6;
+    }
+}
+
+/* Estilos para impresión */
+@media print {
+    .datos-actions-1,
+    .btn-1,
+    .badge-1 {
+        display: none !important;
+    }
+    
+    .datos-card-1 {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 2px solid #ddd !important;
+        margin-bottom: 20px;
+    }
+    
+    .card-header-1 {
+        background: #f5f5f5 !important;
+        color: black !important;
+        border-bottom: 2px solid #ccc;
+    }
+    
+    .info-value-1 {
+        color: black !important;
+    }
+    
+    .info-value-1.saldo-1 {
+        color: darkgreen !important;
+    }
+}

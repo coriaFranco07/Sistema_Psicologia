@@ -1,0 +1,22 @@
+{% extends "usuario/base.html" %}
+
+{% block title %}Eliminar {{ entity_label }} | Sistema Psicologia{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div>
+        <p class="eyebrow">Eliminar registro</p>
+        <h1>Confirmar eliminacion</h1>
+        <p class="hero-copy">Esta accion elimina el perfil y su ficha de datos personales asociada.</p>
+    </div>
+    <a href="{{ cancel_url }}" class="app-button app-button-secondary">Cancelar</a>
+</section>
+
+<form method="post" class="panel-card delete-panel">
+    {% csrf_token %}
+    <div class="delete-icon">!</div>
+    <h2>{{ persona.nombres }}</h2>
+    <p>DNI {{ persona.dni }} · {{ persona.email }}</p>
+    <button type="submit" class="app-button app-button-danger">Si, eliminar {{ entity_label|lower }}</button>
+</form>
+{% endblock %}

@@ -23,6 +23,7 @@ class CatalogoBaseModel(UpperCaseModel):
         abstract = True
 
 
+from .ciclo_vida import CicloVida
 from .estado import Estado
 from .grado_estudio import GradoEstudio
 from .idioma import Idioma
@@ -38,6 +39,7 @@ from .zona import Zona, ZonaLocalidad
 
 __all__ = [
     "CatalogoBaseModel",
+    "CicloVida",
     "Estado",
     "GradoEstudio",
     "Idioma",

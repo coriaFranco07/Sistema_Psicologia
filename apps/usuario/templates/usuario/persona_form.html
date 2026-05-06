@@ -1,0 +1,79 @@
+{% extends "usuario/base.html" %}
+
+{% block title %}
+    {% if modo_edicion %}Editar {{ entity_label }}{% else %}Nuevo {{ entity_label }}{% endif %} | Sistema Psicologia
+{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div>
+        <p class="eyebrow">Formulario</p>
+        <h1>{% if modo_edicion %}Editar {{ entity_label }}{% else %}Nuevo {{ entity_label }}{% endif %}</h1>
+        <p class="hero-copy">Carga la informacion principal y la ficha personal en una sola pantalla.</p>
+    </div>
+    <a href="{{ cancel_url }}" class="app-button app-button-secondary">Volver</a>
+</section>
+
+<form method="post" enctype="multipart/form-data" class="panel-card form-panel">
+    {% csrf_token %}
+
+    {% if form.non_field_errors or datos_form.non_field_errors %}
+        <div class="form-errors">
+            {{ form.non_field_errors }}
+            {{ datos_form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <div class="form-section">
+        <div class="section-title">
+            <h2>Datos principales</h2>
+            <p>Identificacion, estado y foto del perfil.</p>
+        </div>
+        <div class="form-grid">
+            {% for field in form %}
+                <div class="form-field {% if field.name == 'foto' %}form-field-full{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small>{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="field-error">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if persona %}
+        <div class="photo-preview">
+            <img src="{{ persona.foto_url }}" alt="{{ persona.nombres }}">
+        </div>
+    {% endif %}
+
+    <div class="form-section">
+        <div class="section-title">
+            <h2>Ficha personal</h2>
+            <p>Telefono, domicilio y ubicacion general.</p>
+        </div>
+        <div class="form-grid">
+            {% for field in datos_form %}
+                <div class="form-field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="field-error">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a href="{{ cancel_url }}" class="app-button app-button-secondary">Cancelar</a>
+        <button type="submit" class="app-button">
+            {% if modo_edicion %}Guardar cambios{% else %}Crear {{ entity_label|lower }}{% endif %}
+        </button>
+    </div>
+</form>
+{% endblock %}

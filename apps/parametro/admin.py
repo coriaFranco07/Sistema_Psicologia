@@ -16,6 +16,7 @@ from .models import (
     TipoCivil,
     Zona,
     ZonaLocalidad,
+    CicloVida,
 )
 
 
@@ -178,3 +179,11 @@ class ZonaLocalidadAdmin(BaseParametroAdmin):
     @admin.display(ordering="id_localidad__dsc_localidad", description="Localidad")
     def dsc_localidad(self, obj):
         return obj.id_localidad.dsc_localidad
+
+
+@admin.register(CicloVida)
+class CicloVidaAdmin(BaseParametroAdmin):
+    list_display = ("id_ciclo_vida", "dsc_ciclo_vida", "flg_activo")
+    search_fields = ("dsc_ciclo_vida",)
+    list_editable = ("dsc_ciclo_vida", "flg_activo")
+    ordering = ("dsc_ciclo_vida", "id_ciclo_vida")

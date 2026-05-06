@@ -1,180 +1,130 @@
 from datetime import date
-from django import forms
-from .models import Usuario
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import get_user_model
-User = get_user_model()
 import re
+
+from django import forms
 from django.core.exceptions import ValidationError
 
-class UsuarioForm(forms.ModelForm):
-    password1 = forms.CharField(
-        label="Contraseña",
-        widget=forms.PasswordInput(attrs={
-            "class": "form-control",
-            "placeholder": "Contraseña",
-            "id": "password1"
-        })
-    )
+from apps.parametro.models import CicloVida, Estado, GradoEstudio, Ocupacion
 
-    password2 = forms.CharField(
-        label="Confirmar Contraseña",
-        widget=forms.PasswordInput(attrs={
-            "class": "form-control",
-            "placeholder": "Confirmar contraseña",
-            "id": "password2"
-        })
-    )
+from .models import MAX_SIZE_MB, Paciente, Psicologo
 
+
+PERSONA_FIELDS = ["nombres", "email", "dni", "cuil", "fch_nacimiento", "id_estado", "foto"]
+
+
+class BasePersonaForm(forms.ModelForm):
     class Meta:
-        model = Usuario
-        fields = ["username", "dni", "cuil", "email", "nombres", "fch_nacimiento", "id_tipo_socio", "id_jerarquia"]
+        fields = PERSONA_FIELDS
         widgets = {
-            "username": forms.HiddenInput(),
-            "dni": forms.NumberInput(attrs={"class": "form-control", "placeholder": "DNI"}),
-            "cuil": forms.TextInput(attrs={"class": "form-control", "placeholder": "CUIL SIN GUIONES"}),
-            "email": forms.EmailInput(attrs={"class": "form-control", "placeholder": "Correo electrónico"}),
-            "nombres": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nombre completo"}),
-            "fch_nacimiento": forms.DateInput(
-                attrs={
-                    "class": "form-control",
-                    "id": "fch_nacimiento",
-                    "placeholder": "Año/Mes/Día",
-                }
+            "nombres": forms.TextInput(
+                attrs={"class": "app-input", "placeholder": "Nombre completo"}
             ),
-            "id_tipo_socio": forms.Select(attrs={"class": "form-select"}),
-            "id_jerarquia": forms.Select(attrs={"class": "form-select"}),
+            "email": forms.EmailInput(
+                attrs={"class": "app-input", "placeholder": "Correo electronico"}
+            ),
+            "dni": forms.NumberInput(attrs={"class": "app-input", "placeholder": "DNI"}),
+            "cuil": forms.TextInput(
+                attrs={"class": "app-input", "placeholder": "CUIL sin guiones"}
+            ),
+            "fch_nacimiento": forms.DateInput(
+                attrs={"class": "app-input", "type": "date"}
+            ),
+            "id_estado": forms.Select(attrs={"class": "app-select"}),
+            "foto": forms.ClearableFileInput(attrs={"class": "app-input"}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].required = False
+        self.fields["id_estado"].queryset = Estado.objects.filter(flg_activo=True).order_by(
+            "dsc_estado"
+        )
+        self.fields["foto"].required = False
+        self.fields["foto"].help_text = (
+            f"Subi una imagen JPG, PNG o WEBP de hasta {MAX_SIZE_MB} MB."
+        )
 
+    def clean_nombres(self):
+        nombres = self.cleaned_data.get("nombres", "").strip()
+        if not nombres:
+            raise ValidationError("El nombre es obligatorio.")
+        return nombres
 
+    def clean_email(self):
+        email = self.cleaned_data.get("email", "").strip().lower()
+        model = self._meta.model
+        queryset = model.objects.filter(email__iexact=email)
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
+            raise ValidationError("Ya existe un registro con este correo electronico.")
+        return email
 
     def clean_dni(self):
         dni = self.cleaned_data.get("dni")
-        if dni:
-            if not re.match(r"^\d{7,8}$", str(dni)):
-                raise ValidationError("DNI inválido. Debe tener 7 u 8 dígitos.")
-            
-            # Verificar si ya existe un usuario con ese DNI como username
-            if Usuario.objects.filter(username=str(dni)).exists():
-                raise ValidationError("Ya existe un usuario con este DNI.")
+        if dni and not re.match(r"^\d{7,8}$", str(dni)):
+            raise ValidationError("El DNI debe tener 7 u 8 digitos.")
+
+        model = self._meta.model
+        queryset = model.objects.filter(dni=dni)
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if dni and queryset.exists():
+            raise ValidationError("Ya existe un registro con este DNI.")
         return dni
-    
+
     def clean_cuil(self):
         cuil = self.cleaned_data.get("cuil")
         dni = self.cleaned_data.get("dni")
 
-        if cuil:
-            cuil = str(cuil)
+        if not cuil:
+            return cuil
 
-            # Validar que tenga 11 dígitos
-            if not re.match(r"^\d{11}$", cuil):
-                raise ValidationError("CUIL inválido. Debe tener 11 dígitos sin guiones.")
+        cuil = str(cuil).strip()
+        if not re.match(r"^\d{11}$", cuil):
+            raise ValidationError("El CUIL debe tener 11 digitos sin guiones.")
 
-            # Extraer los 8 del medio
-            cuil_dni = cuil[2:10]
+        if dni and cuil[2:10] != str(dni).zfill(8):
+            raise ValidationError("Los digitos centrales del CUIL deben coincidir con el DNI.")
 
-            if dni:
-                dni_padded = str(dni).zfill(8)
-
-                if cuil_dni != dni_padded:
-                    raise ValidationError(
-                        "Los dígitos centrales del CUIL deben coincidir con el DNI ingresado."
-                    )
-
+        model = self._meta.model
+        queryset = model.objects.filter(cuil=cuil)
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
+            raise ValidationError("Ya existe un registro con este CUIL.")
         return cuil
-    
+
     def clean_fch_nacimiento(self):
         fch_nacimiento = self.cleaned_data.get("fch_nacimiento")
         if fch_nacimiento and fch_nacimiento > date.today():
             raise ValidationError("La fecha de nacimiento no puede ser posterior a hoy.")
         return fch_nacimiento
 
-    def clean(self):
-        cleaned_data = super().clean()
 
-        p1 = cleaned_data.get("password1")
-        p2 = cleaned_data.get("password2")
-        if p1 != p2:
-            raise forms.ValidationError("Las contraseñas no coinciden")
-
-        # Asignar automáticamente el username con el DNI
-        dni = cleaned_data.get("dni")
-        if dni:
-            cleaned_data["username"] = str(dni)
+class PsicologoForm(BasePersonaForm):
+    class Meta(BasePersonaForm.Meta):
+        model = Psicologo
 
 
-        return cleaned_data
-    
-class UsuarioUpdateForm(forms.ModelForm):
-    class Meta:
-        model = Usuario
-        fields = ["username", "dni", "cuil", "email", "nombres", "fch_nacimiento", "id_tipo_socio", "id_jerarquia"]
+class PacienteForm(BasePersonaForm):
+    class Meta(BasePersonaForm.Meta):
+        model = Paciente
+        fields = PERSONA_FIELDS + ["id_ocupacion", "id_ciclo_vida", "id_grado_estudio"]
         widgets = {
-            "username": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nombre de usuario"}),
-            "dni": forms.NumberInput(attrs={"class": "form-control", "placeholder": "DNI"}),
-            "cuil": forms.TextInput(attrs={"class": "form-control", "placeholder": "CUIL SIN GUIONES"}),
-            "email": forms.EmailInput(attrs={"class": "form-control", "placeholder": "Correo electrónico"}),
-            "nombres": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nombre completo"}),
-            "fch_nacimiento": forms.DateInput(
-                attrs={
-                    "class": "form-control",
-                    "id": "fch_nacimiento",
-                    "placeholder": "Año/Mes/Día",
-                }
-            ),
-            "id_tipo_socio": forms.Select(attrs={"class": "form-select"}),
-            "id_jerarquia": forms.Select(attrs={"class": "form-select"}),
+            **BasePersonaForm.Meta.widgets,
+            "id_ocupacion": forms.Select(attrs={"class": "app-select"}),
+            "id_ciclo_vida": forms.Select(attrs={"class": "app-select"}),
+            "id_grado_estudio": forms.Select(attrs={"class": "app-select"}),
         }
 
-    def __init__(self, *args, is_edit=False, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        if is_edit:
-            # Quitar tipo de socio si es edición
-            if "id_tipo_socio" in self.fields:
-                del self.fields["id_tipo_socio"]
-
-
-
-    def clean_dni(self):
-        dni = self.cleaned_data.get("dni")
-        if dni:
-            if not re.match(r"^\d{7,8}$", str(dni)):
-                raise ValidationError("DNI inválido. Debe tener 7 u 8 dígitos.")
-        return dni
-    
-
-    def clean_cuil(self):
-        cuil = self.cleaned_data.get("cuil")
-        dni = self.cleaned_data.get("dni")
-
-        if cuil:
-            cuil = str(cuil)  # 👈 convertir a string
-
-            # Validar que tenga 11 dígitos
-            if not re.match(r"^\d{11}$", cuil):
-                raise ValidationError("CUIL inválido. Debe tener 11 dígitos sin guiones.")
-
-            # Extraer los 8 del medio
-            cuil_dni = cuil[2:10]
-
-            if dni:
-                dni_padded = str(dni).zfill(8)
-
-                if cuil_dni != dni_padded:
-                    raise ValidationError(
-                        "Los dígitos centrales del CUIL deben coincidir con el DNI ingresado."
-                    )
-
-        return cuil
-
-    def clean_fch_nacimiento(self):
-        fch_nacimiento = self.cleaned_data.get("fch_nacimiento")
-        if fch_nacimiento and fch_nacimiento > date.today():
-            raise ValidationError("La fecha de nacimiento no puede ser posterior a hoy.")
-        return fch_nacimiento
-
+        self.fields["id_ocupacion"].queryset = Ocupacion.objects.filter(flg_activo=True).order_by(
+            "dsc_ocupacion"
+        )
+        self.fields["id_ciclo_vida"].queryset = CicloVida.objects.filter(flg_activo=True).order_by(
+            "dsc_ciclo_vida"
+        )
+        self.fields["id_grado_estudio"].queryset = GradoEstudio.objects.filter(
+            flg_activo=True
+        ).order_by("dsc_grado_estudio")
