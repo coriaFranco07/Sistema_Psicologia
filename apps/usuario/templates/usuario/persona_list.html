@@ -1,105 +1,52 @@
 {% extends "usuario/base.html" %}
 
-{% block title %}{{ entity_label_plural }} | Sistema Psicologia{% endblock %}
+{% block title %}{{ entity_label_plural|default:"Personas" }}{% endblock %}
 
 {% block content %}
-<section class="page-head">
-    <div>
-        <p class="eyebrow">Listado</p>
-        <h1>{{ entity_label_plural }}</h1>
-        <p class="hero-copy">Consulta, edita y mantiene actualizados los perfiles registrados.</p>
-    </div>
-    <a href="{% url create_url_name %}" class="app-button">Nuevo {{ entity_label|lower }}</a>
-</section>
-
-<section class="panel-card panel-card-tight">
-    <form method="get" class="toolbar-row">
-        <input
-            type="text"
-            name="q"
-            value="{{ query }}"
-            class="app-input"
-            placeholder="Buscar por nombre, DNI, correo o estado"
-        >
-        <button type="submit" class="app-button app-button-secondary">Buscar</button>
+<section class="card">
+    <h2>{{ entity_label_plural|default:"Personas" }}</h2>
+    <form method="get">
+        <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Buscar">
+        <button type="submit">Buscar</button>
+        {% if create_url_name %}
+            <a class="btn" href="{% url create_url_name %}">Nuevo</a>
+        {% endif %}
     </form>
-    <p class="toolbar-meta">{{ total_resultados }} resultado{{ total_resultados|pluralize:"s" }}</p>
 </section>
 
-<section class="table-card">
-    <div class="table-wrap">
-        <table class="app-table">
-            <thead>
+<section class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>DNI</th>
+                <th>Email</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for persona in personas %}
                 <tr>
-                    <th>Perfil</th>
-                    <th>Contacto</th>
-                    <th>Datos personales</th>
-                    <th>Estado</th>
-                    {% if entity_label == "Paciente" %}
-                        <th>Trayectoria</th>
-                    {% endif %}
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for persona in personas %}
-                    {% with datos=persona.datos_personales_rel %}
-                    <tr>
-                        <td>
-                            <div class="persona-cell">
-                                <img src="{{ persona.foto_url }}" alt="{{ persona.nombres }}" class="avatar-thumb">
-                                <div>
-                                    <strong>{{ persona.nombres }}</strong>
-                                    <span>DNI {{ persona.dni }}</span>
-                                    {% if persona.cuil %}
-                                        <span>CUIL {{ persona.cuil }}</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <strong>{{ persona.email }}</strong>
-                            <span>{{ datos.telefono|default:"Sin telefono" }}</span>
-                        </td>
-                        <td>
-                            <strong>{{ datos.domicilio|default:"Sin domicilio" }}</strong>
-                            <span>
-                                {% if datos %}
-                                    {{ datos.id_localidad }}, {{ datos.id_provincia }}
-                                {% else %}
-                                    Completar ficha personal
-                                {% endif %}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="status-pill">{{ persona.id_estado }}</span>
-                        </td>
-                        {% if entity_label == "Paciente" %}
-                            <td>
-                                <strong>{{ persona.id_ocupacion }}</strong>
-                                <span>{{ persona.id_ciclo_vida }} · {{ persona.id_grado_estudio }}</span>
-                            </td>
+                    <td>{{ persona.nombres }}</td>
+                    <td>{{ persona.dni }}</td>
+                    <td>{{ persona.email }}</td>
+                    <td>{{ persona.id_estado }}</td>
+                    <td class="actions">
+                        {% if update_url_name %}
+                            <a href="{% url update_url_name persona.pk %}">Editar</a>
                         {% endif %}
-                        <td>
-                            <div class="action-row">
-                                <a href="{% url update_url_name persona.pk %}" class="table-link">Editar</a>
-                                <a href="{% url delete_url_name persona.pk %}" class="table-link table-link-danger">Eliminar</a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endwith %}
-                {% empty %}
-                    <tr>
-                        <td colspan="{% if entity_label == 'Paciente' %}6{% else %}5{% endif %}">
-                            <div class="empty-state">
-                                <strong>No hay {{ entity_label_plural|lower }} cargados.</strong>
-                                <span>Podes crear el primero desde el boton superior.</span>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                        {% if delete_url_name %}
+                            <a href="{% url delete_url_name persona.pk %}">Eliminar</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">No hay registros para mostrar.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </section>
 {% endblock %}

@@ -1,44 +1,103 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Sistema Psicologia{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/psicologia_app.css' %}">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+        header {
+            background: #1d4ed8;
+            color: white;
+            padding: 16px 24px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 16px;
+        }
+        main {
+            max-width: 1100px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        .card {
+            background: white;
+            border: 1px solid #dbe3ef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+        .messages {
+            margin-bottom: 16px;
+        }
+        .message {
+            background: #e8f0ff;
+            border: 1px solid #c7d7ff;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+        }
+        form p {
+            margin-bottom: 12px;
+        }
+        input, select, textarea, button {
+            font: inherit;
+        }
+        button, .btn {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            background: #6b7280;
+        }
+        .actions a {
+            margin-right: 10px;
+        }
+    </style>
 </head>
-<body class="app-body">
-    <div class="app-shell">
-        <aside class="app-sidebar">
-            <a href="{% url 'usuario:dashboard' %}" class="app-brand">
-                <span class="app-brand-mark">SP</span>
-                <span>
-                    <strong>Sistema Psicologia</strong>
-                    <small>Gestion profesional</small>
-                </span>
-            </a>
+<body>
+    <header>
+        <h1 style="margin:0 0 10px;">Sistema Psicologia</h1>
+        <nav>
+            <a href="/">Login</a>
+            <a href="/psicologos/">Psicologos</a>
+            <a href="/pacientes/">Pacientes</a>
+            <a href="/logout/">Salir</a>
+        </nav>
+    </header>
 
-            <nav class="app-nav">
-                <a href="{% url 'usuario:dashboard' %}" class="app-nav-link">Dashboard</a>
-                <a href="{% url 'usuario:psicologo_list' %}" class="app-nav-link">Psicologos</a>
-                <a href="{% url 'usuario:paciente_list' %}" class="app-nav-link">Pacientes</a>
-                <a href="/admin/" class="app-nav-link">Admin Django</a>
-            </nav>
-        </aside>
+    <main>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-        <main class="app-main">
-            {% if messages %}
-                <div class="app-messages">
-                    {% for message in messages %}
-                        <div class="app-message app-message-{{ message.tags|default:'info' }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            {% block content %}{% endblock %}
-        </main>
-    </div>
+        {% block content %}{% endblock %}
+    </main>
 </body>
 </html>

@@ -1,79 +1,15 @@
 {% extends "usuario/base.html" %}
 
-{% block title %}Dashboard | Sistema Psicologia{% endblock %}
+{% block title %}Vista General{% endblock %}
 
 {% block content %}
-<section class="hero-panel">
-    <div>
-        <p class="eyebrow">Centro de gestion</p>
-        <h1>Psicologos y pacientes, en un mismo lugar.</h1>
-        <p class="hero-copy">
-            El sistema ya separa claramente ambos perfiles y te deja gestionarlos con sus datos personales completos.
-        </p>
-    </div>
-    <div class="hero-actions">
-        <a href="{% url 'usuario:psicologo_create' %}" class="app-button">Nuevo psicologo</a>
-        <a href="{% url 'usuario:paciente_create' %}" class="app-button app-button-secondary">Nuevo paciente</a>
-    </div>
+<section class="card">
+    <h2>Vista general</h2>
+    <p>Esta pantalla queda disponible como template base del modulo usuario.</p>
 </section>
 
-<section class="stats-grid">
-    <article class="stat-card">
-        <span class="stat-label">Psicologos</span>
-        <strong class="stat-value">{{ total_psicologos }}</strong>
-        <a href="{% url 'usuario:psicologo_list' %}" class="stat-link">Ver listado</a>
-    </article>
-    <article class="stat-card">
-        <span class="stat-label">Pacientes</span>
-        <strong class="stat-value">{{ total_pacientes }}</strong>
-        <a href="{% url 'usuario:paciente_list' %}" class="stat-link">Ver listado</a>
-    </article>
-    <article class="stat-card stat-card-accent">
-        <span class="stat-label">Acceso rapido</span>
-        <strong class="stat-value">CRUD completo</strong>
-        <span class="stat-copy">Altas, edicion, eliminacion y datos personales asociados.</span>
-    </article>
-</section>
-
-<section class="dashboard-columns">
-    <article class="panel-card">
-        <div class="panel-card-head">
-            <h2>Ultimos psicologos</h2>
-            <a href="{% url 'usuario:psicologo_list' %}">Abrir</a>
-        </div>
-        <div class="mini-list">
-            {% for psicologo in ultimos_psicologos %}
-                <div class="mini-list-item">
-                    <div>
-                        <strong>{{ psicologo.nombres }}</strong>
-                        <span>DNI {{ psicologo.dni }}</span>
-                    </div>
-                    <span class="status-pill">{{ psicologo.id_estado }}</span>
-                </div>
-            {% empty %}
-                <p class="empty-copy">Todavia no hay psicologos cargados.</p>
-            {% endfor %}
-        </div>
-    </article>
-
-    <article class="panel-card">
-        <div class="panel-card-head">
-            <h2>Ultimos pacientes</h2>
-            <a href="{% url 'usuario:paciente_list' %}">Abrir</a>
-        </div>
-        <div class="mini-list">
-            {% for paciente in ultimos_pacientes %}
-                <div class="mini-list-item">
-                    <div>
-                        <strong>{{ paciente.nombres }}</strong>
-                        <span>{{ paciente.id_ocupacion }} · {{ paciente.id_ciclo_vida }}</span>
-                    </div>
-                    <span class="status-pill">{{ paciente.id_estado }}</span>
-                </div>
-            {% empty %}
-                <p class="empty-copy">Todavia no hay pacientes cargados.</p>
-            {% endfor %}
-        </div>
-    </article>
+<section class="card">
+    <p>Total psicologos: {{ total_psicologos|default:"0" }}</p>
+    <p>Total pacientes: {{ total_pacientes|default:"0" }}</p>
 </section>
 {% endblock %}

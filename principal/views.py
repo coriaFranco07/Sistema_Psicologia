@@ -6,7 +6,7 @@ from .forms import LoginForm
 class StyledLoginView(LoginView):
     template_name = "registration/login.html"
     authentication_form = LoginForm
-    redirect_authenticated_user = True
+    redirect_authenticated_user = False
 
     def form_valid(self, form):
         response = super().form_valid(form)

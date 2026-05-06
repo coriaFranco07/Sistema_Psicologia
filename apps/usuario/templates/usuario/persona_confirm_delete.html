@@ -1,22 +1,16 @@
 {% extends "usuario/base.html" %}
 
-{% block title %}Eliminar {{ entity_label }} | Sistema Psicologia{% endblock %}
+{% block title %}Eliminar {{ entity_label }}{% endblock %}
 
 {% block content %}
-<section class="page-head">
-    <div>
-        <p class="eyebrow">Eliminar registro</p>
-        <h1>Confirmar eliminacion</h1>
-        <p class="hero-copy">Esta accion elimina el perfil y su ficha de datos personales asociada.</p>
-    </div>
-    <a href="{{ cancel_url }}" class="app-button app-button-secondary">Cancelar</a>
-</section>
+<section class="card">
+    <h2>Eliminar {{ entity_label }}</h2>
+    <p>¿Seguro que querés eliminar a <strong>{{ persona }}</strong>?</p>
 
-<form method="post" class="panel-card delete-panel">
-    {% csrf_token %}
-    <div class="delete-icon">!</div>
-    <h2>{{ persona.nombres }}</h2>
-    <p>DNI {{ persona.dni }} · {{ persona.email }}</p>
-    <button type="submit" class="app-button app-button-danger">Si, eliminar {{ entity_label|lower }}</button>
-</form>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirmar eliminación</button>
+        <a class="btn btn-secondary" href="{{ cancel_url }}">Cancelar</a>
+    </form>
+</section>
 {% endblock %}

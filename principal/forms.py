@@ -8,8 +8,10 @@ class LoginForm(AuthenticationForm):
         widget=forms.TextInput(
             attrs={
                 "class": "login-input",
-                "placeholder": "Your username",
+                "placeholder": "Ingresa tu DNI",
                 "autocomplete": "username",
+                "inputmode": "numeric",
+                "maxlength": "8",
             }
         ),
     )
@@ -18,9 +20,9 @@ class LoginForm(AuthenticationForm):
         widget=forms.PasswordInput(
             attrs={
                 "class": "login-input",
-                "placeholder": "Password",
+                "placeholder": "Ingresa tu contraseña",
                 "autocomplete": "current-password",
             }
         ),
     )
-    remember_me = forms.BooleanField(required=False, label="Remember Me")
+    remember_me = forms.BooleanField(required=False, label="Recordarme")

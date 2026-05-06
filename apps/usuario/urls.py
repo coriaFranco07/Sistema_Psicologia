@@ -7,7 +7,6 @@ app_name = "usuario"
 
 
 urlpatterns = [
-    path("", views.DashboardView.as_view(), name="dashboard"),
     path("psicologos/", views.PsicologoListView.as_view(), name="psicologo_list"),
     path("psicologos/nuevo/", views.PsicologoCreateView.as_view(), name="psicologo_create"),
     path(
