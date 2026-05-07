@@ -8,23 +8,28 @@
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 <body class="login-body">
+    <div class="background-blur blur-one"></div>
+    <div class="background-blur blur-two"></div>
+
     <main class="login-layout">
         <section class="login-shell">
             <section class="login-visual">
                 <div class="visual-backdrop"></div>
+
                 <div class="visual-copy">
-                    <span class="visual-badge">Salud mental digital</span>
-                    <h1>Tu espacio seguro para gestionar atención psicológica.</h1>
+                    <span class="visual-badge">Sistema de Psicología</span>
+                    <h1>Cuidar la salud mental también puede sentirse moderno.</h1>
                     <p>
-                        Inicia sesión con tu DNI para acceder a turnos, historial y seguimiento profesional.
+                        Gestiona pacientes, seguimientos y sesiones desde una plataforma clara, humana y segura.
                     </p>
                 </div>
 
-                <div class="medical-photo-frame">
+                <div class="logo-showcase">
+                    <div class="logo-circle"></div>
                     <img
-                        src="{% static 'images/login-medicos.png' %}"
-                        alt="Equipo medico y planta decorativa"
-                        class="medical-photo"
+                        src="{% static 'images/logo_psicologia_login.png' %}"
+                        alt="Logo psicología"
+                        class="psychology-logo"
                     >
                 </div>
             </section>
@@ -34,7 +39,7 @@
                     <div class="login-head">
                         <span class="login-kicker">Bienvenido</span>
                         <h2>Iniciar sesión</h2>
-                        <p>Ingresa con tu DNI y tu contraseña para continuar.</p>
+                        <p>Ingresa con tu DNI y contraseña para acceder a tu espacio profesional.</p>
                     </div>
 
                     {% if form.non_field_errors %}
@@ -51,24 +56,18 @@
                         <div class="login-field">
                             <label for="{{ form.username.id_for_label }}" class="login-label">DNI</label>
                             {{ form.username }}
-                            {% if form.username.errors %}
-                                <span class="field-error">{{ form.username.errors|striptags }}</span>
-                            {% endif %}
                         </div>
 
                         <div class="login-field">
                             <label for="{{ form.password.id_for_label }}" class="login-label">Contraseña</label>
                             {{ form.password }}
-                            {% if form.password.errors %}
-                                <span class="field-error">{{ form.password.errors|striptags }}</span>
-                            {% endif %}
                         </div>
 
                         {% if next %}
                             <input type="hidden" name="next" value="{{ next }}">
                         {% endif %}
 
-                        <button type="submit" class="login-submit">Entrar</button>
+                        <button type="submit" class="login-submit">Entrar al sistema</button>
 
                         <div class="login-meta">
                             <label class="remember-row" for="{{ form.remember_me.id_for_label }}">
@@ -77,11 +76,6 @@
                             </label>
 
                             <a href="/admin/password_reset/" class="forgot-link">Olvidé mi contraseña</a>
-                        </div>
-
-                        <div class="signup-row">
-                            <span>¿No eres parte?</span>
-                            <a href="/pacientes/nuevo/" class="signup-link">Registrarme</a>
                         </div>
                     </form>
                 </div>
