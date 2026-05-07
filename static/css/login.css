@@ -56,14 +56,14 @@ body.login-body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px;
+    padding: 28px 32px;
 }
 
 .login-shell {
-    width: min(1220px, 100%);
-    min-height: 720px;
+    width: min(1180px, 100%);
+    min-height: 640px;
     display: grid;
-    grid-template-columns: 1.1fr 460px;
+    grid-template-columns: 1.1fr 440px;
     border-radius: 36px;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.06);
@@ -74,7 +74,7 @@ body.login-body {
 
 .login-visual {
     position: relative;
-    padding: 72px;
+    padding: 56px 64px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -107,9 +107,9 @@ body.login-body {
 }
 
 .visual-copy h1 {
-    margin: 24px 0 18px;
+    margin: 20px 0 14px;
     max-width: 620px;
-    font-size: clamp(3rem, 5vw, 4.8rem);
+    font-size: clamp(2.6rem, 4.4vw, 4.15rem);
     line-height: 1;
     font-weight: 800;
 }
@@ -117,8 +117,8 @@ body.login-body {
 .visual-copy p {
     max-width: 520px;
     color: var(--text-muted);
-    font-size: 1.08rem;
-    line-height: 1.8;
+    font-size: 1.02rem;
+    line-height: 1.65;
 }
 
 .logo-showcase {
@@ -126,13 +126,13 @@ body.login-body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 300px;
+    min-height: 240px;
 }
 
 .logo-circle {
     position: absolute;
-    width: 340px;
-    height: 340px;
+    width: 290px;
+    height: 290px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255,255,255,0.20), rgba(255,255,255,0.02));
     border: 1px solid rgba(255,255,255,0.08);
@@ -140,7 +140,7 @@ body.login-body {
 
 .psychology-logo {
     position: relative;
-    width: min(100%, 420px);
+    width: min(100%, 350px);
     object-fit: contain;
     filter: drop-shadow(0 22px 40px rgba(0,0,0,0.30));
     animation: floatLogo 5s ease-in-out infinite;
@@ -160,7 +160,7 @@ body.login-body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px;
+    padding: 34px 38px;
 }
 
 .login-card-inner {
@@ -181,26 +181,26 @@ body.login-body {
 .login-head h2 {
     margin: 0;
     color: #1d2747;
-    font-size: 2.3rem;
+    font-size: 2.15rem;
 }
 
 .login-head p {
-    margin-top: 12px;
+    margin-top: 10px;
     color: #6f7b9c;
-    line-height: 1.7;
+    line-height: 1.55;
 }
 
 .login-form {
-    margin-top: 34px;
+    margin-top: 28px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
 }
 
 .login-field {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .login-label {
@@ -210,7 +210,7 @@ body.login-body {
 }
 
 .login-input {
-    height: 60px;
+    height: 56px;
     border-radius: 18px;
     border: 1px solid var(--input-border);
     background: var(--input-bg);
@@ -229,7 +229,7 @@ body.login-body {
 }
 
 .login-submit {
-    height: 58px;
+    height: 56px;
     border: none;
     border-radius: 18px;
     background: linear-gradient(135deg, #5d6dff, #2741d8);
@@ -284,15 +284,16 @@ body.login-body {
 
     .login-shell {
         grid-template-columns: 1fr;
+        min-height: auto;
     }
 
     .login-visual {
-        padding: 42px 30px 20px;
-        min-height: 520px;
+        padding: 38px 30px 18px;
+        min-height: 440px;
     }
 
     .visual-copy h1 {
-        font-size: 3rem;
+        font-size: 2.8rem;
     }
 }
 
