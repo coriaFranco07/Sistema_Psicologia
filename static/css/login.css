@@ -1,15 +1,16 @@
 :root {
-    --bg-dark: #081226;
-    --bg-primary: #0f1f3d;
-    --bg-secondary: #13284d;
-    --accent: #63d4d8;
-    --accent-soft: #ff89b5;
-    --text-main: #edf3ff;
-    --text-muted: #b7c3df;
-    --card-bg: rgba(255, 255, 255, 0.96);
-    --input-bg: #f3f6ff;
-    --input-border: rgba(82, 112, 255, 0.14);
-    --shadow-main: 0 30px 70px rgba(0, 0, 0, 0.35);
+    --bg-dark: #eafff8;
+    --bg-primary: #baf4ee;
+    --bg-secondary: #9ee7ff;
+    --accent: #00b894;
+    --accent-soft: #45d6ff;
+    --accent-warm: #ffd166;
+    --text-main: #0f3d4a;
+    --text-muted: #3f6d78;
+    --card-bg: rgba(255, 255, 255, 0.92);
+    --input-bg: #f2fffc;
+    --input-border: rgba(0, 184, 148, 0.18);
+    --shadow-main: 0 30px 70px rgba(0, 126, 122, 0.20);
 }
 
 * {
@@ -21,7 +22,10 @@ body.login-body {
     min-height: 100vh;
     overflow: hidden;
     font-family: "Inter", "Segoe UI", sans-serif;
-    background: linear-gradient(145deg, var(--bg-dark), var(--bg-primary) 45%, var(--bg-secondary));
+    background:
+        radial-gradient(circle at 12% 18%, rgba(255, 209, 102, 0.35), transparent 18%),
+        radial-gradient(circle at 84% 16%, rgba(69, 214, 255, 0.38), transparent 22%),
+        linear-gradient(145deg, var(--bg-dark), var(--bg-primary) 44%, var(--bg-secondary));
     position: relative;
     color: var(--text-main);
 }
@@ -29,14 +33,14 @@ body.login-body {
 .background-blur {
     position: absolute;
     border-radius: 999px;
-    filter: blur(90px);
-    opacity: 0.35;
+    filter: blur(80px);
+    opacity: 0.48;
 }
 
 .blur-one {
     width: 380px;
     height: 380px;
-    background: #5dd4ff;
+    background: #00d6a3;
     top: -120px;
     left: -80px;
 }
@@ -44,7 +48,7 @@ body.login-body {
 .blur-two {
     width: 420px;
     height: 420px;
-    background: #ff7db0;
+    background: #38cfff;
     bottom: -180px;
     right: -120px;
 }
@@ -66,8 +70,8 @@ body.login-body {
     grid-template-columns: 1.1fr 440px;
     border-radius: 36px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.34);
+    border: 1px solid rgba(255,255,255,0.55);
     backdrop-filter: blur(18px);
     box-shadow: var(--shadow-main);
 }
@@ -84,8 +88,9 @@ body.login-body {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at top left, rgba(99,212,216,0.14), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(255,137,181,0.16), transparent 32%);
+        radial-gradient(circle at top left, rgba(0, 184, 148, 0.22), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(69, 214, 255, 0.28), transparent 34%),
+        linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.06));
 }
 
 .visual-copy,
@@ -98,10 +103,11 @@ body.login-body {
     display: inline-flex;
     padding: 10px 18px;
     border-radius: 999px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.56);
+    border: 1px solid rgba(255,255,255,0.68);
+    color: #087b72;
     font-size: 0.82rem;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
@@ -112,11 +118,12 @@ body.login-body {
     font-size: clamp(2.6rem, 4.4vw, 4.15rem);
     line-height: 1;
     font-weight: 800;
+    color: #093d47;
 }
 
 .visual-copy p {
     max-width: 520px;
-    color: var(--text-muted);
+    color: #326a73;
     font-size: 1.02rem;
     line-height: 1.65;
 }
@@ -134,15 +141,15 @@ body.login-body {
     width: 290px;
     height: 290px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.20), rgba(255,255,255,0.02));
-    border: 1px solid rgba(255,255,255,0.08);
+    background: radial-gradient(circle, rgba(255,255,255,0.78), rgba(255,255,255,0.20));
+    border: 1px solid rgba(255,255,255,0.60);
 }
 
 .psychology-logo {
     position: relative;
     width: min(100%, 350px);
     object-fit: contain;
-    filter: drop-shadow(0 22px 40px rgba(0,0,0,0.30));
+    filter: drop-shadow(0 22px 40px rgba(0, 112, 112, 0.22));
     animation: floatLogo 5s ease-in-out infinite;
 }
 
@@ -156,7 +163,7 @@ body.login-body {
 }
 
 .login-card {
-    background: rgba(255,255,255,0.95);
+    background: rgba(255,255,255,0.92);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -171,22 +178,22 @@ body.login-body {
 .login-kicker {
     display: inline-block;
     margin-bottom: 10px;
-    color: #4962d9;
+    color: #00a98b;
     font-size: 0.82rem;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
 
 .login-head h2 {
     margin: 0;
-    color: #1d2747;
+    color: #103f4a;
     font-size: 2.15rem;
 }
 
 .login-head p {
     margin-top: 10px;
-    color: #6f7b9c;
+    color: #5a7c86;
     line-height: 1.55;
 }
 
@@ -204,7 +211,7 @@ body.login-body {
 }
 
 .login-label {
-    color: #334165;
+    color: #255763;
     font-size: 0.92rem;
     font-weight: 700;
 }
@@ -216,28 +223,28 @@ body.login-body {
     background: var(--input-bg);
     padding: 0 18px;
     font-size: 1rem;
-    color: #22304f;
+    color: #173f4b;
     outline: none;
     transition: all 0.2s ease;
 }
 
 .login-input:focus {
     background: #ffffff;
-    border-color: rgba(69, 98, 255, 0.45);
+    border-color: rgba(0, 184, 148, 0.55);
     transform: translateY(-1px);
-    box-shadow: 0 10px 24px rgba(70, 92, 212, 0.10);
+    box-shadow: 0 10px 24px rgba(0, 184, 148, 0.14);
 }
 
 .login-submit {
     height: 56px;
     border: none;
     border-radius: 18px;
-    background: linear-gradient(135deg, #5d6dff, #2741d8);
+    background: linear-gradient(135deg, #00cba3, #22b8ff);
     color: white;
     font-size: 1rem;
-    font-weight: 700;
+    font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 18px 30px rgba(45, 67, 214, 0.25);
+    box-shadow: 0 18px 30px rgba(0, 184, 148, 0.25);
     transition: all 0.2s ease;
 }
 
@@ -258,14 +265,14 @@ body.login-body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #66738f;
+    color: #53747d;
     font-size: 0.92rem;
 }
 
 .forgot-link {
     text-decoration: none;
-    color: #3856e5;
-    font-weight: 600;
+    color: #009d92;
+    font-weight: 700;
 }
 
 .login-alert {
