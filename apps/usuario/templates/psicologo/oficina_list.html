@@ -1,42 +1,46 @@
 {% extends "usuario/base.html" %}
 {% block title %}Consultorios{% endblock %}
+
+{% block extra_styles %}
+.office-page{display:grid;gap:22px}.office-hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:28px;border-radius:30px;background:radial-gradient(circle at 12% 12%,rgba(20,184,166,.18),transparent 26%),linear-gradient(135deg,#0f172a,#155e75);color:#fff;box-shadow:0 24px 60px rgba(15,23,42,.16)}.office-hero h1{margin:8px 0 8px;font-size:clamp(2rem,4vw,3.4rem);letter-spacing:-.06em;line-height:.95}.office-hero p{margin:0;max-width:650px;color:rgba(226,232,240,.9);line-height:1.6}.office-kicker{display:inline-flex;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.office-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 16px;border-radius:14px;text-decoration:none;font-weight:900;border:0}.office-btn.primary{background:#fff;color:#0f172a}.office-card{overflow:hidden;border-radius:28px;background:#fff;border:1px solid #e2e8f0;box-shadow:0 18px 44px rgba(15,23,42,.06)}.office-toolbar{display:flex;gap:12px;padding:16px;border-bottom:1px solid #e2e8f0;background:#f8fafc}.office-search{flex:1;min-height:46px;border:1px solid #dbe4ee;border-radius:14px;padding:0 14px;font-weight:700}.office-table-wrap{overflow:auto}.office-table{width:100%;border-collapse:separate;border-spacing:0}.office-table th{padding:15px 18px;background:#f8fafc;color:#64748b;font-size:.75rem;text-align:left;text-transform:uppercase;letter-spacing:.08em}.office-table td{padding:16px 18px;border-top:1px solid #edf2f7;vertical-align:middle}.office-table tbody tr{transition:background .18s ease}.office-table tbody tr:hover{background:#f8fafc}.office-person{display:flex;align-items:center;gap:12px}.office-avatar{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#ccfbf1,#dbeafe);color:#0f766e;font-weight:900}.office-main{display:grid;gap:3px}.office-main strong{color:#0f172a}.office-main span{color:#64748b;font-size:.86rem}.office-address{font-weight:800;color:#0f172a}.office-muted{display:block;color:#64748b;font-size:.86rem;margin-top:4px}.office-pill{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:#ecfeff;color:#0e7490;font-size:.76rem;font-weight:900}.office-actions{display:flex;justify-content:flex-end;gap:8px}.office-action{padding:9px 11px;border-radius:12px;text-decoration:none;font-size:.82rem;font-weight:900;background:#eef2ff;color:#3730a3}.office-action.danger{background:#fff1f2;color:#be123c}.office-empty{padding:34px;text-align:center;color:#64748b;font-weight:800}@media(max-width:760px){.office-hero,.office-toolbar{display:grid}.office-table thead{display:none}.office-table,.office-table tbody,.office-table tr,.office-table td{display:block;width:100%}.office-table tr{border-top:1px solid #e2e8f0;padding:14px}.office-table td{border:0;padding:8px 0}.office-actions{justify-content:flex-start}}
+{% endblock %}
+
 {% block content %}
-<section class="app-page-head">
-  <div>
-    <p class="app-kicker">Psicólogos</p>
-    <h1>Consultorios</h1>
-    <p>Administrá las oficinas y espacios de atención asociados al psicólogo.</p>
-  </div>
-  <a class="app-btn app-btn-primary" href="{% url 'usuario:psicologo_oficina_create' %}">Nuevo consultorio</a>
-</section>
+<div class="office-page">
+  <section class="office-hero">
+    <div>
+      <span class="office-kicker">Consultorios</span>
+      <h1>Espacios de atención</h1>
+      <p>Administrá domicilios, teléfonos y zonas de atención asociados a tu perfil profesional.</p>
+    </div>
+    <a class="office-btn primary" href="{% url 'usuario:psicologo_oficina_create' %}">Nuevo consultorio</a>
+  </section>
 
-<section class="app-card">
-  <form method="get" class="app-toolbar">
-    <input class="app-input" type="search" name="q" value="{{ query }}" placeholder="Buscar por psicólogo, domicilio, teléfono o ubicación">
-    <button class="app-btn" type="submit">Buscar</button>
-  </form>
+  <section class="office-card">
+    <form method="get" class="office-toolbar">
+      <input class="office-search" type="search" name="q" value="{{ query }}" placeholder="Buscar por psicólogo, domicilio, teléfono o ubicación">
+      <button class="office-btn primary" type="submit">Buscar</button>
+    </form>
 
-  <div class="app-table-wrap">
-    <table class="app-table">
-      <thead><tr><th>Psicólogo</th><th>Domicilio</th><th>Teléfono</th><th>Ubicación</th><th>Estado</th><th></th></tr></thead>
-      <tbody>
-        {% for oficina in oficinas %}
-        <tr>
-          <td>{{ oficina.id_psicologo.nombres }}</td>
-          <td>{{ oficina.domicilio }}</td>
-          <td>{{ oficina.telefono|default:"-" }}</td>
-          <td>{{ oficina.id_localidad }}{% if oficina.id_provincia %}, {{ oficina.id_provincia }}{% endif %}</td>
-          <td>{{ oficina.id_estado }}</td>
-          <td class="app-actions">
-            <a href="{% url 'usuario:psicologo_oficina_update' oficina.pk %}">Editar</a>
-            <a class="danger" href="{% url 'usuario:psicologo_oficina_delete' oficina.pk %}">Eliminar</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="6" class="app-empty">No hay consultorios cargados todavía.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</section>
+    <div class="office-table-wrap">
+      <table class="office-table">
+        <thead><tr><th>Psicólogo</th><th>Consultorio</th><th>Teléfono</th><th>Ubicación</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+          {% for oficina in oficinas %}
+          <tr>
+            <td><div class="office-person"><div class="office-avatar">{{ oficina.id_psicologo.nombres|slice:":1"|default:"P" }}</div><div class="office-main"><strong>{{ oficina.id_psicologo.nombres }}</strong><span>DNI {{ oficina.id_psicologo.dni }}</span></div></div></td>
+            <td><span class="office-address">{{ oficina.domicilio }}</span><span class="office-muted">Consultorio presencial</span></td>
+            <td>{{ oficina.telefono|default:"-" }}</td>
+            <td><strong>{{ oficina.id_localidad }}</strong><span class="office-muted">{{ oficina.id_provincia }} · {{ oficina.id_zona }}</span></td>
+            <td><span class="office-pill">{{ oficina.id_estado }}</span></td>
+            <td><div class="office-actions"><a class="office-action" href="{% url 'usuario:psicologo_oficina_update' oficina.pk %}">Editar</a><a class="office-action danger" href="{% url 'usuario:psicologo_oficina_delete' oficina.pk %}">Eliminar</a></div></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="office-empty">No hay consultorios cargados todavía.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
 {% endblock %}
