@@ -10,6 +10,180 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/inicio.css' %}">
+  <style>
+    .experience-slider {
+      position: relative;
+      min-height: 560px;
+      border-radius: 34px;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.58));
+      border: 1px solid rgba(255,255,255,.68);
+      box-shadow: 0 30px 80px rgba(15, 23, 42, .18);
+      isolation: isolate;
+    }
+
+    .experience-slider::before,
+    .experience-slider::after {
+      content: "";
+      position: absolute;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .experience-slider::before {
+      inset: 0;
+      background: linear-gradient(180deg, rgba(15,23,42,.03), rgba(15,23,42,.50));
+    }
+
+    .experience-slider::after {
+      width: 220px;
+      height: 220px;
+      right: -72px;
+      top: -70px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.24);
+      border: 1px solid rgba(255,255,255,.42);
+    }
+
+    .experience-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: scale(1.04);
+      transition: opacity .9s ease, transform 1.6s ease;
+    }
+
+    .experience-slide.is-active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .experience-slide img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .experience-copy {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 22px;
+      z-index: 4;
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.84);
+      border: 1px solid rgba(255,255,255,.70);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 18px 42px rgba(15,23,42,.18);
+    }
+
+    .experience-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: #e0f4f1;
+      color: #1a8c7a;
+      font-size: .76rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .experience-badge::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .experience-copy h3 {
+      margin: 12px 0 6px;
+      color: #172033;
+      font-size: clamp(1.28rem, 2vw, 1.8rem);
+      line-height: 1.05;
+      letter-spacing: -.04em;
+    }
+
+    .experience-copy p {
+      margin: 0;
+      color: #5f6c7b;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    .experience-dots {
+      position: absolute;
+      z-index: 5;
+      left: 50%;
+      bottom: 172px;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.42);
+      backdrop-filter: blur(12px);
+    }
+
+    .experience-dot {
+      width: 9px;
+      height: 9px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(15,23,42,.28);
+      cursor: pointer;
+      transition: width .22s ease, background-color .22s ease;
+    }
+
+    .experience-dot.is-active {
+      width: 28px;
+      background: #1a8c7a;
+    }
+
+    .experience-floating-card {
+      position: absolute;
+      z-index: 4;
+      top: 20px;
+      left: 20px;
+      display: grid;
+      gap: 3px;
+      padding: 13px 15px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(255,255,255,.74);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 16px 34px rgba(15,23,42,.13);
+    }
+
+    .experience-floating-card strong {
+      color: #172033;
+      font-size: .98rem;
+    }
+
+    .experience-floating-card span {
+      color: #64748b;
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+      .experience-slider { min-height: 480px; }
+      .experience-dots { bottom: 154px; }
+    }
+
+    @media (max-width: 640px) {
+      .experience-slider { min-height: 440px; border-radius: 26px; }
+      .experience-copy { left: 14px; right: 14px; bottom: 14px; padding: 15px; border-radius: 20px; }
+      .experience-dots { bottom: 145px; }
+      .experience-floating-card { top: 14px; left: 14px; }
+    }
+  </style>
 </head>
 <body>
 
@@ -50,7 +224,38 @@
       </div>
 
       <div class="hero-right">
-        <h1>AQUI PONER IMAGENES QUE PASEN SOLAS SOBRE EXPERIENCIA DEL USUARIO</h1>
+        <div class="experience-slider" data-experience-slider>
+          <div class="experience-slide is-active">
+            <img src="{% static 'images/fotos_inicio/experiencia_1.jpg' %}" alt="Paciente usando la app desde su casa">
+          </div>
+          <div class="experience-slide">
+            <img src="{% static 'images/fotos_inicio/experiencia_2.jpg' %}" alt="Persona realizando una consulta online">
+          </div>
+          <div class="experience-slide">
+            <img src="{% static 'images/fotos_inicio/experiencia_3.jpg' %}" alt="Paciente reservando un turno desde el celular">
+          </div>
+          <div class="experience-slide">
+            <img src="{% static 'images/fotos_inicio/experiencia_4.jpg' %}" alt="Persona tranquila luego de organizar su proceso terapeutico">
+          </div>
+
+          <div class="experience-floating-card">
+            <strong>Experiencia simple</strong>
+            <span>Turnos, seguimiento y cuidado en un solo lugar</span>
+          </div>
+
+          <div class="experience-dots" aria-label="Imagenes de experiencia de usuario">
+            <button class="experience-dot is-active" type="button" data-slide-dot="0" aria-label="Ver experiencia 1"></button>
+            <button class="experience-dot" type="button" data-slide-dot="1" aria-label="Ver experiencia 2"></button>
+            <button class="experience-dot" type="button" data-slide-dot="2" aria-label="Ver experiencia 3"></button>
+            <button class="experience-dot" type="button" data-slide-dot="3" aria-label="Ver experiencia 4"></button>
+          </div>
+
+          <div class="experience-copy">
+            <span class="experience-badge">Pacientes reales</span>
+            <h3>Una app pensada para acompañarte antes, durante y después de cada sesión.</h3>
+            <p>Reservá turnos, hablá con tu psicólogo y mantené tu proceso organizado desde cualquier dispositivo.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -129,195 +334,37 @@
       <p class="how-p">Diseñamos cada paso para eliminar la fricción. Porque cuando alguien busca ayuda, lo último que necesita es un proceso complicado.</p>
     </div>
     <div class="steps-grid">
-      <div class="step-card">
-        <span class="step-num">1</span>
-        <div class="step-icon si-plum">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#4a2d6b" stroke-width="1.7"/><path d="M4 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#4a2d6b" stroke-width="1.7" stroke-linecap="round"/></svg>
-        </div>
-        <h3>Creás tu perfil</h3>
-        <p>Simple, guiado, sin tecnicismos. Solo lo necesario para conectarte con el profesional ideal.</p>
-      </div>
-      <div class="step-card">
-        <span class="step-num">2</span>
-        <div class="step-icon si-teal">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#1a8c7a" stroke-width="1.7"/><path d="M8 11l2 2 4-4" stroke="#1a8c7a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <h3>Elegís tu psicólogo</h3>
-        <p>Filtrá por especialidad y disponibilidad. Perfiles reales con experiencia y reseñas verificadas.</p>
-      </div>
-      <div class="step-card">
-        <span class="step-num">3</span>
-        <div class="step-icon si-rose">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="16" rx="3" stroke="#d94f6e" stroke-width="1.7"/><path d="M7 2v4M15 2v4M3 10h16" stroke="#d94f6e" stroke-width="1.7" stroke-linecap="round"/></svg>
-        </div>
-        <h3>Reservás tu turno</h3>
-        <p>Elegís día y hora. La primera consulta es gratuita. Sin sorpresas, sin compromisos previos.</p>
-      </div>
-      <div class="step-card">
-        <span class="step-num">4</span>
-        <div class="step-icon si-amber">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3v2M11 17v2M3 11h2M17 11h2M5.6 5.6l1.4 1.4M15 15l1.4 1.4M5.6 16.4l1.4-1.4M15 7l1.4-1.4" stroke="#e8a020" stroke-width="1.7" stroke-linecap="round"/><circle cx="11" cy="11" r="4" stroke="#e8a020" stroke-width="1.7"/></svg>
-        </div>
-        <h3>Empezás tu proceso</h3>
-        <p>Sesiones online, cómodas y privadas. Tu historial y progreso siempre organizados.</p>
-      </div>
+      <div class="step-card"><span class="step-num">1</span><div class="step-icon si-plum"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#4a2d6b" stroke-width="1.7"/><path d="M4 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#4a2d6b" stroke-width="1.7" stroke-linecap="round"/></svg></div><h3>Creás tu perfil</h3><p>Simple, guiado, sin tecnicismos. Solo lo necesario para conectarte con el profesional ideal.</p></div>
+      <div class="step-card"><span class="step-num">2</span><div class="step-icon si-teal"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#1a8c7a" stroke-width="1.7"/><path d="M8 11l2 2 4-4" stroke="#1a8c7a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Elegís tu psicólogo</h3><p>Filtrá por especialidad y disponibilidad. Perfiles reales con experiencia y reseñas verificadas.</p></div>
+      <div class="step-card"><span class="step-num">3</span><div class="step-icon si-rose"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="16" rx="3" stroke="#d94f6e" stroke-width="1.7"/><path d="M7 2v4M15 2v4M3 10h16" stroke="#d94f6e" stroke-width="1.7" stroke-linecap="round"/></svg></div><h3>Reservás tu turno</h3><p>Elegís día y hora. La primera consulta es gratuita. Sin sorpresas, sin compromisos previos.</p></div>
+      <div class="step-card"><span class="step-num">4</span><div class="step-icon si-amber"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3v2M11 17v2M3 11h2M17 11h2M5.6 5.6l1.4 1.4M15 15l1.4 1.4M5.6 16.4l1.4-1.4M15 7l1.4-1.4" stroke="#e8a020" stroke-width="1.7" stroke-linecap="round"/><circle cx="11" cy="11" r="4" stroke="#e8a020" stroke-width="1.7"/></svg></div><h3>Empezás tu proceso</h3><p>Sesiones online, cómodas y privadas. Tu historial y progreso siempre organizados.</p></div>
     </div>
   </div>
 </section>
 
 <section id="psicologos" class="featured-section">
-  <div class="featured-top">
-    <div>
-      <div class="featured-kicker">Profesionales</div>
-      <h2 class="featured-h">Conocé algunos de nuestros psicólogos</h2>
-    </div>
-  </div>
+  <div class="featured-top"><div><div class="featured-kicker">Profesionales</div><h2 class="featured-h">Conocé algunos de nuestros psicólogos</h2></div></div>
   <div class="psych-grid">
-    <div class="psych-card">
-      <div class="psych-top">
-        <div class="psych-av av-1">LP</div>
-        <div class="psych-meta">
-          <div class="psych-name">Lic. Delfina Conte</div>
-          <div class="psych-spec">Psicología Clínica</div>
-          <div class="psych-rate"><span class="psych-rate-stars">★★★★★</span> <span>5.0</span> <span class="psych-rate-count">(148)</span></div>
-        </div>
-        
-      </div>
-      <div class="psych-tags">
-        <span class="badge badge-plum">Ansiedad</span>
-        <span class="badge badge-teal">Vínculos</span>
-        <span class="badge badge-amber">TCC</span>
-      </div>
-      <p class="psych-quote">"Me especializo en ayudar a personas a entender sus patrones y construir una vida más plena."</p>
-      <button class="psych-cta">Ver perfil completo →</button>
-    </div>
-    <div class="psych-card">
-      <div class="psych-top">
-        <div class="psych-av av-2">DM</div>
-        <div class="psych-meta">
-          <div class="psych-name">Lic. Giuliana Picon</div>
-          <div class="psych-spec">Psicoanálisis</div>
-          <div class="psych-rate"><span class="psych-rate-stars">★★★★★</span> <span>4.9</span> <span class="psych-rate-count">(93)</span></div>
-        </div>
-        
-      </div>
-      <div class="psych-tags">
-        <span class="badge badge-teal">Depresión</span>
-        <span class="badge badge-plum">Autoestima</span>
-        <span class="badge badge-amber">Duelo</span>
-      </div>
-      <p class="psych-quote">"Trabajo desde la escucha profunda para que cada persona pueda hacer su propio recorrido."</p>
-
-      <button class="psych-cta">Ver perfil completo →</button>
-    </div>
-    <div class="psych-card">
-      <div class="psych-top">
-        <div class="psych-av av-3">SC</div>
-        <div class="psych-meta">
-          <div class="psych-name">Lic. Sofía Castaño</div>
-          <div class="psych-spec">Infanto-Juvenil</div>
-          <div class="psych-rate"><span class="psych-rate-stars">★★★★★</span> <span>4.9</span> <span class="psych-rate-count">(211)</span></div>
-        </div>
-        
-      </div>
-      <div class="psych-tags">
-        <span class="badge badge-plum">Niños</span>
-        <span class="badge badge-teal">Adolescentes</span>
-        <span class="badge badge-amber">Familia</span>
-      </div>
-      <p class="psych-quote">"Cada niño tiene su propio tiempo y lenguaje. Acompañarlos en eso es lo que más me apasiona."</p>
-      <button class="psych-cta">Ver perfil completo →</button>
-    </div>
+    <div class="psych-card"><div class="psych-top"><div class="psych-av av-1">LP</div><div class="psych-meta"><div class="psych-name">Lic. Delfina Conte</div><div class="psych-spec">Psicología Clínica</div><div class="psych-rate"><span class="psych-rate-stars">★★★★★</span> <span>5.0</span> <span class="psych-rate-count">(148)</span></div></div></div><div class="psych-tags"><span class="badge badge-plum">Ansiedad</span><span class="badge badge-teal">Vínculos</span><span class="badge badge-amber">TCC</span></div><p class="psych-quote">"Me especializo en ayudar a personas a entender sus patrones y construir una vida más plena."</p><button class="psych-cta">Ver perfil completo →</button></div>
+    <div class="psych-card"><div class="psych-top"><div class="psych-av av-2">DM</div><div class="psych-meta"><div class="psych-name">Lic. Giuliana Picon</div><div class="psych-spec">Psicoanálisis</div><div class="psych-rate"><span class="psych-rate-stars">★★★★★</span> <span>4.9</span> <span class="psych-rate-count">(93)</span></div></div></div><div class="psych-tags"><span class="badge badge-teal">Depresión</span><span class="badge badge-plum">Autoestima</span><span class="badge badge-amber">Duelo</span></div><p class="psych-quote">"Trabajo desde la escucha profunda para que cada persona pueda hacer su propio recorrido."</p><button class="psych-cta">Ver perfil completo →</button></div>
+    <div class="psych-card"><div class="psych-top"><div class="psych-av av-3">SC</div><div class="psych-meta"><div class="psych-name">Lic. Sofía Castaño</div><div class="psych-spec">Infanto-Juvenil</div><div class="psych-rate"><span class="psych-rate-stars">★★★★★</span> <span>4.9</span> <span class="psych-rate-count">(211)</span></div></div></div><div class="psych-tags"><span class="badge badge-plum">Niños</span><span class="badge badge-teal">Adolescentes</span><span class="badge badge-amber">Familia</span></div><p class="psych-quote">"Cada niño tiene su propio tiempo y lenguaje. Acompañarlos en eso es lo que más me apasiona."</p><button class="psych-cta">Ver perfil completo →</button></div>
   </div>
 </section>
 
-<section class="testi-section">
-  <div class="testi-in">
-    <div class="testi-kicker">Historias reales</div>
-    <h2 class="testi-h">Personas que dieron el paso.<br>Y lo volvieron a dar.</h2>
-    <div class="testi-grid">
-      <div class="testi-card">
-        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
-        <p class="testi-q">"Llevaba meses postergando buscar ayuda. Entré a MenteClara, elegí una psicóloga y en tres días ya había tenido mi primera sesión. Me cambió la vida."</p>
-        <div class="testi-author">
-          <div class="tav">VR</div>
-          <div><div class="testi-name">Valentina R.</div><div class="testi-role">Paciente · Córdoba · 6 meses</div></div>
-        </div>
-      </div>
-      <div class="testi-card">
-        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
-        <p class="testi-q">"Como psicólogo, el tiempo que pasaba en burocracia era absurdo. Desde que uso MenteClara solo me enfoco en mis pacientes. La agenda y el historial son increíbles."</p>
-        <div class="testi-author">
-          <div class="tav">DM</div>
-          <div><div class="testi-name">Lic. Diego M.</div><div class="testi-role">Psicólogo · Rosario · 2 años</div></div>
-        </div>
-      </div>
-      <div class="testi-card">
-        <div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
-        <p class="testi-q">"Tenía miedo de que fuera incómodo o impersonal. Pero encontré una psicóloga que realmente me entiende. Los turnos online son más cómodos de lo que pensaba."</p>
-        <div class="testi-author">
-          <div class="tav">MG</div>
-          <div><div class="testi-name">Martín G.</div><div class="testi-role">Paciente · Mendoza · 4 meses</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<section class="testi-section"><div class="testi-in"><div class="testi-kicker">Historias reales</div><h2 class="testi-h">Personas que dieron el paso.<br>Y lo volvieron a dar.</h2><div class="testi-grid"><div class="testi-card"><div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div><p class="testi-q">"Llevaba meses postergando buscar ayuda. Entré a MenteClara, elegí una psicóloga y en tres días ya había tenido mi primera sesión. Me cambió la vida."</p><div class="testi-author"><div class="tav">VR</div><div><div class="testi-name">Valentina R.</div><div class="testi-role">Paciente · Córdoba · 6 meses</div></div></div></div><div class="testi-card"><div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div><p class="testi-q">"Como psicólogo, el tiempo que pasaba en burocracia era absurdo. Desde que uso MenteClara solo me enfoco en mis pacientes. La agenda y el historial son increíbles."</p><div class="testi-author"><div class="tav">DM</div><div><div class="testi-name">Lic. Diego M.</div><div class="testi-role">Psicólogo · Rosario · 2 años</div></div></div></div><div class="testi-card"><div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div><p class="testi-q">"Tenía miedo de que fuera incómodo o impersonal. Pero encontré una psicóloga que realmente me entiende. Los turnos online son más cómodos de lo que pensaba."</p><div class="testi-author"><div class="tav">MG</div><div><div class="testi-name">Martín G.</div><div class="testi-role">Paciente · Mendoza · 4 meses</div></div></div></div></div></div></section>
 
 <section class="faq-section">
-  <div class="faq-kicker">Preguntas frecuentes</div>
-  <h2 class="faq-h">Todo lo que querés saber antes de empezar.</h2>
-  <details open>
-    <summary>¿La primera consulta es realmente gratis? <span class="sum-icon">−</span></summary>
-    <p class="faq-body">Sí, completamente. Creemos que antes de comprometerse con un proceso terapéutico, es importante que puedas conocer al profesional y sentir si hay conexión. La primera sesión de 30 minutos no tiene costo para vos.</p>
-  </details>
-  <details>
-    <summary>¿Cómo elijo al psicólogo correcto? <span class="sum-icon">+</span></summary>
-    <p class="faq-body">Podés filtrar por especialidad, enfoque terapéutico, disponibilidad horaria y franja de precios. Cada perfil tiene reseñas reales de pacientes y una presentación del profesional. Si después de la primera consulta no es lo que esperabas, podés buscar otro sin problemas.</p>
-  </details>
-  <details>
-    <summary>¿Es seguro y privado? <span class="sum-icon">+</span></summary>
-    <p class="faq-body">Totalmente. Tus datos clínicos son confidenciales y solo vos y tu psicólogo tienen acceso a ellos. Usamos encriptación de extremo a extremo y cumplimos con las normas de privacidad vigentes en Argentina.</p>
-  </details>
-  <details>
-    <summary>¿Qué pasa si necesito cambiar de profesional? <span class="sum-icon">+</span></summary>
-    <p class="faq-body">Podés hacerlo cuando quieras, sin dar explicaciones. Tu historial queda guardado en tu perfil y podés optar por compartirlo con el nuevo profesional o empezar desde cero.</p>
-  </details>
-  <details>
-    <summary>¿Cuánto cuesta una sesión? <span class="sum-icon">+</span></summary>
-    <p class="faq-body">Los precios los define cada profesional. En MenteClara encontrás opciones desde $5.000 hasta $12.000 por sesión. Podés filtrar por rango de precios al buscar tu psicólogo.</p>
-  </details>
+  <div class="faq-kicker">Preguntas frecuentes</div><h2 class="faq-h">Todo lo que querés saber antes de empezar.</h2>
+  <details open><summary>¿La primera consulta es realmente gratis? <span class="sum-icon">−</span></summary><p class="faq-body">Sí, completamente. Creemos que antes de comprometerse con un proceso terapéutico, es importante que puedas conocer al profesional y sentir si hay conexión. La primera sesión de 30 minutos no tiene costo para vos.</p></details>
+  <details><summary>¿Cómo elijo al psicólogo correcto? <span class="sum-icon">+</span></summary><p class="faq-body">Podés filtrar por especialidad, enfoque terapéutico, disponibilidad horaria y franja de precios. Cada perfil tiene reseñas reales de pacientes y una presentación del profesional.</p></details>
+  <details><summary>¿Es seguro y privado? <span class="sum-icon">+</span></summary><p class="faq-body">Totalmente. Tus datos clínicos son confidenciales y solo vos y tu psicólogo tienen acceso a ellos.</p></details>
+  <details><summary>¿Qué pasa si necesito cambiar de profesional? <span class="sum-icon">+</span></summary><p class="faq-body">Podés hacerlo cuando quieras, sin dar explicaciones. Tu historial queda guardado en tu perfil.</p></details>
+  <details><summary>¿Cuánto cuesta una sesión? <span class="sum-icon">+</span></summary><p class="faq-body">Los precios los define cada profesional y podés filtrar por rango de precios.</p></details>
 </section>
 
-<div class="cta-section">
-  <div class="cta-box">
-    <div style="position:relative;z-index:1">
-      <div class="cta-kicker">Empezá hoy</div>
-      <h2 class="cta-h">El mejor momento para<br>empezar tu proceso es ahora.</h2>
-    </div>
-    <div class="cta-actions">
-      <a href="{% url 'usuario:paciente_create' %}" class="cta-btn-main">Buscar mi psicólogo →</a>
-      <a href="{% url 'usuario:psicologo_create' %}" class="cta-btn-sec">¿Sos psicólogo/a? Sumate</a>
-    </div>
-  </div>
-</div>
+<div class="cta-section"><div class="cta-box"><div style="position:relative;z-index:1"><div class="cta-kicker">Empezá hoy</div><h2 class="cta-h">El mejor momento para<br>empezar tu proceso es ahora.</h2></div><div class="cta-actions"><a href="{% url 'usuario:paciente_create' %}" class="cta-btn-main">Buscar mi psicólogo →</a><a href="{% url 'usuario:psicologo_create' %}" class="cta-btn-sec">¿Sos psicólogo/a? Sumate</a></div></div></div>
 
-<footer class="footer">
-  <div class="footer-in">
-    <div class="footer-brand">
-      <div class="brand-icon" style="width:32px;height:32px;border-radius:8px;">
-        <svg width="18" height="18" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="white" stroke-width="1.7"/><path d="M4 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
-      </div>
-      <span class="footer-brand-name">MenteClara</span>
-    </div>
-    <p class="footer-copy">© 2025 MenteClara. Plataforma de psicología digital.</p>
-    <nav class="footer-links">
-      <a href="#">Privacidad</a>
-      <a href="#">Términos</a>
-      <a href="#">Ingresar</a>
-    </nav>
-  </div>
-</footer>
+<footer class="footer"><div class="footer-in"><div class="footer-brand"><div class="brand-icon" style="width:32px;height:32px;border-radius:8px;"><svg width="18" height="18" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="white" stroke-width="1.7"/><path d="M4 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg></div><span class="footer-brand-name">MenteClara</span></div><p class="footer-copy">© 2025 MenteClara. Plataforma de psicología digital.</p><nav class="footer-links"><a href="#">Privacidad</a><a href="#">Términos</a><a href="{% url 'login' %}">Ingresar</a></nav></div></footer>
 
 <script>
   document.querySelectorAll('details').forEach(d => {
@@ -326,12 +373,40 @@
       if (icon) icon.textContent = d.open ? '−' : '+';
     });
   });
-  document.querySelectorAll('.slot').forEach(s => {
-    s.addEventListener('click', () => {
-      document.querySelectorAll('.slot').forEach(x => x.classList.remove('active'));
-      s.classList.add('active');
+
+  (function () {
+    const slider = document.querySelector('[data-experience-slider]');
+    if (!slider) return;
+
+    const slides = Array.from(slider.querySelectorAll('.experience-slide'));
+    const dots = Array.from(slider.querySelectorAll('.experience-dot'));
+    let current = 0;
+    let timer = null;
+
+    function showSlide(index) {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, slideIndex) => slide.classList.toggle('is-active', slideIndex === current));
+      dots.forEach((dot, dotIndex) => dot.classList.toggle('is-active', dotIndex === current));
+    }
+
+    function startSlider() {
+      timer = window.setInterval(() => showSlide(current + 1), 4200);
+    }
+
+    function restartSlider() {
+      if (timer) window.clearInterval(timer);
+      startSlider();
+    }
+
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        showSlide(Number(dot.dataset.slideDot || 0));
+        restartSlider();
+      });
     });
-  });
+
+    startSlider();
+  }());
 </script>
 </body>
 </html>
