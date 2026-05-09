@@ -26,12 +26,16 @@
       {% csrf_token %}
       <div class="office-form-grid">
         {% for field in form %}
-          <div class="office-field {% if field.name == 'domicilio' %}span-2{% endif %}">
-            <label>{{ field.label }}</label>
+          {% if field.is_hidden %}
             {{ field }}
-            {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
-            {% for error in field.errors %}<p class="office-error">{{ error }}</p>{% endfor %}
-          </div>
+          {% else %}
+            <div class="office-field {% if field.name == 'domicilio' %}span-2{% endif %}">
+              <label>{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+              {% for error in field.errors %}<p class="office-error">{{ error }}</p>{% endfor %}
+            </div>
+          {% endif %}
         {% endfor %}
       </div>
 
