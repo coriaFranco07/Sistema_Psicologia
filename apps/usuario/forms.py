@@ -19,8 +19,16 @@ from apps.parametro.models import (
     TipoCivil,
     Zona,
 )
+from apps.parametro.models.metodo_pago import MetodoPago
 
-from .models import MAX_SIZE_MB, Paciente, Psicologo, PsicologoPendiente
+from .models import (
+    MAX_SIZE_MB,
+    Paciente,
+    Psicologo,
+    PsicologoMetodoPago,
+    PsicologoOficina,
+    PsicologoPendiente,
+)
 
 
 USUARIO_BASE_FIELDS = ["nombres", "email", "dni", "cuil", "fch_nacimiento", "foto"]
@@ -393,3 +401,101 @@ class PacienteForm(UsuarioBaseForm):
         self.fields["id_grado_estudio"].queryset = GradoEstudio.objects.filter(
             flg_activo=True
         ).order_by("dsc_grado_estudio")
+
+
+class PsicologoOficinaForm(forms.ModelForm):
+    class Meta:
+        model = PsicologoOficina
+        fields = [
+            "id_psicologo",
+            "domicilio",
+            "telefono",
+            "id_pais",
+            "id_provincia",
+            "id_localidad",
+            "id_zona",
+            "id_estado",
+        ]
+        widgets = {
+            "id_psicologo": forms.Select(attrs={"class": "app-select"}),
+            "domicilio": forms.TextInput(attrs={"class": "app-input", "placeholder": "Domicilio de la oficina"}),
+            "telefono": forms.TextInput(attrs={"class": "app-input", "placeholder": "Telefono de contacto"}),
+            "id_pais": forms.Select(attrs={"class": "app-select"}),
+            "id_provincia": forms.Select(attrs={"class": "app-select"}),
+            "id_localidad": forms.Select(attrs={"class": "app-select"}),
+            "id_zona": forms.Select(attrs={"class": "app-select"}),
+            "id_estado": forms.Select(attrs={"class": "app-select"}),
+        }
+
+    def __init__(self, *args, user=None, psicologo=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.psicologo = psicologo
+        self.fields["id_psicologo"].queryset = Psicologo.objects.order_by("nombres", "dni")
+        self.fields["id_pais"].queryset = Pais.objects.filter(flg_activo=True).order_by("dsc_pais")
+        self.fields["id_provincia"].queryset = Provincia.objects.filter(flg_activo=True).order_by("dsc_provincia")
+        self.fields["id_localidad"].queryset = Localidad.objects.filter(flg_activo=True).order_by("dsc_localidad")
+        self.fields["id_zona"].queryset = Zona.objects.filter(flg_activo=True).order_by("dsc_zona")
+        self.fields["id_estado"].queryset = Estado.objects.filter(flg_activo=True).order_by("dsc_estado")
+
+        if self.psicologo and not (self.user and (self.user.is_staff or self.user.is_superuser)):
+            self.fields["id_psicologo"].queryset = Psicologo.objects.filter(pk=self.psicologo.pk)
+            self.fields["id_psicologo"].initial = self.psicologo
+            self.fields["id_psicologo"].disabled = True
+
+    def save(self, commit=True):
+        oficina = super().save(commit=False)
+        if self.psicologo and self.fields["id_psicologo"].disabled:
+            oficina.id_psicologo = self.psicologo
+        if commit:
+            oficina.save()
+            self.save_m2m()
+        return oficina
+
+
+class PsicologoMetodoPagoForm(forms.ModelForm):
+    class Meta:
+        model = PsicologoMetodoPago
+        fields = ["id_psicologo", "id_metodo_pago", "id_estado"]
+        widgets = {
+            "id_psicologo": forms.Select(attrs={"class": "app-select"}),
+            "id_metodo_pago": forms.Select(attrs={"class": "app-select"}),
+            "id_estado": forms.Select(attrs={"class": "app-select"}),
+        }
+
+    def __init__(self, *args, user=None, psicologo=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.psicologo = psicologo
+        self.fields["id_psicologo"].queryset = Psicologo.objects.order_by("nombres", "dni")
+        self.fields["id_metodo_pago"].queryset = MetodoPago.objects.filter(flg_activo=True).order_by("dsc_metodo_pago")
+        self.fields["id_estado"].queryset = Estado.objects.filter(flg_activo=True).order_by("dsc_estado")
+
+        if self.psicologo and not (self.user and (self.user.is_staff or self.user.is_superuser)):
+            self.fields["id_psicologo"].queryset = Psicologo.objects.filter(pk=self.psicologo.pk)
+            self.fields["id_psicologo"].initial = self.psicologo
+            self.fields["id_psicologo"].disabled = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        psicologo = self.psicologo if self.fields["id_psicologo"].disabled else cleaned_data.get("id_psicologo")
+        metodo_pago = cleaned_data.get("id_metodo_pago")
+        if psicologo and metodo_pago:
+            queryset = PsicologoMetodoPago.objects.filter(
+                id_psicologo=psicologo,
+                id_metodo_pago=metodo_pago,
+            )
+            if self.instance.pk:
+                queryset = queryset.exclude(pk=self.instance.pk)
+            if queryset.exists():
+                raise ValidationError("Este metodo de pago ya esta cargado para el psicologo.")
+        return cleaned_data
+
+    def save(self, commit=True):
+        metodo_pago = super().save(commit=False)
+        if self.psicologo and self.fields["id_psicologo"].disabled:
+            metodo_pago.id_psicologo = self.psicologo
+        if commit:
+            metodo_pago.save()
+            self.save_m2m()
+        return metodo_pago
