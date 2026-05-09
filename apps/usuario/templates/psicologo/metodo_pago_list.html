@@ -1,40 +1,44 @@
 {% extends "usuario/base.html" %}
 {% block title %}Métodos de pago{% endblock %}
+
+{% block extra_styles %}
+.pay-page{display:grid;gap:22px}.pay-hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:28px;border-radius:30px;background:radial-gradient(circle at 10% 12%,rgba(99,102,241,.2),transparent 24%),linear-gradient(135deg,#111827,#312e81);color:#fff;box-shadow:0 24px 60px rgba(15,23,42,.16)}.pay-hero h1{margin:8px 0 8px;font-size:clamp(2rem,4vw,3.3rem);line-height:.95;letter-spacing:-.06em}.pay-hero p{margin:0;max-width:640px;color:rgba(226,232,240,.9);line-height:1.6}.pay-kicker{display:inline-flex;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.pay-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 16px;border-radius:14px;text-decoration:none;font-weight:900;border:0}.pay-btn.primary{background:#fff;color:#111827}.pay-card{overflow:hidden;border-radius:28px;background:#fff;border:1px solid #e2e8f0;box-shadow:0 18px 44px rgba(15,23,42,.06)}.pay-toolbar{display:flex;gap:12px;padding:16px;border-bottom:1px solid #e2e8f0;background:#f8fafc}.pay-search{flex:1;min-height:46px;border:1px solid #dbe4ee;border-radius:14px;padding:0 14px;font-weight:700}.pay-table-wrap{overflow:auto}.pay-table{width:100%;border-collapse:separate;border-spacing:0}.pay-table th{padding:15px 18px;background:#f8fafc;color:#64748b;font-size:.75rem;text-align:left;text-transform:uppercase;letter-spacing:.08em}.pay-table td{padding:16px 18px;border-top:1px solid #edf2f7;vertical-align:middle}.pay-table tbody tr:hover{background:#fafaff}.pay-person{display:flex;align-items:center;gap:12px}.pay-avatar{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#ddd6fe,#dbeafe);color:#4338ca;font-weight:900}.pay-main{display:grid;gap:3px}.pay-main strong{color:#0f172a}.pay-main span{color:#64748b;font-size:.86rem}.pay-method{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:14px;background:#eef2ff;color:#312e81;font-weight:900}.pay-dot{width:10px;height:10px;border-radius:999px;background:#6366f1}.pay-state{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:#ecfdf5;color:#15803d;font-size:.76rem;font-weight:900}.pay-actions{display:flex;justify-content:flex-end;gap:8px}.pay-action{padding:9px 11px;border-radius:12px;text-decoration:none;font-size:.82rem;font-weight:900;background:#eef2ff;color:#3730a3}.pay-action.danger{background:#fff1f2;color:#be123c}.pay-empty{padding:34px;text-align:center;color:#64748b;font-weight:800}@media(max-width:760px){.pay-hero,.pay-toolbar{display:grid}.pay-table thead{display:none}.pay-table,.pay-table tbody,.pay-table tr,.pay-table td{display:block;width:100%}.pay-table tr{border-top:1px solid #e2e8f0;padding:14px}.pay-table td{border:0;padding:8px 0}.pay-actions{justify-content:flex-start}}
+{% endblock %}
+
 {% block content %}
-<section class="app-page-head">
-  <div>
-    <p class="app-kicker">Psicólogos</p>
-    <h1>Métodos de pago</h1>
-    <p>Gestioná los medios de pago habilitados para cada profesional.</p>
-  </div>
-  <a class="app-btn app-btn-primary" href="{% url 'usuario:psicologo_metodo_pago_create' %}">Nuevo método</a>
-</section>
+<div class="pay-page">
+  <section class="pay-hero">
+    <div>
+      <span class="pay-kicker">Cobros</span>
+      <h1>Métodos de pago</h1>
+      <p>Configurá y administrá los medios de pago disponibles para tus pacientes.</p>
+    </div>
+    <a class="pay-btn primary" href="{% url 'usuario:psicologo_metodo_pago_create' %}">Nuevo método</a>
+  </section>
 
-<section class="app-card">
-  <form method="get" class="app-toolbar">
-    <input class="app-input" type="search" name="q" value="{{ query }}" placeholder="Buscar por psicólogo o método de pago">
-    <button class="app-btn" type="submit">Buscar</button>
-  </form>
+  <section class="pay-card">
+    <form method="get" class="pay-toolbar">
+      <input class="pay-search" type="search" name="q" value="{{ query }}" placeholder="Buscar por psicólogo o método de pago">
+      <button class="pay-btn primary" type="submit">Buscar</button>
+    </form>
 
-  <div class="app-table-wrap">
-    <table class="app-table">
-      <thead><tr><th>Psicólogo</th><th>Método de pago</th><th>Estado</th><th></th></tr></thead>
-      <tbody>
-        {% for metodo in metodos_pago %}
-        <tr>
-          <td>{{ metodo.id_psicologo.nombres }}</td>
-          <td>{{ metodo.id_metodo_pago }}</td>
-          <td>{{ metodo.id_estado }}</td>
-          <td class="app-actions">
-            <a href="{% url 'usuario:psicologo_metodo_pago_update' metodo.pk %}">Editar</a>
-            <a class="danger" href="{% url 'usuario:psicologo_metodo_pago_delete' metodo.pk %}">Eliminar</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="4" class="app-empty">No hay métodos de pago cargados.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</section>
+    <div class="pay-table-wrap">
+      <table class="pay-table">
+        <thead><tr><th>Psicólogo</th><th>Método</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+          {% for metodo in metodos_pago %}
+          <tr>
+            <td><div class="pay-person"><div class="pay-avatar">{{ metodo.id_psicologo.nombres|slice:":1"|default:"P" }}</div><div class="pay-main"><strong>{{ metodo.id_psicologo.nombres }}</strong><span>DNI {{ metodo.id_psicologo.dni }}</span></div></div></td>
+            <td><span class="pay-method"><span class="pay-dot"></span>{{ metodo.id_metodo_pago }}</span></td>
+            <td><span class="pay-state">{{ metodo.id_estado }}</span></td>
+            <td><div class="pay-actions"><a class="pay-action" href="{% url 'usuario:psicologo_metodo_pago_update' metodo.pk %}">Editar</a><a class="pay-action danger" href="{% url 'usuario:psicologo_metodo_pago_delete' metodo.pk %}">Eliminar</a></div></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="pay-empty">No hay métodos de pago cargados.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
 {% endblock %}
