@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import CharField, Q
 from django.db.models.functions import Cast
@@ -7,13 +8,58 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import DeleteView, DetailView, ListView, TemplateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
 
 from apps.datos_personales.forms import DatosPersonalesForm
 from apps.datos_personales.models import DatosPersonales
 
-from .forms import DatosPersonalesSolicitudForm, PacienteForm, PsicologoForm, PsicologoPendienteForm
-from .models import Paciente, Psicologo, PsicologoPendiente
+from .forms import (
+    DatosPersonalesSolicitudForm,
+    PacienteForm,
+    PsicologoForm,
+    PsicologoMetodoPagoForm,
+    PsicologoOficinaForm,
+    PsicologoPendienteForm,
+)
+from .models import Paciente, Psicologo, PsicologoMetodoPago, PsicologoOficina, PsicologoPendiente
+
+
+class PsicologoOwnerOrStaffMixin(LoginRequiredMixin, UserPassesTestMixin):
+    psicologo_owner_field = "id_psicologo"
+
+    def get_logged_psicologo(self):
+        if not self.request.user.is_authenticated:
+            return None
+        return Psicologo.objects.filter(dni=self.request.user.username).first()
+
+    def user_is_staff(self):
+        user = self.request.user
+        return user.is_staff or user.is_superuser
+
+    def test_func(self):
+        if self.user_is_staff():
+            return True
+        psicologo = self.get_logged_psicologo()
+        if psicologo is None:
+            return False
+        obj = getattr(self, "object", None)
+        if obj is None:
+            return True
+        return getattr(obj, self.psicologo_owner_field + "_id") == psicologo.pk
+
+    def get_owner_filtered_queryset(self, queryset):
+        if self.user_is_staff():
+            return queryset
+        psicologo = self.get_logged_psicologo()
+        if psicologo is None:
+            return queryset.none()
+        return queryset.filter(**{self.psicologo_owner_field: psicologo})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        kwargs["psicologo"] = self.get_logged_psicologo()
+        return kwargs
 
 
 class DashboardView(TemplateView):
@@ -603,6 +649,152 @@ class PacienteCreateView(PacienteFormView):
 
 class PacienteUpdateView(PacienteFormView):
     success_action = "actualizado"
+
+
+class PsicologoOficinaListView(PsicologoOwnerOrStaffMixin, ListView):
+    model = PsicologoOficina
+    template_name = "psicologo/oficina_list.html"
+    context_object_name = "oficinas"
+
+    def get_queryset(self):
+        queryset = PsicologoOficina.objects.select_related(
+            "id_psicologo",
+            "id_pais",
+            "id_provincia",
+            "id_localidad",
+            "id_zona",
+            "id_estado",
+        ).order_by("id_psicologo__nombres", "domicilio")
+        queryset = self.get_owner_filtered_queryset(queryset)
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(
+                Q(id_psicologo__nombres__icontains=query)
+                | Q(domicilio__icontains=query)
+                | Q(telefono__icontains=query)
+                | Q(id_pais__dsc_pais__icontains=query)
+                | Q(id_provincia__dsc_provincia__icontains=query)
+                | Q(id_localidad__dsc_localidad__icontains=query)
+                | Q(id_zona__dsc_zona__icontains=query)
+                | Q(id_estado__dsc_estado__icontains=query)
+            )
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["query"] = self.request.GET.get("q", "").strip()
+        context["total_resultados"] = self.object_list.count()
+        return context
+
+
+class PsicologoOficinaCreateView(PsicologoOwnerOrStaffMixin, CreateView):
+    model = PsicologoOficina
+    form_class = PsicologoOficinaForm
+    template_name = "psicologo/oficina_form.html"
+    success_url = reverse_lazy("usuario:psicologo_oficina_list")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Oficina creada correctamente.")
+        return super().form_valid(form)
+
+
+class PsicologoOficinaUpdateView(PsicologoOwnerOrStaffMixin, UpdateView):
+    model = PsicologoOficina
+    form_class = PsicologoOficinaForm
+    template_name = "psicologo/oficina_form.html"
+    success_url = reverse_lazy("usuario:psicologo_oficina_list")
+
+    def get_queryset(self):
+        queryset = PsicologoOficina.objects.select_related("id_psicologo")
+        return self.get_owner_filtered_queryset(queryset)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Oficina actualizada correctamente.")
+        return super().form_valid(form)
+
+
+class PsicologoOficinaDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
+    model = PsicologoOficina
+    template_name = "psicologo/oficina_confirm_delete.html"
+    context_object_name = "oficina"
+    success_url = reverse_lazy("usuario:psicologo_oficina_list")
+
+    def get_queryset(self):
+        queryset = PsicologoOficina.objects.select_related("id_psicologo")
+        return self.get_owner_filtered_queryset(queryset)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Oficina eliminada correctamente.")
+        return super().form_valid(form)
+
+
+class PsicologoMetodoPagoListView(PsicologoOwnerOrStaffMixin, ListView):
+    model = PsicologoMetodoPago
+    template_name = "psicologo/metodo_pago_list.html"
+    context_object_name = "metodos_pago"
+
+    def get_queryset(self):
+        queryset = PsicologoMetodoPago.objects.select_related(
+            "id_psicologo",
+            "id_metodo_pago",
+            "id_estado",
+        ).order_by("id_psicologo__nombres", "id_metodo_pago__dsc_metodo_pago")
+        queryset = self.get_owner_filtered_queryset(queryset)
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(
+                Q(id_psicologo__nombres__icontains=query)
+                | Q(id_metodo_pago__dsc_metodo_pago__icontains=query)
+                | Q(id_estado__dsc_estado__icontains=query)
+            )
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["query"] = self.request.GET.get("q", "").strip()
+        context["total_resultados"] = self.object_list.count()
+        return context
+
+
+class PsicologoMetodoPagoCreateView(PsicologoOwnerOrStaffMixin, CreateView):
+    model = PsicologoMetodoPago
+    form_class = PsicologoMetodoPagoForm
+    template_name = "psicologo/metodo_pago_form.html"
+    success_url = reverse_lazy("usuario:psicologo_metodo_pago_list")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Metodo de pago creado correctamente.")
+        return super().form_valid(form)
+
+
+class PsicologoMetodoPagoUpdateView(PsicologoOwnerOrStaffMixin, UpdateView):
+    model = PsicologoMetodoPago
+    form_class = PsicologoMetodoPagoForm
+    template_name = "psicologo/metodo_pago_form.html"
+    success_url = reverse_lazy("usuario:psicologo_metodo_pago_list")
+
+    def get_queryset(self):
+        queryset = PsicologoMetodoPago.objects.select_related("id_psicologo")
+        return self.get_owner_filtered_queryset(queryset)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Metodo de pago actualizado correctamente.")
+        return super().form_valid(form)
+
+
+class PsicologoMetodoPagoDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
+    model = PsicologoMetodoPago
+    template_name = "psicologo/metodo_pago_confirm_delete.html"
+    context_object_name = "metodo_pago"
+    success_url = reverse_lazy("usuario:psicologo_metodo_pago_list")
+
+    def get_queryset(self):
+        queryset = PsicologoMetodoPago.objects.select_related("id_psicologo")
+        return self.get_owner_filtered_queryset(queryset)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Metodo de pago eliminado correctamente.")
+        return super().form_valid(form)
 
 
 class PsicologoDeleteView(DeleteView):
