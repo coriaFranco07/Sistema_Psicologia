@@ -17,6 +17,7 @@ from .forms import (
     DatosPersonalesSolicitudForm,
     PacienteForm,
     PsicologoForm,
+    PsicologoIdiomaForm,
     PsicologoMetodoPagoForm,
     PsicologoOficinaForm,
     PsicologoPendienteForm,

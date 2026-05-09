@@ -21,6 +21,7 @@ from apps.parametro.models import (
     Sexo,
     TipoCivil,
     Zona,
+    
 )
 from apps.parametro.models.idioma import Idioma
 from apps.parametro.models.metodo_pago import MetodoPago

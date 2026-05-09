@@ -30,6 +30,7 @@ from .models import (
     PsicologoMetodoPago,
     PsicologoOficina,
     PsicologoPendiente,
+    PsicologoIdioma,
 )
 
 
