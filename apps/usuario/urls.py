@@ -80,6 +80,26 @@ urlpatterns = [
         views.PsicologoMetodoPagoDeleteView.as_view(),
         name="psicologo_metodo_pago_delete",
     ),
+    path(
+        "psicologos/idiomas/",
+        views.PsicologoIdiomaListView.as_view(),
+        name="psicologo_idioma_list",
+    ),
+    path(
+        "psicologos/idiomas/nuevo/",
+        views.PsicologoIdiomaCreateView.as_view(),
+        name="psicologo_idioma_create",
+    ),
+    path(
+        "psicologos/idiomas/<int:pk>/editar/",
+        views.PsicologoIdiomaUpdateView.as_view(),
+        name="psicologo_idioma_update",
+    ),
+    path(
+        "psicologos/idiomas/<int:pk>/eliminar/",
+        views.PsicologoIdiomaDeleteView.as_view(),
+        name="psicologo_idioma_delete",
+    ),
     path("pacientes/", views.PacienteListView.as_view(), name="paciente_list"),
     path("pacientes/nuevo/", views.PacienteCreateView.as_view(), name="paciente_create"),
     path(
