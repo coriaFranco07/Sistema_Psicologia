@@ -8,10 +8,8 @@ class LoginForm(AuthenticationForm):
         widget=forms.TextInput(
             attrs={
                 "class": "login-input",
-                "placeholder": "Ingresa tu DNI",
+                "placeholder": "Ingresa tu DNI o usuario",
                 "autocomplete": "username",
-                "inputmode": "numeric",
-                "maxlength": "8",
             }
         ),
     )
