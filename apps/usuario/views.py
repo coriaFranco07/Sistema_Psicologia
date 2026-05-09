@@ -127,6 +127,14 @@ class BasePersonaFormView(View):
             return None
         return getattr(persona, "datos_personales_rel", None)
 
+    def assign_datos_relation(self, datos_personales, persona):
+        if self.relation_field == "psicologo":
+            datos_personales.psicologo = persona
+            datos_personales.paciente = None
+        else:
+            datos_personales.paciente = persona
+            datos_personales.psicologo = None
+
     def get_context(self, form, datos_form, persona):
         return {
             "form": form,
@@ -135,7 +143,79 @@ class BasePersonaFormView(View):
             "entity_label": self.entity_label,
             "modo_edicion": persona is not None,
             "cancel_url": self.success_url,
+            "form_steps": self.build_form_steps(form, datos_form),
         }
+
+    def build_form_steps(self, form, datos_form):
+        steps = [
+            {
+                "slug": "datos-basicos",
+                "title": "Datos basicos",
+                "description": "Completa la identidad principal y los datos de acceso.",
+                "fields": [
+                    form["nombres"],
+                    form["email"],
+                    form["dni"],
+                    form["cuil"],
+                    form["password1"],
+                    form["password2"],
+                ],
+            },
+            {
+                "slug": "contacto",
+                "title": "Contacto",
+                "description": "Carga fecha de nacimiento y datos personales de contacto.",
+                "fields": [
+                    form["fch_nacimiento"],
+                    datos_form["telefono"],
+                    datos_form["domicilio"],
+                    datos_form["id_sexo"],
+                    datos_form["id_std_civil"],
+                ],
+            },
+            {
+                "slug": "ubicacion",
+                "title": "Ubicacion",
+                "description": "Indica el lugar de residencia para completar el perfil.",
+                "fields": [
+                    datos_form["id_pais"],
+                    datos_form["id_provincia"],
+                    datos_form["id_localidad"],
+                    datos_form["id_zona"],
+                ],
+            },
+        ]
+
+        profile_fields = []
+        profile_description = "Define el estado actual y agrega una foto si deseas."
+
+        if "id_ocupacion" in form.fields:
+            profile_fields.extend(
+                [
+                    form["id_ocupacion"],
+                    form["id_ciclo_vida"],
+                    form["id_grado_estudio"],
+                ]
+            )
+            profile_description = (
+                "Completa ocupacion, ciclo de vida y grado de estudio antes de finalizar."
+            )
+
+        profile_fields.append(form["foto"])
+        steps.append(
+            {
+                "slug": "perfil",
+                "title": "Perfil final",
+                "description": profile_description,
+                "fields": profile_fields,
+            }
+        )
+
+        for index, step in enumerate(steps, start=1):
+            step["index"] = index
+            step["has_errors"] = any(bound_field.errors for bound_field in step["fields"])
+
+        return steps
 
     def get(self, request, *args, **kwargs):
         persona = self.get_object()
@@ -151,20 +231,18 @@ class BasePersonaFormView(View):
             instance=self.get_datos_instance(persona),
         )
 
-        if not (form.is_valid() and datos_form.is_valid()):
+        form_is_valid = form.is_valid()
+        if form_is_valid:
+            self.assign_datos_relation(datos_form.instance, form.save(commit=False))
+
+        if not (form_is_valid and datos_form.is_valid()):
             return render(request, self.template_name, self.get_context(form, datos_form, persona))
 
         with transaction.atomic():
             persona = form.save()
+            form.save_auth_user(persona)
             datos_personales = datos_form.save(commit=False)
-
-            if self.relation_field == "psicologo":
-                datos_personales.psicologo = persona
-                datos_personales.paciente = None
-            else:
-                datos_personales.paciente = persona
-                datos_personales.psicologo = None
-
+            self.assign_datos_relation(datos_personales, persona)
             datos_personales.save()
 
         messages.success(request, f"{self.entity_label} {self.success_action} correctamente.")

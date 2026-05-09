@@ -75,9 +75,39 @@
         .actions a {
             margin-right: 10px;
         }
+        .app-input,
+        .app-select,
+        .app-textarea {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            background: #ffffff;
+            box-sizing: border-box;
+        }
+        .app-input:focus,
+        .app-select:focus,
+        .app-textarea:focus {
+            outline: 2px solid rgba(37, 99, 235, 0.18);
+            border-color: #2563eb;
+        }
+        .errorlist {
+            margin: 8px 0 0;
+            padding-left: 18px;
+            color: #b91c1c;
+        }
+        .helptext {
+            display: block;
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+        {% block extra_styles %}{% endblock %}
     </style>
 </head>
 <body>
+    {% block page_header %}
     <header>
         <h1 style="margin:0 0 10px;">Sistema Psicologia</h1>
         <nav>
@@ -87,8 +117,9 @@
             <a href="/logout/">Salir</a>
         </nav>
     </header>
+    {% endblock %}
 
-    <main>
+    <main class="{% block main_class %}{% endblock %}">
         {% if messages %}
             <div class="messages">
                 {% for message in messages %}
@@ -99,5 +130,6 @@
 
         {% block content %}{% endblock %}
     </main>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

@@ -4,42 +4,54 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login | Sistema Psicologia</title>
+    <title>Acceso | Sistema Psicologia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 <body class="login-body">
-    <div class="background-blur blur-one"></div>
-    <div class="background-blur blur-two"></div>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
 
     <main class="login-layout">
         <section class="login-shell">
-            <section class="login-visual">
-                <div class="visual-backdrop"></div>
+            <section class="login-visual" aria-label="Presentacion del sistema">
+                <a class="login-brand" href="{% url 'home' %}">
+                    <span class="brand-mark">SP</span>
+                    <span>
+                        <strong>Sistema Psicologia</strong>
+                        <small>Salud mental digital</small>
+                    </span>
+                </a>
 
                 <div class="visual-copy">
-                    <span class="visual-badge">Sistema de Psicología</span>
-                    <h1>Cuidar la salud mental también puede sentirse moderno.</h1>
+                    <span class="visual-badge">Acceso seguro</span>
+                    <h1>Un entorno tranquilo para gestionar el cuidado emocional.</h1>
                     <p>
-                        Gestiona pacientes, seguimientos y sesiones desde una plataforma clara, humana y segura.
+                        Ingresa a tu espacio profesional o personal con DNI y contrasena.
+                        Tus datos se mantienen dentro del sistema de gestion.
                     </p>
                 </div>
 
-                <div class="logo-showcase">
-                    <div class="logo-circle"></div>
-                    <img
-                        src="{% static 'images/logo_psicologia_login.png' %}"
-                        alt="Logo psicología"
-                        class="psychology-logo"
-                    >
+                <div class="visual-stats glass-card">
+                    <div>
+                        <strong>Privacidad</strong>
+                        <span>Acceso individual</span>
+                    </div>
+                    <div>
+                        <strong>Orden</strong>
+                        <span>Gestion por perfiles</span>
+                    </div>
                 </div>
             </section>
 
             <section class="login-card">
-                <div class="login-card-inner">
+                <div class="login-card-inner glass-card">
                     <div class="login-head">
                         <span class="login-kicker">Bienvenido</span>
-                        <h2>Iniciar sesión</h2>
-                        <p>Ingresa con tu DNI y contraseña para acceder a tu espacio profesional.</p>
+                        <h2>Iniciar sesion</h2>
+                        <p>Usa tu DNI y contrasena para continuar.</p>
                     </div>
 
                     {% if form.non_field_errors %}
@@ -55,12 +67,21 @@
 
                         <div class="login-field">
                             <label for="{{ form.username.id_for_label }}" class="login-label">DNI</label>
-                            {{ form.username }}
+                            <div class="input-shell">
+                                <span class="input-icon">ID</span>
+                                {{ form.username }}
+                            </div>
                         </div>
 
                         <div class="login-field">
-                            <label for="{{ form.password.id_for_label }}" class="login-label">Contraseña</label>
-                            {{ form.password }}
+                            <label for="{{ form.password.id_for_label }}" class="login-label">Contrasena</label>
+                            <div class="input-shell password-shell">
+                                <span class="input-icon">**</span>
+                                {{ form.password }}
+                                <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar u ocultar contrasena" aria-pressed="false">
+                                    Ver
+                                </button>
+                            </div>
                         </div>
 
                         {% if next %}
@@ -75,12 +96,42 @@
                                 <span>Recordarme</span>
                             </label>
 
-                            <a href="/admin/password_reset/" class="forgot-link">Olvidé mi contraseña</a>
+                            <a href="/admin/password_reset/" class="forgot-link">Olvide mi contrasena</a>
+                        </div>
+
+                        <div class="register-choice">
+                            <p class="register-choice-title">Todavia no tienes cuenta?</p>
+                            <div class="register-actions">
+                                <a href="{% url 'usuario:paciente_create' %}" class="register-link register-link-patient">
+                                    Quiero ser paciente
+                                </a>
+                                <a href="{% url 'usuario:psicologo_create' %}" class="register-link register-link-psychologist">
+                                    Quiero ser psicologo
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
             </section>
         </section>
     </main>
+
+    <script>
+        (function () {
+            var button = document.querySelector("[data-password-toggle]");
+            var input = document.getElementById("{{ form.password.id_for_label }}");
+
+            if (!button || !input) {
+                return;
+            }
+
+            button.addEventListener("click", function () {
+                var shouldShow = input.type === "password";
+                input.type = shouldShow ? "text" : "password";
+                button.textContent = shouldShow ? "Ocultar" : "Ver";
+                button.setAttribute("aria-pressed", shouldShow ? "true" : "false");
+            });
+        }());
+    </script>
 </body>
 </html>

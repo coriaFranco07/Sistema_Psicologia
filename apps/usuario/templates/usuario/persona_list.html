@@ -2,20 +2,311 @@
 
 {% block title %}{{ entity_label_plural|default:"Personas" }}{% endblock %}
 
-{% block content %}
-<section class="card">
-    <h2>{{ entity_label_plural|default:"Personas" }}</h2>
-    <form method="get">
-        <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Buscar">
-        <button type="submit">Buscar</button>
-        {% if create_url_name %}
-            <a class="btn" href="{% url create_url_name %}">Nuevo</a>
-        {% endif %}
-    </form>
-</section>
+{% block page_header %}{% endblock %}
 
-<section class="card">
-    <table>
+{% block main_class %}list-main{% endblock %}
+
+{% block extra_styles %}
+main.list-main {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 32px 20px 48px;
+}
+
+.list-page {
+    display: grid;
+    gap: 18px;
+}
+
+.list-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 22px 0 10px;
+}
+
+.list-kicker {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.list-hero h1 {
+    margin: 12px 0 6px;
+    color: #0f172a;
+    font-size: 2rem;
+    line-height: 1.1;
+}
+
+.list-hero p {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.55;
+}
+
+.list-count {
+    min-width: 150px;
+    padding: 14px 16px;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #475569;
+    text-align: right;
+}
+
+.list-count strong {
+    display: block;
+    color: #0f172a;
+    font-size: 1.45rem;
+}
+
+.list-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+}
+
+.search-form {
+    display: flex;
+    flex: 1;
+    gap: 10px;
+}
+
+.search-input {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.search-input:focus {
+    outline: 2px solid rgba(37, 99, 235, 0.18);
+    border-color: #2563eb;
+    background: #ffffff;
+}
+
+.btn-modern {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-modern-primary {
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.btn-modern-secondary {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+}
+
+.table-panel {
+    overflow: hidden;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.07);
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.modern-table th {
+    padding: 14px 18px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.modern-table td {
+    padding: 16px 18px;
+    border-bottom: 1px solid #edf2f7;
+    color: #334155;
+}
+
+.modern-table tr:last-child td {
+    border-bottom: none;
+}
+
+.modern-table tbody tr {
+    transition: background-color 0.18s ease;
+}
+
+.modern-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.person-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.person-avatar {
+    width: 42px;
+    height: 42px;
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #dbeafe, #ccfbf1);
+    color: #075985;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.person-name {
+    display: block;
+    color: #0f172a;
+    font-weight: 800;
+}
+
+.person-sub {
+    display: block;
+    margin-top: 3px;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 0.84rem;
+    font-weight: 800;
+}
+
+.table-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.action-link {
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+
+.action-link-edit {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.action-link-delete {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.empty-table {
+    padding: 44px 18px;
+    color: #64748b;
+    text-align: center;
+}
+
+@media (max-width: 820px) {
+    main.list-main {
+        padding: 20px 14px 34px;
+    }
+
+    .list-hero,
+    .list-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .list-count {
+        text-align: left;
+    }
+
+    .search-form {
+        flex-direction: column;
+    }
+
+    .btn-modern {
+        width: 100%;
+    }
+
+    .table-panel {
+        overflow-x: auto;
+    }
+
+    .modern-table {
+        min-width: 760px;
+    }
+}
+{% endblock %}
+
+{% block content %}
+<section class="list-page">
+    <div class="list-hero">
+        <div>
+            <span class="list-kicker">Gestion de registros</span>
+            <h1>{{ entity_label_plural|default:"Personas" }}</h1>
+            <p>Consulta, busca y administra los registros cargados en el sistema.</p>
+        </div>
+        <div class="list-count">
+            <strong>{{ total_resultados }}</strong>
+            registros encontrados
+        </div>
+    </div>
+
+    <div class="list-toolbar">
+        <form method="get" class="search-form">
+            <input class="search-input" type="text" name="q" value="{{ query|default:'' }}" placeholder="Buscar por nombre, DNI, email o estado">
+            <button class="btn-modern btn-modern-secondary" type="submit">Buscar</button>
+        </form>
+        {% if create_url_name %}
+            <a class="btn-modern btn-modern-primary" href="{% url create_url_name %}">Nuevo {{ entity_label }}</a>
+        {% endif %}
+    </div>
+
+    <div class="table-panel">
+    <table class="modern-table">
         <thead>
             <tr>
                 <th>Nombre</th>
@@ -28,25 +319,38 @@
         <tbody>
             {% for persona in personas %}
                 <tr>
-                    <td>{{ persona.nombres }}</td>
+                    <td>
+                        <div class="person-cell">
+                            <span class="person-avatar">{{ persona.nombres|first }}</span>
+                            <div>
+                                <span class="person-name">{{ persona.nombres }}</span>
+                                {% if persona.cuil %}
+                                    <span class="person-sub">CUIL {{ persona.cuil }}</span>
+                                {% else %}
+                                    <span class="person-sub">CUIL sin cargar</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
                     <td>{{ persona.dni }}</td>
                     <td>{{ persona.email }}</td>
-                    <td>{{ persona.id_estado }}</td>
-                    <td class="actions">
+                    <td><span class="status-pill">{{ persona.id_estado }}</span></td>
+                    <td class="table-actions">
                         {% if update_url_name %}
-                            <a href="{% url update_url_name persona.pk %}">Editar</a>
+                            <a class="action-link action-link-edit" href="{% url update_url_name persona.pk %}">Editar</a>
                         {% endif %}
                         {% if delete_url_name %}
-                            <a href="{% url delete_url_name persona.pk %}">Eliminar</a>
+                            <a class="action-link action-link-delete" href="{% url delete_url_name persona.pk %}">Eliminar</a>
                         {% endif %}
                     </td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="5">No hay registros para mostrar.</td>
+                    <td class="empty-table" colspan="5">No hay registros para mostrar.</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </section>
 {% endblock %}
