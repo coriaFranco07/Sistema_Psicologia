@@ -1,0 +1,30 @@
+{% extends "usuario/base.html" %}
+{% block title %}Consultorio{% endblock %}
+{% block content %}
+<section class="app-page-head">
+  <div>
+    <p class="app-kicker">Psicólogos</p>
+    <h1>{% if form.instance.pk %}Editar consultorio{% else %}Nuevo consultorio{% endif %}</h1>
+    <p>Configurá la información del espacio de atención del profesional.</p>
+  </div>
+</section>
+
+<form method="post" class="app-form-card">
+  {% csrf_token %}
+  <div class="app-form-grid">
+    {% for field in form %}
+      <div class="app-field {% if field.name == 'domicilio' %}span-2{% endif %}">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+        {% for error in field.errors %}<p class="app-error">{{ error }}</p>{% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="app-form-actions">
+    <a class="app-btn" href="{% url 'usuario:psicologo_oficina_list' %}">Cancelar</a>
+    <button class="app-btn app-btn-primary" type="submit">Guardar consultorio</button>
+  </div>
+</form>
+{% endblock %}
