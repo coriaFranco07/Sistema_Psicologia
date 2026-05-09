@@ -2,7 +2,14 @@ from django.contrib import admin
 
 from apps.datos_personales.models import DatosPersonales
 
-from .models import Paciente, Psicologo, PsicologoPendiente
+from .models import (
+    Paciente,
+    Psicologo,
+    PsicologoIdioma,
+    PsicologoMetodoPago,
+    PsicologoOficina,
+    PsicologoPendiente,
+)
 
 
 class PsicologoDatosPersonalesInline(admin.StackedInline):
@@ -70,3 +77,27 @@ class PacienteAdmin(admin.ModelAdmin):
     autocomplete_fields = ("id_estado", "id_ocupacion", "id_grado_estudio")
     readonly_fields = ("id_ciclo_vida",)
     inlines = [PacienteDatosPersonalesInline]
+
+
+@admin.register(PsicologoMetodoPago)
+class PsicologoMetodoPagoAdmin(admin.ModelAdmin):
+    list_display = ("id_psicologo", "id_metodo_pago", "id_estado")
+    search_fields = ("id_psicologo__nombres", "id_metodo_pago__dsc_met_pago")
+    list_filter = ("id_estado", "id_metodo_pago")
+    list_select_related = ("id_psicologo", "id_metodo_pago", "id_estado")
+
+
+@admin.register(PsicologoOficina)
+class PsicologoOficinaAdmin(admin.ModelAdmin):
+    list_display = ("id_psicologo", "domicilio", "telefono", "id_localidad", "id_estado")
+    search_fields = ("id_psicologo__nombres", "domicilio", "telefono")
+    list_filter = ("id_estado", "id_pais", "id_provincia")
+    list_select_related = ("id_psicologo", "id_estado", "id_pais", "id_provincia", "id_localidad")
+
+
+@admin.register(PsicologoIdioma)
+class PsicologoIdiomaAdmin(admin.ModelAdmin):
+    list_display = ("id_psicologo", "id_idioma", "id_estado")
+    search_fields = ("id_psicologo__nombres", "id_idioma__dsc_idioma")
+    list_filter = ("id_estado", "id_idioma")
+    list_select_related = ("id_psicologo", "id_idioma", "id_estado")
