@@ -19,12 +19,14 @@ from apps.parametro.models import (
     TipoCivil,
     Zona,
 )
+from apps.parametro.models.idioma import Idioma
 from apps.parametro.models.metodo_pago import MetodoPago
 
 from .models import (
     MAX_SIZE_MB,
     Paciente,
     Psicologo,
+    PsicologoIdioma,
     PsicologoMetodoPago,
     PsicologoOficina,
     PsicologoPendiente,
@@ -378,3 +380,54 @@ class PsicologoMetodoPagoForm(forms.ModelForm):
             metodo_pago.save()
             self.save_m2m()
         return metodo_pago
+
+
+class PsicologoIdiomaForm(forms.ModelForm):
+    class Meta:
+        model = PsicologoIdioma
+        fields = ["id_psicologo", "id_idioma", "id_estado"]
+        widgets = {
+            "id_psicologo": forms.Select(attrs={"class": "app-select"}),
+            "id_idioma": forms.Select(attrs={"class": "app-select"}),
+            "id_estado": forms.Select(attrs={"class": "app-select"}),
+        }
+
+    def __init__(self, *args, user=None, psicologo=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.psicologo = psicologo
+        self.is_psicologo_user = bool(self.psicologo and not (self.user and (self.user.is_staff or self.user.is_superuser)))
+        self.fields["id_psicologo"].queryset = Psicologo.objects.order_by("nombres", "dni")
+        self.fields["id_idioma"].queryset = Idioma.objects.filter(flg_activo=True).order_by("dsc_idioma")
+        self.fields["id_estado"].queryset = Estado.objects.filter(flg_activo=True).order_by("dsc_estado")
+
+        if self.is_psicologo_user:
+            self.fields["id_psicologo"].queryset = Psicologo.objects.filter(pk=self.psicologo.pk)
+            self.fields["id_psicologo"].initial = self.psicologo
+            self.fields["id_psicologo"].disabled = True
+            self.fields["id_estado"].required = False
+            self.fields["id_estado"].widget = forms.HiddenInput()
+            self.fields["id_estado"].initial = get_estado_activo()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        psicologo = self.psicologo if self.fields["id_psicologo"].disabled else cleaned_data.get("id_psicologo")
+        idioma = cleaned_data.get("id_idioma")
+        if psicologo and idioma:
+            queryset = PsicologoIdioma.objects.filter(id_psicologo=psicologo, id_idioma=idioma)
+            if self.instance.pk:
+                queryset = queryset.exclude(pk=self.instance.pk)
+            if queryset.exists():
+                raise ValidationError("Este idioma ya esta cargado para el psicologo.")
+        return cleaned_data
+
+    def save(self, commit=True):
+        idioma = super().save(commit=False)
+        if self.psicologo and self.fields["id_psicologo"].disabled:
+            idioma.id_psicologo = self.psicologo
+        if self.is_psicologo_user:
+            idioma.id_estado = get_estado_activo()
+        if commit:
+            idioma.save()
+            self.save_m2m()
+        return idioma
