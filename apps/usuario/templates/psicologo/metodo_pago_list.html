@@ -1,0 +1,40 @@
+{% extends "usuario/base.html" %}
+{% block title %}Métodos de pago{% endblock %}
+{% block content %}
+<section class="app-page-head">
+  <div>
+    <p class="app-kicker">Psicólogos</p>
+    <h1>Métodos de pago</h1>
+    <p>Gestioná los medios de pago habilitados para cada profesional.</p>
+  </div>
+  <a class="app-btn app-btn-primary" href="{% url 'usuario:psicologo_metodo_pago_create' %}">Nuevo método</a>
+</section>
+
+<section class="app-card">
+  <form method="get" class="app-toolbar">
+    <input class="app-input" type="search" name="q" value="{{ query }}" placeholder="Buscar por psicólogo o método de pago">
+    <button class="app-btn" type="submit">Buscar</button>
+  </form>
+
+  <div class="app-table-wrap">
+    <table class="app-table">
+      <thead><tr><th>Psicólogo</th><th>Método de pago</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+        {% for metodo in metodos_pago %}
+        <tr>
+          <td>{{ metodo.id_psicologo.nombres }}</td>
+          <td>{{ metodo.id_metodo_pago }}</td>
+          <td>{{ metodo.id_estado }}</td>
+          <td class="app-actions">
+            <a href="{% url 'usuario:psicologo_metodo_pago_update' metodo.pk %}">Editar</a>
+            <a class="danger" href="{% url 'usuario:psicologo_metodo_pago_delete' metodo.pk %}">Eliminar</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="app-empty">No hay métodos de pago cargados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
