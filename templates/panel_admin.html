@@ -1,0 +1,21 @@
+{% extends "usuario/base.html" %}
+
+{% block title %}Panel Administrador{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h2>Panel de administracion</h2>
+    <p>Bienvenido {{ request.user.username }}.</p>
+    <p>Este panel esta disponible solo para usuarios staff o superusuarios.</p>
+</section>
+
+<section class="card">
+    <h3>Accesos rapidos</h3>
+    <ul>
+        <li><a href="/admin/">Administracion Django</a></li>
+        <li><a href="{% url 'usuario:psicologo_pendiente_list' %}">Solicitudes pendientes</a></li>
+        <li><a href="{% url 'usuario:psicologo_list' %}">Psicologos</a></li>
+        <li><a href="{% url 'usuario:paciente_list' %}">Pacientes</a></li>
+    </ul>
+</section>
+{% endblock %}
