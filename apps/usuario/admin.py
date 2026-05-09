@@ -21,11 +21,11 @@ class PacienteDatosPersonalesInline(admin.StackedInline):
 
 @admin.register(Psicologo)
 class PsicologoAdmin(admin.ModelAdmin):
-    list_display = ("nombres", "dni", "email", "id_estado", "tiene_foto")
-    search_fields = ("nombres", "dni", "email", "cuil")
-    list_filter = ("id_estado",)
-    list_select_related = ("id_estado",)
-    autocomplete_fields = ("id_estado",)
+    list_display = ("nombres", "dni", "email", "id_estado", "id_rama", "tiene_foto")
+    search_fields = ("nombres", "dni", "email", "cuil", "id_rama__dsc_rama")
+    list_filter = ("id_estado", "id_rama")
+    list_select_related = ("id_estado", "id_rama")
+    autocomplete_fields = ("id_estado", "id_rama")
     inlines = [PsicologoDatosPersonalesInline]
 
     @admin.display(boolean=True, description="Foto")
@@ -46,5 +46,6 @@ class PacienteAdmin(admin.ModelAdmin):
     search_fields = ("nombres", "dni", "email", "cuil")
     list_filter = ("id_estado", "id_ocupacion", "id_ciclo_vida", "id_grado_estudio")
     list_select_related = ("id_estado", "id_ocupacion", "id_ciclo_vida", "id_grado_estudio")
-    autocomplete_fields = ("id_estado", "id_ocupacion", "id_ciclo_vida", "id_grado_estudio")
+    autocomplete_fields = ("id_estado", "id_ocupacion", "id_grado_estudio")
+    readonly_fields = ("id_ciclo_vida",)
     inlines = [PacienteDatosPersonalesInline]

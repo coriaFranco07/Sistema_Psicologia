@@ -16,6 +16,7 @@ from .models import (
     TipoCivil,
     Zona,
     ZonaLocalidad,
+    Rama,
     CicloVida,
 )
 
@@ -25,6 +26,14 @@ class BaseParametroAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
     list_per_page = 25
     save_on_top = True
+
+
+@admin.register(Rama)
+class RamaAdmin(BaseParametroAdmin):
+    list_display = ("id_rama", "dsc_rama", "flg_activo")
+    search_fields = ("dsc_rama",)
+    list_editable = ("dsc_rama", "flg_activo")
+    ordering = ("dsc_rama", "id_rama")
 
 
 @admin.register(Sexo)

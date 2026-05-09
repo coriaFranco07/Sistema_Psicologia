@@ -21,9 +21,9 @@ class DashboardView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["total_psicologos"] = Psicologo.objects.count()
         context["total_pacientes"] = Paciente.objects.count()
-        context["ultimos_psicologos"] = Psicologo.objects.select_related("id_estado").order_by(
-            "-fch_creacion"
-        )[:5]
+        context["ultimos_psicologos"] = Psicologo.objects.select_related(
+            "id_estado", "id_rama"
+        ).order_by("-fch_creacion")[:5]
         context["ultimos_pacientes"] = Paciente.objects.select_related(
             "id_estado", "id_ocupacion", "id_ciclo_vida"
         ).order_by("-fch_creacion")[:5]
@@ -87,6 +87,8 @@ class PsicologoListView(BasePersonaListView):
     create_url_name = "usuario:psicologo_create"
     update_url_name = "usuario:psicologo_update"
     delete_url_name = "usuario:psicologo_delete"
+    extra_search_fields = ("id_rama__dsc_rama",)
+    select_related_fields = ("id_rama",)
 
 
 class PacienteListView(BasePersonaListView):
@@ -189,16 +191,19 @@ class BasePersonaFormView(View):
         profile_fields = []
         profile_description = "Define el estado actual y agrega una foto si deseas."
 
+        if "id_rama" in form.fields:
+            profile_fields.append(form["id_rama"])
+            profile_description = "Selecciona la rama profesional y agrega una foto si deseas."
+
         if "id_ocupacion" in form.fields:
             profile_fields.extend(
                 [
                     form["id_ocupacion"],
-                    form["id_ciclo_vida"],
                     form["id_grado_estudio"],
                 ]
             )
             profile_description = (
-                "Completa ocupacion, ciclo de vida y grado de estudio antes de finalizar."
+                "Completa ocupacion y grado de estudio. El ciclo de vida se calcula automaticamente segun la fecha de nacimiento."
             )
 
         profile_fields.append(form["foto"])
@@ -263,6 +268,7 @@ class PsicologoCreateView(BasePersonaCreateView):
     relation_field = "psicologo"
     success_url = reverse_lazy("usuario:psicologo_list")
     entity_label = "Psicologo"
+    select_related_fields = ("id_rama",)
 
 
 class PsicologoUpdateView(BasePersonaUpdateView):
@@ -271,6 +277,7 @@ class PsicologoUpdateView(BasePersonaUpdateView):
     relation_field = "psicologo"
     success_url = reverse_lazy("usuario:psicologo_list")
     entity_label = "Psicologo"
+    select_related_fields = ("id_rama",)
 
 
 class PacienteCreateView(BasePersonaCreateView):

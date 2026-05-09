@@ -32,6 +32,7 @@ from .metodo_pago import MetodoPago
 from .ocupacion import Ocupacion
 from .pais import Pais
 from .provincia import PaisProvincia, Provincia, ProvinciaLocalidad
+from .rama import Rama
 from .sexo import Sexo
 from .tipo_cita import TipoCita
 from .tipo_civil import TipoCivil
@@ -50,6 +51,7 @@ __all__ = [
     "PaisProvincia",
     "Provincia",
     "ProvinciaLocalidad",
+    "Rama",
     "Sexo",
     "TipoCita",
     "TipoCivil",

@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
-from apps.parametro.models import CicloVida, Estado, GradoEstudio, Ocupacion
+from apps.parametro.models import Estado, GradoEstudio, Ocupacion, Rama
 
 from .models import MAX_SIZE_MB, Paciente, Psicologo
 
@@ -205,26 +205,34 @@ class BasePersonaForm(forms.ModelForm):
 class PsicologoForm(BasePersonaForm):
     class Meta(BasePersonaForm.Meta):
         model = Psicologo
+        fields = PERSONA_FIELDS + ["id_rama"]
+        widgets = {
+            **BasePersonaForm.Meta.widgets,
+            "id_rama": forms.Select(attrs={"class": "app-select"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["id_rama"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
 
 
 class PacienteForm(BasePersonaForm):
     class Meta(BasePersonaForm.Meta):
         model = Paciente
-        fields = PERSONA_FIELDS + ["id_ocupacion", "id_ciclo_vida", "id_grado_estudio"]
+        fields = PERSONA_FIELDS + ["id_ocupacion", "id_grado_estudio"]
         widgets = {
             **BasePersonaForm.Meta.widgets,
             "id_ocupacion": forms.Select(attrs={"class": "app-select"}),
-            "id_ciclo_vida": forms.Select(attrs={"class": "app-select"}),
             "id_grado_estudio": forms.Select(attrs={"class": "app-select"}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["fch_nacimiento"].help_text = (
+            "Con esta fecha el sistema calcula automaticamente el ciclo de vida."
+        )
         self.fields["id_ocupacion"].queryset = Ocupacion.objects.filter(flg_activo=True).order_by(
             "dsc_ocupacion"
-        )
-        self.fields["id_ciclo_vida"].queryset = CicloVida.objects.filter(flg_activo=True).order_by(
-            "dsc_ciclo_vida"
         )
         self.fields["id_grado_estudio"].queryset = GradoEstudio.objects.filter(
             flg_activo=True

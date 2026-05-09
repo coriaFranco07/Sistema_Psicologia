@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     FileExtensionValidator,
@@ -7,10 +9,16 @@ from django.core.validators import (
 from django.db import models
 from django.templatetags.static import static
 
-from apps.parametro.models import CicloVida, Estado, GradoEstudio, Ocupacion
+from apps.parametro.models import CicloVida, Estado, GradoEstudio, Ocupacion, Rama
 
 
 MAX_SIZE_MB = 5
+CICLO_VIDA_POR_EDAD = (
+    (11, "INFANCIA"),
+    (18, "ADOLESCENCIA"),
+    (40, "ADULTEZ INICIAL"),
+    (60, "ADULTEZ MADURA"),
+)
 
 
 def validate_photo_size(file_obj):
@@ -20,6 +28,16 @@ def validate_photo_size(file_obj):
     max_size = MAX_SIZE_MB * 1024 * 1024
     if file_obj.size > max_size:
         raise ValidationError(f"La foto no puede superar los {MAX_SIZE_MB} MB.")
+
+
+def calculate_age_from_birth_date(fch_nacimiento, today=None):
+    if not fch_nacimiento:
+        return None
+
+    today = today or date.today()
+    return today.year - fch_nacimiento.year - (
+        (today.month, today.day) < (fch_nacimiento.month, fch_nacimiento.day)
+    )
 
 
 class PersonaBase(models.Model):
@@ -74,6 +92,10 @@ class PersonaBase(models.Model):
         return f"{self.nombres} - DNI {self.dni}"
 
     @property
+    def edad(self):
+        return calculate_age_from_birth_date(self.fch_nacimiento)
+
+    @property
     def foto_url(self):
         if self.foto:
             return self.foto.url
@@ -88,6 +110,8 @@ class PersonaBase(models.Model):
 
 
 class Psicologo(PersonaBase):
+
+    id_rama = models.ForeignKey(Rama, on_delete=models.RESTRICT, related_name="psicologos", verbose_name="Rama")
     class Meta(PersonaBase.Meta):
         verbose_name = "Psicologo"
         verbose_name_plural = "Psicologos"
@@ -116,3 +140,45 @@ class Paciente(PersonaBase):
     class Meta(PersonaBase.Meta):
         verbose_name = "Paciente"
         verbose_name_plural = "Pacientes"
+
+    @classmethod
+    def get_ciclo_vida_descripcion_by_age(cls, edad):
+        if edad is None or edad < 0:
+            return None
+
+        for edad_maxima, descripcion in CICLO_VIDA_POR_EDAD:
+            if edad < edad_maxima:
+                return descripcion
+        return "VEJEZ"
+
+    def assign_ciclo_vida_from_birth_date(self):
+        descripcion = self.get_ciclo_vida_descripcion_by_age(self.edad)
+        if not descripcion:
+            return None
+
+        ciclo_vida = (
+            CicloVida.objects.filter(dsc_ciclo_vida__iexact=descripcion, flg_activo=True)
+            .order_by("id_ciclo_vida")
+            .first()
+        )
+        if ciclo_vida is None:
+            raise ValidationError(
+                {
+                    "fch_nacimiento": (
+                        f"No existe un ciclo de vida activo configurado para '{descripcion}'."
+                    )
+                }
+            )
+
+        self.id_ciclo_vida = ciclo_vida
+        return ciclo_vida
+
+    def clean(self):
+        super().clean()
+        if self.fch_nacimiento:
+            self.assign_ciclo_vida_from_birth_date()
+
+    def save(self, *args, **kwargs):
+        if self.fch_nacimiento:
+            self.assign_ciclo_vida_from_birth_date()
+        super().save(*args, **kwargs)
