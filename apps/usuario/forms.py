@@ -34,108 +34,48 @@ from .models import (
 USUARIO_BASE_FIELDS = ["nombres", "email", "dni", "cuil", "fch_nacimiento", "foto"]
 
 
+def get_estado_activo():
+    return Estado.objects.filter(dsc_estado__iexact="ACTIVO", flg_activo=True).first()
+
+
 class DatosPersonalesSolicitudForm(forms.Form):
-    telefono = forms.CharField(
-        max_length=25,
-        widget=forms.TextInput(attrs={"class": "app-input", "placeholder": "Telefono o celular"}),
-    )
-    domicilio = forms.CharField(
-        max_length=200,
-        widget=forms.TextInput(attrs={"class": "app-input", "placeholder": "Domicilio"}),
-    )
-    id_sexo = forms.ModelChoiceField(
-        queryset=Sexo.objects.none(),
-        label="Sexo",
-        widget=forms.Select(attrs={"class": "app-select"}),
-    )
-    id_std_civil = forms.ModelChoiceField(
-        queryset=TipoCivil.objects.none(),
-        label="Estado civil",
-        widget=forms.Select(attrs={"class": "app-select"}),
-    )
-    id_pais = forms.ModelChoiceField(
-        queryset=Pais.objects.none(),
-        label="Pais",
-        widget=forms.Select(attrs={"class": "app-select"}),
-    )
-    id_provincia = forms.ModelChoiceField(
-        queryset=Provincia.objects.none(),
-        label="Provincia",
-        widget=forms.Select(attrs={"class": "app-select"}),
-    )
-    id_localidad = forms.ModelChoiceField(
-        queryset=Localidad.objects.none(),
-        label="Localidad",
-        widget=forms.Select(attrs={"class": "app-select"}),
-    )
-    id_zona = forms.ModelChoiceField(
-        queryset=Zona.objects.none(),
-        label="Zona",
-        widget=forms.Select(attrs={"class": "app-select"}),
-    )
+    telefono = forms.CharField(max_length=25, widget=forms.TextInput(attrs={"class": "app-input", "placeholder": "Telefono o celular"}))
+    domicilio = forms.CharField(max_length=200, widget=forms.TextInput(attrs={"class": "app-input", "placeholder": "Domicilio"}))
+    id_sexo = forms.ModelChoiceField(queryset=Sexo.objects.none(), label="Sexo", widget=forms.Select(attrs={"class": "app-select"}))
+    id_std_civil = forms.ModelChoiceField(queryset=TipoCivil.objects.none(), label="Estado civil", widget=forms.Select(attrs={"class": "app-select"}))
+    id_pais = forms.ModelChoiceField(queryset=Pais.objects.none(), label="Pais", widget=forms.Select(attrs={"class": "app-select"}))
+    id_provincia = forms.ModelChoiceField(queryset=Provincia.objects.none(), label="Provincia", widget=forms.Select(attrs={"class": "app-select"}))
+    id_localidad = forms.ModelChoiceField(queryset=Localidad.objects.none(), label="Localidad", widget=forms.Select(attrs={"class": "app-select"}))
+    id_zona = forms.ModelChoiceField(queryset=Zona.objects.none(), label="Zona", widget=forms.Select(attrs={"class": "app-select"}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["id_sexo"].queryset = Sexo.objects.filter(flg_activo=True).order_by("dsc_tipo")
-        self.fields["id_std_civil"].queryset = TipoCivil.objects.filter(flg_activo=True).order_by(
-            "dsc_std_civil"
-        )
+        self.fields["id_std_civil"].queryset = TipoCivil.objects.filter(flg_activo=True).order_by("dsc_std_civil")
         self.fields["id_pais"].queryset = Pais.objects.filter(flg_activo=True).order_by("dsc_pais")
-        self.fields["id_provincia"].queryset = Provincia.objects.filter(flg_activo=True).order_by(
-            "dsc_provincia"
-        )
-        self.fields["id_localidad"].queryset = Localidad.objects.filter(flg_activo=True).order_by(
-            "dsc_localidad"
-        )
+        self.fields["id_provincia"].queryset = Provincia.objects.filter(flg_activo=True).order_by("dsc_provincia")
+        self.fields["id_localidad"].queryset = Localidad.objects.filter(flg_activo=True).order_by("dsc_localidad")
         self.fields["id_zona"].queryset = Zona.objects.filter(flg_activo=True).order_by("dsc_zona")
 
 
 class UsuarioBaseForm(forms.ModelForm):
-    password1 = forms.CharField(
-        label="Contrasena",
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "app-input",
-                "placeholder": "Ingresa una contrasena",
-                "autocomplete": "new-password",
-            }
-        ),
-    )
-    password2 = forms.CharField(
-        label="Confirmar contrasena",
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "app-input",
-                "placeholder": "Repite la contrasena",
-                "autocomplete": "new-password",
-            }
-        ),
-    )
+    password1 = forms.CharField(label="Contrasena", widget=forms.PasswordInput(attrs={"class": "app-input", "placeholder": "Ingresa una contrasena", "autocomplete": "new-password"}))
+    password2 = forms.CharField(label="Confirmar contrasena", widget=forms.PasswordInput(attrs={"class": "app-input", "placeholder": "Repite la contrasena", "autocomplete": "new-password"}))
 
     class Meta:
         fields = USUARIO_BASE_FIELDS
         widgets = {
-            "nombres": forms.TextInput(
-                attrs={"class": "app-input", "placeholder": "Nombre completo"}
-            ),
-            "email": forms.EmailInput(
-                attrs={"class": "app-input", "placeholder": "Correo electronico"}
-            ),
+            "nombres": forms.TextInput(attrs={"class": "app-input", "placeholder": "Nombre completo"}),
+            "email": forms.EmailInput(attrs={"class": "app-input", "placeholder": "Correo electronico"}),
             "dni": forms.NumberInput(attrs={"class": "app-input", "placeholder": "DNI"}),
-            "cuil": forms.TextInput(
-                attrs={"class": "app-input", "placeholder": "CUIL sin guiones"}
-            ),
-            "fch_nacimiento": forms.DateInput(
-                attrs={"class": "app-input", "type": "date"}
-            ),
+            "cuil": forms.TextInput(attrs={"class": "app-input", "placeholder": "CUIL sin guiones"}),
+            "fch_nacimiento": forms.DateInput(attrs={"class": "app-input", "type": "date"}),
             "foto": forms.ClearableFileInput(attrs={"class": "app-input"}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.original_username = (
-            str(self.instance.dni) if self.instance and self.instance.pk and self.instance.dni else None
-        )
+        self.original_username = str(self.instance.dni) if self.instance and self.instance.pk and self.instance.dni else None
         is_editing = bool(self.instance and self.instance.pk)
         self.fields["password1"].required = not is_editing
         self.fields["password2"].required = not is_editing
@@ -143,25 +83,20 @@ class UsuarioBaseForm(forms.ModelForm):
             help_text = "Deja estos campos vacios si no queres cambiar la contrasena."
             self.fields["password1"].help_text = help_text
             self.fields["password2"].help_text = help_text
-
         self.fields["foto"].required = False
-        self.fields["foto"].help_text = (
-            f"La foto es opcional: podes dejarla vacia. Si cargas una imagen, usa JPG, PNG o WEBP de hasta {MAX_SIZE_MB} MB."
-        )
+        self.fields["foto"].help_text = f"La foto es opcional: podes dejarla vacia. Si cargas una imagen, usa JPG, PNG o WEBP de hasta {MAX_SIZE_MB} MB."
 
     @staticmethod
     def get_default_estado():
-        return Estado.objects.filter(dsc_estado__iexact="ACTIVO", flg_activo=True).first()
+        return get_estado_activo()
 
     def save(self, commit=True):
         usuario = super().save(commit=False)
         if hasattr(usuario, "id_estado_id") and (not usuario.pk or not usuario.id_estado_id):
             usuario.id_estado = self.get_default_estado()
-
         if commit:
             usuario.save()
             self.save_m2m()
-
         return usuario
 
     def clean_nombres(self):
@@ -184,36 +119,29 @@ class UsuarioBaseForm(forms.ModelForm):
         dni = self.cleaned_data.get("dni")
         if dni and not re.match(r"^\d{7,8}$", str(dni)):
             raise ValidationError("El DNI debe tener 7 u 8 digitos.")
-
         model = self._meta.model
         queryset = model.objects.filter(dni=dni)
         if self.instance.pk:
             queryset = queryset.exclude(pk=self.instance.pk)
         if dni and queryset.exists():
             raise ValidationError("Ya existe un registro con este DNI.")
-
         username = str(dni) if dni else ""
         if username:
             user_exists = get_user_model().objects.filter(username=username).exists()
             if user_exists and username != self.original_username:
                 raise ValidationError("Ya existe un usuario de acceso con este DNI.")
-
         return dni
 
     def clean_cuil(self):
         cuil = self.cleaned_data.get("cuil")
         dni = self.cleaned_data.get("dni")
-
         if not cuil:
             return cuil
-
         cuil = str(cuil).strip()
         if not re.match(r"^\d{11}$", cuil):
             raise ValidationError("El CUIL debe tener 11 digitos sin guiones.")
-
         if dni and cuil[2:10] != str(dni).zfill(8):
             raise ValidationError("Los digitos centrales del CUIL deben coincidir con el DNI.")
-
         model = self._meta.model
         queryset = model.objects.filter(cuil=cuil)
         if self.instance.pk:
@@ -232,7 +160,6 @@ class UsuarioBaseForm(forms.ModelForm):
         cleaned_data = super().clean()
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
-
         if password1 or password2:
             if password1 != password2:
                 self.add_error("password2", "Las contrasenas no coinciden.")
@@ -241,10 +168,8 @@ class UsuarioBaseForm(forms.ModelForm):
                     validate_password(password1)
                 except ValidationError as error:
                     self.add_error("password1", error)
-
         if not self.instance.pk and self.get_default_estado() is None:
             raise ValidationError("No hay un estado ACTIVO configurado para crear el registro.")
-
         return cleaned_data
 
     def save_auth_user(self, usuario):
@@ -252,28 +177,22 @@ class UsuarioBaseForm(forms.ModelForm):
         username = str(usuario.dni)
         UserModel = get_user_model()
         user = None
-
         if self.original_username:
             user = UserModel.objects.filter(username=self.original_username).first()
-
         if user is None:
             user = UserModel.objects.filter(username=username).first()
-
         if user is None:
             if not password and self.instance.pk:
                 return None
             user = UserModel(username=username)
-
         user.username = username
         user.email = usuario.email
         if hasattr(user, "first_name"):
             user.first_name = usuario.nombres[:150]
-
         if password:
             user.set_password(password)
         elif not user.pk:
             user.set_unusable_password()
-
         user.save()
         return user
 
@@ -282,42 +201,26 @@ class PsicologoForm(UsuarioBaseForm):
     class Meta(UsuarioBaseForm.Meta):
         model = Psicologo
         fields = USUARIO_BASE_FIELDS + ["id_rama", "titulo"]
-        widgets = {
-            **UsuarioBaseForm.Meta.widgets,
-            "id_rama": forms.Select(attrs={"class": "app-select"}),
-            "titulo": forms.ClearableFileInput(
-                attrs={"class": "app-input", "accept": "application/pdf,.pdf"}
-            ),
-        }
+        widgets = {**UsuarioBaseForm.Meta.widgets, "id_rama": forms.Select(attrs={"class": "app-select"}), "titulo": forms.ClearableFileInput(attrs={"class": "app-input", "accept": "application/pdf,.pdf"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["id_rama"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
         self.fields["titulo"].label = "Titulo"
-        self.fields["titulo"].help_text = (
-            "Adjunta el titulo profesional en formato PDF. Es obligatorio para enviar la solicitud."
-        )
+        self.fields["titulo"].help_text = "Adjunta el titulo profesional en formato PDF. Es obligatorio para enviar la solicitud."
 
 
 class PsicologoPendienteForm(UsuarioBaseForm):
     class Meta(UsuarioBaseForm.Meta):
         model = PsicologoPendiente
         fields = USUARIO_BASE_FIELDS + ["id_rama", "titulo"]
-        widgets = {
-            **UsuarioBaseForm.Meta.widgets,
-            "id_rama": forms.Select(attrs={"class": "app-select"}),
-            "titulo": forms.ClearableFileInput(
-                attrs={"class": "app-input", "accept": "application/pdf,.pdf"}
-            ),
-        }
+        widgets = {**UsuarioBaseForm.Meta.widgets, "id_rama": forms.Select(attrs={"class": "app-select"}), "titulo": forms.ClearableFileInput(attrs={"class": "app-input", "accept": "application/pdf,.pdf"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["id_rama"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
         self.fields["titulo"].label = "Titulo"
-        self.fields["titulo"].help_text = (
-            "Adjunta el titulo profesional en formato PDF. Es obligatorio para enviar la solicitud."
-        )
+        self.fields["titulo"].help_text = "Adjunta el titulo profesional en formato PDF. Es obligatorio para enviar la solicitud."
 
     @staticmethod
     def get_active_solicitudes():
@@ -335,48 +238,38 @@ class PsicologoPendienteForm(UsuarioBaseForm):
         dni = self.cleaned_data.get("dni")
         if dni and not re.match(r"^\d{7,8}$", str(dni)):
             raise ValidationError("El DNI debe tener 7 u 8 digitos.")
-
         if dni and Psicologo.objects.filter(dni=dni).exists():
             raise ValidationError("Ya existe un psicologo aprobado con este DNI.")
         if dni and self.get_active_solicitudes().filter(dni=dni).exists():
             raise ValidationError("Ya existe una solicitud pendiente o aprobada con este DNI.")
-
         username = str(dni) if dni else ""
         if username and get_user_model().objects.filter(username=username).exists():
             raise ValidationError("Ya existe un usuario de acceso con este DNI.")
-
         return dni
 
     def clean_cuil(self):
         cuil = self.cleaned_data.get("cuil")
         dni = self.cleaned_data.get("dni")
-
         if not cuil:
             return cuil
-
         cuil = str(cuil).strip()
         if not re.match(r"^\d{11}$", cuil):
             raise ValidationError("El CUIL debe tener 11 digitos sin guiones.")
-
         if dni and cuil[2:10] != str(dni).zfill(8):
             raise ValidationError("Los digitos centrales del CUIL deben coincidir con el DNI.")
-
         if Psicologo.objects.filter(cuil=cuil).exists():
             raise ValidationError("Ya existe un psicologo aprobado con este CUIL.")
         if self.get_active_solicitudes().filter(cuil=cuil).exists():
             raise ValidationError("Ya existe una solicitud pendiente o aprobada con este CUIL.")
-
         return cuil
 
     def save(self, commit=True):
         solicitud = super().save(commit=False)
         solicitud.password_hash = make_password(self.cleaned_data["password1"])
         solicitud.estado = PsicologoPendiente.ESTADO_PENDIENTE
-
         if commit:
             solicitud.save()
             self.save_m2m()
-
         return solicitud
 
 
@@ -384,38 +277,19 @@ class PacienteForm(UsuarioBaseForm):
     class Meta(UsuarioBaseForm.Meta):
         model = Paciente
         fields = USUARIO_BASE_FIELDS + ["id_ocupacion", "id_grado_estudio"]
-        widgets = {
-            **UsuarioBaseForm.Meta.widgets,
-            "id_ocupacion": forms.Select(attrs={"class": "app-select"}),
-            "id_grado_estudio": forms.Select(attrs={"class": "app-select"}),
-        }
+        widgets = {**UsuarioBaseForm.Meta.widgets, "id_ocupacion": forms.Select(attrs={"class": "app-select"}), "id_grado_estudio": forms.Select(attrs={"class": "app-select"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["fch_nacimiento"].help_text = (
-            "Con esta fecha el sistema calcula automaticamente el ciclo de vida."
-        )
-        self.fields["id_ocupacion"].queryset = Ocupacion.objects.filter(flg_activo=True).order_by(
-            "dsc_ocupacion"
-        )
-        self.fields["id_grado_estudio"].queryset = GradoEstudio.objects.filter(
-            flg_activo=True
-        ).order_by("dsc_grado_estudio")
+        self.fields["fch_nacimiento"].help_text = "Con esta fecha el sistema calcula automaticamente el ciclo de vida."
+        self.fields["id_ocupacion"].queryset = Ocupacion.objects.filter(flg_activo=True).order_by("dsc_ocupacion")
+        self.fields["id_grado_estudio"].queryset = GradoEstudio.objects.filter(flg_activo=True).order_by("dsc_grado_estudio")
 
 
 class PsicologoOficinaForm(forms.ModelForm):
     class Meta:
         model = PsicologoOficina
-        fields = [
-            "id_psicologo",
-            "domicilio",
-            "telefono",
-            "id_pais",
-            "id_provincia",
-            "id_localidad",
-            "id_zona",
-            "id_estado",
-        ]
+        fields = ["id_psicologo", "domicilio", "telefono", "id_pais", "id_provincia", "id_localidad", "id_zona", "id_estado"]
         widgets = {
             "id_psicologo": forms.Select(attrs={"class": "app-select"}),
             "domicilio": forms.TextInput(attrs={"class": "app-input", "placeholder": "Domicilio de la oficina"}),
@@ -431,6 +305,7 @@ class PsicologoOficinaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.user = user
         self.psicologo = psicologo
+        self.is_psicologo_user = bool(self.psicologo and not (self.user and (self.user.is_staff or self.user.is_superuser)))
         self.fields["id_psicologo"].queryset = Psicologo.objects.order_by("nombres", "dni")
         self.fields["id_pais"].queryset = Pais.objects.filter(flg_activo=True).order_by("dsc_pais")
         self.fields["id_provincia"].queryset = Provincia.objects.filter(flg_activo=True).order_by("dsc_provincia")
@@ -438,15 +313,20 @@ class PsicologoOficinaForm(forms.ModelForm):
         self.fields["id_zona"].queryset = Zona.objects.filter(flg_activo=True).order_by("dsc_zona")
         self.fields["id_estado"].queryset = Estado.objects.filter(flg_activo=True).order_by("dsc_estado")
 
-        if self.psicologo and not (self.user and (self.user.is_staff or self.user.is_superuser)):
+        if self.is_psicologo_user:
             self.fields["id_psicologo"].queryset = Psicologo.objects.filter(pk=self.psicologo.pk)
             self.fields["id_psicologo"].initial = self.psicologo
             self.fields["id_psicologo"].disabled = True
+            self.fields["id_estado"].required = False
+            self.fields["id_estado"].widget = forms.HiddenInput()
+            self.fields["id_estado"].initial = get_estado_activo()
 
     def save(self, commit=True):
         oficina = super().save(commit=False)
         if self.psicologo and self.fields["id_psicologo"].disabled:
             oficina.id_psicologo = self.psicologo
+        if self.is_psicologo_user:
+            oficina.id_estado = get_estado_activo()
         if commit:
             oficina.save()
             self.save_m2m()
@@ -457,34 +337,31 @@ class PsicologoMetodoPagoForm(forms.ModelForm):
     class Meta:
         model = PsicologoMetodoPago
         fields = ["id_psicologo", "id_metodo_pago", "id_estado"]
-        widgets = {
-            "id_psicologo": forms.Select(attrs={"class": "app-select"}),
-            "id_metodo_pago": forms.Select(attrs={"class": "app-select"}),
-            "id_estado": forms.Select(attrs={"class": "app-select"}),
-        }
+        widgets = {"id_psicologo": forms.Select(attrs={"class": "app-select"}), "id_metodo_pago": forms.Select(attrs={"class": "app-select"}), "id_estado": forms.Select(attrs={"class": "app-select"})}
 
     def __init__(self, *args, user=None, psicologo=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
         self.psicologo = psicologo
+        self.is_psicologo_user = bool(self.psicologo and not (self.user and (self.user.is_staff or self.user.is_superuser)))
         self.fields["id_psicologo"].queryset = Psicologo.objects.order_by("nombres", "dni")
         self.fields["id_metodo_pago"].queryset = MetodoPago.objects.filter(flg_activo=True).order_by("dsc_met_pago")
         self.fields["id_estado"].queryset = Estado.objects.filter(flg_activo=True).order_by("dsc_estado")
 
-        if self.psicologo and not (self.user and (self.user.is_staff or self.user.is_superuser)):
+        if self.is_psicologo_user:
             self.fields["id_psicologo"].queryset = Psicologo.objects.filter(pk=self.psicologo.pk)
             self.fields["id_psicologo"].initial = self.psicologo
             self.fields["id_psicologo"].disabled = True
+            self.fields["id_estado"].required = False
+            self.fields["id_estado"].widget = forms.HiddenInput()
+            self.fields["id_estado"].initial = get_estado_activo()
 
     def clean(self):
         cleaned_data = super().clean()
         psicologo = self.psicologo if self.fields["id_psicologo"].disabled else cleaned_data.get("id_psicologo")
         metodo_pago = cleaned_data.get("id_metodo_pago")
         if psicologo and metodo_pago:
-            queryset = PsicologoMetodoPago.objects.filter(
-                id_psicologo=psicologo,
-                id_metodo_pago=metodo_pago,
-            )
+            queryset = PsicologoMetodoPago.objects.filter(id_psicologo=psicologo, id_metodo_pago=metodo_pago)
             if self.instance.pk:
                 queryset = queryset.exclude(pk=self.instance.pk)
             if queryset.exists():
@@ -495,6 +372,8 @@ class PsicologoMetodoPagoForm(forms.ModelForm):
         metodo_pago = super().save(commit=False)
         if self.psicologo and self.fields["id_psicologo"].disabled:
             metodo_pago.id_psicologo = self.psicologo
+        if self.is_psicologo_user:
+            metodo_pago.id_estado = get_estado_activo()
         if commit:
             metodo_pago.save()
             self.save_m2m()
