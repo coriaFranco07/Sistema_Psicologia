@@ -324,7 +324,7 @@ class PsicologoMetodoPago(models.Model):
         verbose_name_plural = "Métodos de pago de los psicólogos"
 
     def __str__(self):
-        return f"{self.id_psicologo.nombres} - {self.id_metodo_pago.dsc_metodo_pago}"
+        return f"{self.id_psicologo.nombres} - {self.id_metodo_pago.dsc_met_pago}"
     
 
 class PsicologoOficina(models.Model):

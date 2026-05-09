@@ -738,13 +738,13 @@ class PsicologoMetodoPagoListView(PsicologoOwnerOrStaffMixin, ListView):
             "id_psicologo",
             "id_metodo_pago",
             "id_estado",
-        ).order_by("id_psicologo__nombres", "id_metodo_pago__dsc_metodo_pago")
+        ).order_by("id_psicologo__nombres", "id_metodo_pago__dsc_met_pago")
         queryset = self.get_owner_filtered_queryset(queryset)
         query = self.request.GET.get("q", "").strip()
         if query:
             queryset = queryset.filter(
                 Q(id_psicologo__nombres__icontains=query)
-                | Q(id_metodo_pago__dsc_metodo_pago__icontains=query)
+                | Q(id_metodo_pago__dsc_met_pago__icontains=query)
                 | Q(id_estado__dsc_estado__icontains=query)
             )
         return queryset

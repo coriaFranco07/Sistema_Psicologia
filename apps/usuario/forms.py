@@ -468,7 +468,7 @@ class PsicologoMetodoPagoForm(forms.ModelForm):
         self.user = user
         self.psicologo = psicologo
         self.fields["id_psicologo"].queryset = Psicologo.objects.order_by("nombres", "dni")
-        self.fields["id_metodo_pago"].queryset = MetodoPago.objects.filter(flg_activo=True).order_by("dsc_metodo_pago")
+        self.fields["id_metodo_pago"].queryset = MetodoPago.objects.filter(flg_activo=True).order_by("dsc_met_pago")
         self.fields["id_estado"].queryset = Estado.objects.filter(flg_activo=True).order_by("dsc_estado")
 
         if self.psicologo and not (self.user and (self.user.is_staff or self.user.is_superuser)):
