@@ -22,7 +22,8 @@ from .forms import (
     PsicologoOficinaForm,
     PsicologoPendienteForm,
 )
-from .models import Paciente, Psicologo, PsicologoMetodoPago, PsicologoOficina, PsicologoPendiente
+
+from .models import Paciente, Psicologo, PsicologoIdioma, PsicologoMetodoPago, PsicologoOficina, PsicologoPendiente
 
 
 class PsicologoOwnerOrStaffMixin(LoginRequiredMixin, UserPassesTestMixin):
