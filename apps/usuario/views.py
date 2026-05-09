@@ -829,3 +829,76 @@ class PacienteDeleteView(DeleteView):
         context = super().get_context_data(**kwargs)
         context["cancel_url"] = self.success_url
         return context
+
+
+
+class PsicologoIdiomaListView(PsicologoOwnerOrStaffMixin, ListView):
+    model = PsicologoIdioma
+    template_name = "psicologo/idioma_list.html"
+    context_object_name = "idiomas"
+
+    def get_queryset(self):
+        queryset = PsicologoIdioma.objects.select_related(
+            "id_psicologo",
+            "id_idioma",
+            "id_estado",
+        ).order_by("id_psicologo__nombres", "id_idioma__dsc_idioma")
+
+        queryset = self.get_owner_filtered_queryset(queryset)
+
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(
+                Q(id_psicologo__nombres__icontains=query)
+                | Q(id_idioma__dsc_idioma__icontains=query)
+                | Q(id_estado__dsc_estado__icontains=query)
+            )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["query"] = self.request.GET.get("q", "").strip()
+        context["total_resultados"] = self.object_list.count()
+        return context
+
+
+class PsicologoIdiomaCreateView(PsicologoOwnerOrStaffMixin, CreateView):
+    model = PsicologoIdioma
+    form_class = PsicologoIdiomaForm
+    template_name = "psicologo/idioma_form.html"
+    success_url = reverse_lazy("usuario:psicologo_idioma_list")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Idioma creado correctamente.")
+        return super().form_valid(form)
+
+
+class PsicologoIdiomaUpdateView(PsicologoOwnerOrStaffMixin, UpdateView):
+    model = PsicologoIdioma
+    form_class = PsicologoIdiomaForm
+    template_name = "psicologo/idioma_form.html"
+    success_url = reverse_lazy("usuario:psicologo_idioma_list")
+
+    def get_queryset(self):
+        queryset = PsicologoIdioma.objects.select_related("id_psicologo")
+        return self.get_owner_filtered_queryset(queryset)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Idioma actualizado correctamente.")
+        return super().form_valid(form)
+
+
+class PsicologoIdiomaDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
+    model = PsicologoIdioma
+    template_name = "psicologo/idioma_confirm_delete.html"
+    context_object_name = "idioma"
+    success_url = reverse_lazy("usuario:psicologo_idioma_list")
+
+    def get_queryset(self):
+        queryset = PsicologoIdioma.objects.select_related("id_psicologo")
+        return self.get_owner_filtered_queryset(queryset)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Idioma eliminado correctamente.")
+        return super().form_valid(form)
