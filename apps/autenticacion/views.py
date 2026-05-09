@@ -7,7 +7,6 @@ import json
 from apps.core.utils import get_parametro_json, log_error, user_estado_control
 from apps.datos_personales.models import DatosPersonales
 from apps.datos_personales.serializers import DatosPersonalesSerializer
-from apps.estado_socio.models import EstadoSocio, SocioEstado
 import logging
 import traceback
 
@@ -23,6 +22,7 @@ def build_absolute_media_url(request, relative_url):
 @csrf_exempt
 def login(request):
     try:
+
         if request.method != 'POST':
             return JsonResponse({"error": "Método no permitido"}, status=405)
 
@@ -54,9 +54,6 @@ def login(request):
             "email": user.email,
             "dni": user.dni,
             "nombres": getattr(user, 'nombres', ''),  # por si no tiene campo nombres
-            "estado_socio": str(getattr(user, 'id_std_socio', '')),
-            "tipo_socio": str(getattr(user, 'id_tipo_socio', '')),
-            "jerarquia": str(getattr(user, 'id_jerarquia', '')),
             "foto_url": build_absolute_media_url(request, user.foto_url)
         }
 
@@ -68,38 +65,6 @@ def login(request):
         except DatosPersonales.DoesNotExist:
             datos_personales = {}  # si no existen datos personales
 
-
-        # CONTROL DE ESTADO DEL SOCIO
-        if not user_estado_control(user):
-            return JsonResponse({"error": "Regularice su situacion"}, status=403)
-
-        
-        #CONTROL AGREGADO PARA CAMBIAR ESTADO A DEUDOR
-        parametro_monto = get_parametro_json("LIMITE_MONTO_DEUDOR")
-        monto = parametro_monto.get("monto") if parametro_monto else 0
-                
-        if user.saldo_gral_flia < 0 and abs(user.saldo_gral_flia) > monto:
-                estado_deudor, created = EstadoSocio.objects.get_or_create(
-                    dsc_std_socio="DEUDOR",
-                    defaults={
-                        "descuento": True,
-                        "servicio": False,
-                        "es_socio": True,
-                        "bloqueado": True,
-                    }
-                )
-                
-
-                        
-            # 3) Crear nuevo estado DEUDOR
-                SocioEstado.objects.create(
-                    username=user,
-                    id_std_socio=estado_deudor,
-                    fch_in_std=timezone.now().date()
-                )
-                        
-
-                return JsonResponse({"error": "Regularice su situacion"}, status=400)
         
         return JsonResponse({
             "user_id": user.id,

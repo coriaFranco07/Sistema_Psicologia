@@ -28,7 +28,7 @@
       <a href="#como-funciona" class="hdr-link">¿Cómo funciona?</a>
       <a href="#psicologos" class="hdr-link">Psicólogos</a>
       <a href="#para-profesionales" class="hdr-link">Para profesionales</a>
-      <a href="#login" class="hdr-cta">Ingresar →</a>
+      <a href="{% url 'login' %}" class="hdr-cta">Ingresar →</a>
     </nav>
   </div>
 </header>
@@ -147,7 +147,7 @@
           <li><span class="perk-check"><svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Tu historial, notas y seguimiento en un solo lugar</li>
           <li><span class="perk-check"><svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Podés cambiar de profesional cuando quieras</li>
         </ul>
-        <a href="#registro-paciente" class="ac-btn">Buscar mi psicólogo →</a>
+        <a href="{% url 'usuario:paciente_create' %}" class="ac-btn">Buscar mi psicólogo →</a>
         <div class="ac-deco deco-a"></div>
         <div class="ac-deco deco-b"></div>
       </div>
@@ -161,7 +161,7 @@
           <li><span class="perk-check"><svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Historial clínico seguro y accesible desde cualquier lugar</li>
           <li><span class="perk-check"><svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Sin comisiones en los primeros 3 meses</li>
         </ul>
-        <a href="#registro-psicologo" class="ac-btn">Sumar mi práctica →</a>
+        <a href="{% url 'usuario:psicologo_create' %}" class="ac-btn">Sumar mi práctica →</a>
         <div class="ac-deco deco-a"></div>
         <div class="ac-deco deco-b"></div>
       </div>
@@ -347,8 +347,8 @@
       <p class="cta-sub">Primera consulta sin costo. Sin compromiso. Solo vos dando el paso.</p>
     </div>
     <div class="cta-actions">
-      <a href="#registro-paciente" class="cta-btn-main">Buscar mi psicólogo →</a>
-      <a href="#registro-psicologo" class="cta-btn-sec">¿Sos psicólogo/a? Sumate</a>
+      <a href="{% url 'usuario:paciente_create' %}" class="cta-btn-main">Buscar mi psicólogo →</a>
+      <a href="{% url 'usuario:psicologo_create' %}" class="cta-btn-sec">¿Sos psicólogo/a? Sumate</a>
     </div>
   </div>
 </div>

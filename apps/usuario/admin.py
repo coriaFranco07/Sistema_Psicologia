@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from apps.datos_personales.models import DatosPersonales
 
-from .models import Paciente, Psicologo
+from .models import Paciente, Psicologo, PsicologoPendiente
 
 
 class PsicologoDatosPersonalesInline(admin.StackedInline):
@@ -21,7 +21,15 @@ class PacienteDatosPersonalesInline(admin.StackedInline):
 
 @admin.register(Psicologo)
 class PsicologoAdmin(admin.ModelAdmin):
-    list_display = ("nombres", "dni", "email", "id_estado", "id_rama", "tiene_foto")
+    list_display = (
+        "nombres",
+        "dni",
+        "email",
+        "id_estado",
+        "id_rama",
+        "tiene_titulo",
+        "tiene_foto",
+    )
     search_fields = ("nombres", "dni", "email", "cuil", "id_rama__dsc_rama")
     list_filter = ("id_estado", "id_rama")
     list_select_related = ("id_estado", "id_rama")
@@ -31,6 +39,19 @@ class PsicologoAdmin(admin.ModelAdmin):
     @admin.display(boolean=True, description="Foto")
     def tiene_foto(self, obj):
         return bool(obj.foto)
+
+    @admin.display(boolean=True, description="Titulo")
+    def tiene_titulo(self, obj):
+        return bool(obj.titulo)
+
+
+@admin.register(PsicologoPendiente)
+class PsicologoPendienteAdmin(admin.ModelAdmin):
+    list_display = ("nombres", "dni", "email", "id_rama", "estado", "fch_creacion")
+    search_fields = ("nombres", "dni", "email", "cuil", "id_rama__dsc_rama")
+    list_filter = ("estado", "id_rama")
+    list_select_related = ("id_rama", "psicologo")
+    readonly_fields = ("password_hash", "psicologo", "fch_creacion", "fch_actualizacion", "fch_resolucion")
 
 
 @admin.register(Paciente)

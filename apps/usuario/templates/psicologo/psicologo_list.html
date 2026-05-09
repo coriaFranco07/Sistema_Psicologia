@@ -1,0 +1,506 @@
+{% extends "usuario/base.html" %}
+
+{% block title %}Psicologos{% endblock %}
+
+{% block main_class %}list-main{% endblock %}
+
+{% block extra_styles %}
+main.list-main {
+    max-width: 1520px;
+    margin: 0 auto;
+    padding: 32px 20px 48px;
+}
+
+.list-page {
+    display: grid;
+    gap: 18px;
+}
+
+.list-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 22px 0 10px;
+}
+
+.list-kicker {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.list-hero h1 {
+    margin: 12px 0 6px;
+    color: #0f172a;
+    font-size: 2rem;
+    line-height: 1.1;
+}
+
+.list-hero p {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.55;
+}
+
+.list-count {
+    min-width: 150px;
+    padding: 14px 16px;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #475569;
+    text-align: right;
+}
+
+.list-count strong {
+    display: block;
+    color: #0f172a;
+    font-size: 1.45rem;
+}
+
+.list-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+}
+
+.search-form {
+    display: flex;
+    flex: 1;
+    gap: 10px;
+}
+
+.search-input {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.search-input:focus {
+    outline: 2px solid rgba(37, 99, 235, 0.18);
+    border-color: #2563eb;
+    background: #ffffff;
+}
+
+.btn-modern {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-modern-primary {
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.btn-modern-secondary {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+}
+
+.btn-modern-info {
+    border: 1px solid #0ea5e9;
+    background: #eff6ff;
+    color: #0369a1;
+}
+
+.table-panel {
+    overflow: visible;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.07);
+}
+
+.modern-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.modern-table th {
+    padding: 14px 18px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.modern-table td {
+    padding: 16px 18px;
+    border-bottom: 1px solid #edf2f7;
+    color: #334155;
+    vertical-align: top;
+    word-break: break-word;
+}
+
+.modern-table tr:last-child td {
+    border-bottom: none;
+}
+
+.modern-table tbody tr {
+    transition: background-color 0.18s ease;
+}
+
+.modern-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.person-cell {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.person-avatar {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 auto;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #dbeafe, #ccfbf1);
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.person-name {
+    display: block;
+    color: #0f172a;
+    font-weight: 800;
+}
+
+.person-sub {
+    display: block;
+    margin-top: 3px;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.cell-title {
+    display: block;
+    color: #0f172a;
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+.cell-sub {
+    display: block;
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.file-link {
+    color: #0369a1;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.file-link:hover {
+    text-decoration: underline;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 0.84rem;
+    font-weight: 800;
+}
+
+.table-actions {
+    text-align: right;
+    width: 132px;
+}
+
+.action-link {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 800;
+    border: 1px solid transparent;
+}
+
+.action-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.action-menu[open] {
+    z-index: 3;
+}
+
+.action-menu-summary {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 0.88rem;
+    font-weight: 800;
+    cursor: pointer;
+    list-style: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+    user-select: none;
+}
+
+.action-menu-summary::-webkit-details-marker {
+    display: none;
+}
+
+.action-menu-summary:hover,
+.action-menu[open] .action-menu-summary {
+    border-color: #93c5fd;
+    background: #f8fbff;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+}
+
+.action-menu-caret {
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.18s ease;
+}
+
+.action-menu[open] .action-menu-caret {
+    transform: rotate(225deg);
+}
+
+.action-menu-panel {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    min-width: 180px;
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid #dbe3ef;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.16);
+}
+
+.action-link-edit {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #dbeafe;
+}
+
+.action-link-delete {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fee2e2;
+}
+
+.action-link-view {
+    background: yellow-50;
+    color: #0369a1;
+    border-color: #dbeafe;
+}
+
+.empty-table {
+    padding: 44px 18px;
+    color: #64748b;
+    text-align: center;
+}
+
+@media (max-width: 820px) {
+    main.list-main {
+        padding: 20px 14px 34px;
+    }
+
+    .list-hero,
+    .list-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .list-count {
+        text-align: left;
+    }
+
+    .search-form {
+        flex-direction: column;
+    }
+
+    .btn-modern {
+        width: 100%;
+    }
+
+    .modern-table th,
+    .modern-table td {
+        padding: 14px 12px;
+    }
+}
+{% endblock %}
+
+{% block content %}
+<section class="list-page">
+    <div class="list-hero">
+        <div>
+            <span class="list-kicker">Modulo de psicologos</span>
+            <h1>Psicologos</h1>
+            <p>Consulta, busca y administra los perfiles profesionales cargados en el sistema.</p>
+        </div>
+        <div class="list-count">
+            <strong>{{ total_resultados }}</strong>
+            registros encontrados
+        </div>
+    </div>
+
+    <div class="list-toolbar">
+        <form method="get" class="search-form">
+            <input class="search-input" type="text" name="q" value="{{ query|default:'' }}" placeholder="Buscar por nombre, DNI, email, telefono, rama o ubicacion">
+            <button class="btn-modern btn-modern-secondary" type="submit">Buscar</button>
+        </form>
+        <a class="btn-modern btn-modern-primary" href="{% url 'usuario:psicologo_create' %}">Nuevo Psicologo</a>
+    </div>
+
+    <div class="table-panel">
+    <table class="modern-table">
+        <thead>
+            <tr>
+                <th>Perfil</th>
+                <th>Documento</th>
+                <th>Contacto</th>
+                <th>Datos personales</th>
+                <th>Ubicacion</th>
+                <th>Rama</th>
+                <th>Estado</th>
+                <th>Fecha Alta</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for psicologo in psicologos %}
+                {% with datos=psicologo.datos_personales_rel %}
+                    <tr>
+                        <td>
+                            <div class="person-cell">
+                                
+                                <div>
+                                    <span class="person-name">{{ psicologo.nombres }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="cell-title">{{ psicologo.dni }}</span>
+                            {% if psicologo.cuil %}
+                                <span class="cell-sub">{{ psicologo.cuil }}</span>
+                            {% else %}
+                                <span class="cell-sub">CUIL sin cargar</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="cell-title">{{ psicologo.email }}</span>
+                            {% if datos and datos.telefono %}
+                                <span class="cell-sub">{{ datos.telefono }}</span>
+                            {% else %}
+                                <span class="cell-sub">Telefono sin cargar</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="cell-title">{{ psicologo.fch_nacimiento|date:"d/m/Y" }}</span>
+                            <span class="cell-sub">Edad {{ psicologo.edad }} años</span>
+                            
+                        </td>
+                        <td>
+                            <span class="cell-title">
+                                {% if datos and datos.id_pais %}
+                                    {{ datos.id_pais }}
+                                {% else %}
+                                    Pais sin cargar
+                                {% endif %}
+                            </span>
+                            <span class="cell-sub">
+                                {% if datos and datos.id_provincia %}
+                                    {{ datos.id_provincia }}
+                                {% else %}
+                                    Sin cargar
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="cell-title">{{ psicologo.id_rama }}</span>
+                        </td>
+
+                        <td>
+                            <span class="status-pill">{{ psicologo.id_estado }}</span>
+                        </td>
+                        <td>
+                            <span class="cell-title">{{ psicologo.fch_creacion|date:"d/m/Y H:i" }}</span>
+                            
+                        </td>
+                        <td class="table-actions">
+                            <details class="action-menu">
+                                <summary class="action-menu-summary">
+                                    <span>Acciones</span>
+                                    <span class="action-menu-caret"></span>
+                                </summary>
+                                <div class="action-menu-panel">
+                                    <a class="action-link action-link-view" href="{% url 'usuario:psicologo_detail' psicologo.pk %}">Ver ficha</a>
+                                    <a class="action-link action-link-edit" href="{% url 'usuario:psicologo_update' psicologo.pk %}">Editar</a>
+                                    <a class="action-link action-link-delete" href="{% url 'usuario:psicologo_delete' psicologo.pk %}">Eliminar</a>
+                                </div>
+                            </details>
+                        </td>
+                    </tr>
+                {% endwith %}
+            {% empty %}
+                <tr>
+                    <td class="empty-table" colspan="10">No hay registros para mostrar.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</section>
+{% endblock %}

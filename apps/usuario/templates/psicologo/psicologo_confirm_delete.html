@@ -1,0 +1,16 @@
+{% extends "usuario/base.html" %}
+
+{% block title %}Eliminar Psicologo{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h2>Eliminar Psicologo</h2>
+    <p>Seguro que queres eliminar a <strong>{{ psicologo }}</strong>?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirmar eliminacion</button>
+        <a class="btn btn-secondary" href="{{ cancel_url }}">Cancelar</a>
+    </form>
+</section>
+{% endblock %}

@@ -18,7 +18,7 @@
         <section class="login-shell">
             <section class="login-visual" aria-label="Presentacion del sistema">
                 <a class="login-brand" href="{% url 'home' %}">
-                    <span class="brand-mark">SP</span>
+                    
                     <span>
                         <strong>Sistema Psicologia</strong>
                         <small>Salud mental digital</small>
@@ -102,10 +102,10 @@
                         <div class="register-choice">
                             <p class="register-choice-title">Todavia no tienes cuenta?</p>
                             <div class="register-actions">
-                                <a href="{% url 'usuario:paciente_create' %}" class="register-link register-link-patient">
+                                <a href="{% url 'home' %}" class="register-link register-link-patient">
                                     Quiero ser paciente
                                 </a>
-                                <a href="{% url 'usuario:psicologo_create' %}" class="register-link register-link-psychologist">
+                                <a href="{% url 'home' %}" class="register-link register-link-psychologist">
                                     Quiero ser psicologo
                                 </a>
                             </div>

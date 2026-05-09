@@ -9,7 +9,19 @@ from django.core.validators import (
 from django.db import models
 from django.templatetags.static import static
 
-from apps.parametro.models import CicloVida, Estado, GradoEstudio, Ocupacion, Rama
+from apps.parametro.models import (
+    CicloVida,
+    Estado,
+    GradoEstudio,
+    Localidad,
+    Ocupacion,
+    Pais,
+    Provincia,
+    Rama,
+    Sexo,
+    TipoCivil,
+    Zona,
+)
 
 
 MAX_SIZE_MB = 5
@@ -40,7 +52,7 @@ def calculate_age_from_birth_date(fch_nacimiento, today=None):
     )
 
 
-class PersonaBase(models.Model):
+class UsuarioBase(models.Model):
     nombres = models.CharField(max_length=100)
     email = models.EmailField(max_length=50, unique=True)
     dni = models.PositiveBigIntegerField(
@@ -109,15 +121,119 @@ class PersonaBase(models.Model):
             return None
 
 
-class Psicologo(PersonaBase):
+class Psicologo(UsuarioBase):
 
     id_rama = models.ForeignKey(Rama, on_delete=models.RESTRICT, related_name="psicologos", verbose_name="Rama")
-    class Meta(PersonaBase.Meta):
+    titulo = models.FileField(
+        upload_to="psicologos/titulos/",
+        default="",
+        verbose_name="Titulo",
+        validators=[FileExtensionValidator(["pdf"])],
+    )
+
+    class Meta(UsuarioBase.Meta):
         verbose_name = "Psicologo"
         verbose_name_plural = "Psicologos"
 
 
-class Paciente(PersonaBase):
+class PsicologoPendiente(models.Model):
+    ESTADO_PENDIENTE = "PENDIENTE"
+    ESTADO_APROBADO = "APROBADO"
+    ESTADO_RECHAZADO = "RECHAZADO"
+    ESTADOS = (
+        (ESTADO_PENDIENTE, "Pendiente"),
+        (ESTADO_APROBADO, "Aprobado"),
+        (ESTADO_RECHAZADO, "Rechazado"),
+    )
+
+    nombres = models.CharField(max_length=100)
+    email = models.EmailField(max_length=50)
+    dni = models.PositiveBigIntegerField(
+        validators=[MinValueValidator(1_000_000), MaxValueValidator(99_999_999)]
+    )
+    cuil = models.PositiveBigIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(10_000_000_000), MaxValueValidator(99_999_999_999)],
+    )
+    fch_nacimiento = models.DateField(verbose_name="Fecha de nacimiento")
+    foto = models.FileField(
+        upload_to="personas/fotos/",
+        null=True,
+        blank=True,
+        validators=[
+            FileExtensionValidator(["jpg", "jpeg", "png", "webp"]),
+            validate_photo_size,
+        ],
+    )
+    id_rama = models.ForeignKey(
+        Rama,
+        on_delete=models.RESTRICT,
+        related_name="psicologos_pendientes",
+        verbose_name="Rama",
+    )
+    titulo = models.FileField(
+        upload_to="psicologos/titulos/",
+        verbose_name="Titulo",
+        validators=[FileExtensionValidator(["pdf"])],
+    )
+    telefono = models.CharField(max_length=25)
+    domicilio = models.CharField(max_length=200)
+    id_sexo = models.ForeignKey(Sexo, on_delete=models.RESTRICT, verbose_name="Sexo")
+    id_std_civil = models.ForeignKey(
+        TipoCivil,
+        on_delete=models.RESTRICT,
+        verbose_name="Estado civil",
+    )
+    id_pais = models.ForeignKey(Pais, on_delete=models.RESTRICT, verbose_name="Pais")
+    id_provincia = models.ForeignKey(
+        Provincia,
+        on_delete=models.RESTRICT,
+        verbose_name="Provincia",
+    )
+    id_localidad = models.ForeignKey(
+        Localidad,
+        on_delete=models.RESTRICT,
+        verbose_name="Localidad",
+    )
+    id_zona = models.ForeignKey(Zona, on_delete=models.RESTRICT, verbose_name="Zona")
+    password_hash = models.CharField(max_length=128)
+    estado = models.CharField(
+        max_length=12,
+        choices=ESTADOS,
+        default=ESTADO_PENDIENTE,
+    )
+    psicologo = models.OneToOneField(
+        Psicologo,
+        on_delete=models.SET_NULL,
+        related_name="solicitud_origen",
+        null=True,
+        blank=True,
+    )
+    fch_creacion = models.DateTimeField(auto_now_add=True)
+    fch_actualizacion = models.DateTimeField(auto_now=True)
+    fch_resolucion = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("-fch_creacion",)
+        verbose_name = "Psicologo pendiente"
+        verbose_name_plural = "Psicologos pendientes"
+
+    def __str__(self):
+        return f"{self.nombres} - DNI {self.dni} ({self.get_estado_display()})"
+
+    @property
+    def edad(self):
+        return calculate_age_from_birth_date(self.fch_nacimiento)
+
+    @property
+    def foto_url(self):
+        if self.foto:
+            return self.foto.url
+        return static("images/foto_usuario_default.png")
+
+
+class Paciente(UsuarioBase):
     id_ocupacion = models.ForeignKey(
         Ocupacion,
         on_delete=models.RESTRICT,
@@ -137,7 +253,7 @@ class Paciente(PersonaBase):
         verbose_name="Grado de estudio",
     )
 
-    class Meta(PersonaBase.Meta):
+    class Meta(UsuarioBase.Meta):
         verbose_name = "Paciente"
         verbose_name_plural = "Pacientes"
 

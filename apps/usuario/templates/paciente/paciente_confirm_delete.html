@@ -1,15 +1,15 @@
 {% extends "usuario/base.html" %}
 
-{% block title %}Eliminar {{ entity_label }}{% endblock %}
+{% block title %}Eliminar Paciente{% endblock %}
 
 {% block content %}
 <section class="card">
-    <h2>Eliminar {{ entity_label }}</h2>
-    <p>¿Seguro que querés eliminar a <strong>{{ persona }}</strong>?</p>
+    <h2>Eliminar Paciente</h2>
+    <p>Seguro que queres eliminar a <strong>{{ paciente }}</strong>?</p>
 
     <form method="post">
         {% csrf_token %}
-        <button type="submit">Confirmar eliminación</button>
+        <button type="submit">Confirmar eliminacion</button>
         <a class="btn btn-secondary" href="{{ cancel_url }}">Cancelar</a>
     </form>
 </section>

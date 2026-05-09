@@ -1,8 +1,6 @@
 {% extends "usuario/base.html" %}
 
-{% block title %}{{ entity_label_plural|default:"Personas" }}{% endblock %}
-
-{% block page_header %}{% endblock %}
+{% block title %}Pacientes{% endblock %}
 
 {% block main_class %}list-main{% endblock %}
 
@@ -285,9 +283,9 @@ main.list-main {
 <section class="list-page">
     <div class="list-hero">
         <div>
-            <span class="list-kicker">Gestion de registros</span>
-            <h1>{{ entity_label_plural|default:"Personas" }}</h1>
-            <p>Consulta, busca y administra los registros cargados en el sistema.</p>
+            <span class="list-kicker">Modulo de pacientes</span>
+            <h1>Pacientes</h1>
+            <p>Consulta, busca y administra las fichas de pacientes cargadas en el sistema.</p>
         </div>
         <div class="list-count">
             <strong>{{ total_resultados }}</strong>
@@ -300,9 +298,7 @@ main.list-main {
             <input class="search-input" type="text" name="q" value="{{ query|default:'' }}" placeholder="Buscar por nombre, DNI, email o estado">
             <button class="btn-modern btn-modern-secondary" type="submit">Buscar</button>
         </form>
-        {% if create_url_name %}
-            <a class="btn-modern btn-modern-primary" href="{% url create_url_name %}">Nuevo {{ entity_label }}</a>
-        {% endif %}
+        <a class="btn-modern btn-modern-primary" href="{% url 'usuario:paciente_create' %}">Nuevo Paciente</a>
     </div>
 
     <div class="table-panel">
@@ -317,31 +313,27 @@ main.list-main {
             </tr>
         </thead>
         <tbody>
-            {% for persona in personas %}
+            {% for paciente in pacientes %}
                 <tr>
                     <td>
                         <div class="person-cell">
-                            <span class="person-avatar">{{ persona.nombres|first }}</span>
+                            <span class="person-avatar">{{ paciente.nombres|first }}</span>
                             <div>
-                                <span class="person-name">{{ persona.nombres }}</span>
-                                {% if persona.cuil %}
-                                    <span class="person-sub">CUIL {{ persona.cuil }}</span>
+                                <span class="person-name">{{ paciente.nombres }}</span>
+                                {% if paciente.cuil %}
+                                    <span class="person-sub">CUIL {{ paciente.cuil }}</span>
                                 {% else %}
                                     <span class="person-sub">CUIL sin cargar</span>
                                 {% endif %}
                             </div>
                         </div>
                     </td>
-                    <td>{{ persona.dni }}</td>
-                    <td>{{ persona.email }}</td>
-                    <td><span class="status-pill">{{ persona.id_estado }}</span></td>
+                    <td>{{ paciente.dni }}</td>
+                    <td>{{ paciente.email }}</td>
+                    <td><span class="status-pill">{{ paciente.id_estado }}</span></td>
                     <td class="table-actions">
-                        {% if update_url_name %}
-                            <a class="action-link action-link-edit" href="{% url update_url_name persona.pk %}">Editar</a>
-                        {% endif %}
-                        {% if delete_url_name %}
-                            <a class="action-link action-link-delete" href="{% url delete_url_name persona.pk %}">Eliminar</a>
-                        {% endif %}
+                        <a class="action-link action-link-edit" href="{% url 'usuario:paciente_update' paciente.pk %}">Editar</a>
+                        <a class="action-link action-link-delete" href="{% url 'usuario:paciente_delete' paciente.pk %}">Eliminar</a>
                     </td>
                 </tr>
             {% empty %}

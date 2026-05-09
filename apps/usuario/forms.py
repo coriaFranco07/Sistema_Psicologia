@@ -3,18 +3,86 @@ import re
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
-from apps.parametro.models import Estado, GradoEstudio, Ocupacion, Rama
+from apps.parametro.models import (
+    Estado,
+    GradoEstudio,
+    Localidad,
+    Ocupacion,
+    Pais,
+    Provincia,
+    Rama,
+    Sexo,
+    TipoCivil,
+    Zona,
+)
 
-from .models import MAX_SIZE_MB, Paciente, Psicologo
+from .models import MAX_SIZE_MB, Paciente, Psicologo, PsicologoPendiente
 
 
-PERSONA_FIELDS = ["nombres", "email", "dni", "cuil", "fch_nacimiento", "foto"]
+USUARIO_BASE_FIELDS = ["nombres", "email", "dni", "cuil", "fch_nacimiento", "foto"]
 
 
-class BasePersonaForm(forms.ModelForm):
+class DatosPersonalesSolicitudForm(forms.Form):
+    telefono = forms.CharField(
+        max_length=25,
+        widget=forms.TextInput(attrs={"class": "app-input", "placeholder": "Telefono o celular"}),
+    )
+    domicilio = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"class": "app-input", "placeholder": "Domicilio"}),
+    )
+    id_sexo = forms.ModelChoiceField(
+        queryset=Sexo.objects.none(),
+        label="Sexo",
+        widget=forms.Select(attrs={"class": "app-select"}),
+    )
+    id_std_civil = forms.ModelChoiceField(
+        queryset=TipoCivil.objects.none(),
+        label="Estado civil",
+        widget=forms.Select(attrs={"class": "app-select"}),
+    )
+    id_pais = forms.ModelChoiceField(
+        queryset=Pais.objects.none(),
+        label="Pais",
+        widget=forms.Select(attrs={"class": "app-select"}),
+    )
+    id_provincia = forms.ModelChoiceField(
+        queryset=Provincia.objects.none(),
+        label="Provincia",
+        widget=forms.Select(attrs={"class": "app-select"}),
+    )
+    id_localidad = forms.ModelChoiceField(
+        queryset=Localidad.objects.none(),
+        label="Localidad",
+        widget=forms.Select(attrs={"class": "app-select"}),
+    )
+    id_zona = forms.ModelChoiceField(
+        queryset=Zona.objects.none(),
+        label="Zona",
+        widget=forms.Select(attrs={"class": "app-select"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["id_sexo"].queryset = Sexo.objects.filter(flg_activo=True).order_by("dsc_tipo")
+        self.fields["id_std_civil"].queryset = TipoCivil.objects.filter(flg_activo=True).order_by(
+            "dsc_std_civil"
+        )
+        self.fields["id_pais"].queryset = Pais.objects.filter(flg_activo=True).order_by("dsc_pais")
+        self.fields["id_provincia"].queryset = Provincia.objects.filter(flg_activo=True).order_by(
+            "dsc_provincia"
+        )
+        self.fields["id_localidad"].queryset = Localidad.objects.filter(flg_activo=True).order_by(
+            "dsc_localidad"
+        )
+        self.fields["id_zona"].queryset = Zona.objects.filter(flg_activo=True).order_by("dsc_zona")
+
+
+class UsuarioBaseForm(forms.ModelForm):
     password1 = forms.CharField(
         label="Contrasena",
         widget=forms.PasswordInput(
@@ -37,7 +105,7 @@ class BasePersonaForm(forms.ModelForm):
     )
 
     class Meta:
-        fields = PERSONA_FIELDS
+        fields = USUARIO_BASE_FIELDS
         widgets = {
             "nombres": forms.TextInput(
                 attrs={"class": "app-input", "placeholder": "Nombre completo"}
@@ -78,15 +146,15 @@ class BasePersonaForm(forms.ModelForm):
         return Estado.objects.filter(dsc_estado__iexact="ACTIVO", flg_activo=True).first()
 
     def save(self, commit=True):
-        persona = super().save(commit=False)
-        if not persona.pk or not persona.id_estado_id:
-            persona.id_estado = self.get_default_estado()
+        usuario = super().save(commit=False)
+        if hasattr(usuario, "id_estado_id") and (not usuario.pk or not usuario.id_estado_id):
+            usuario.id_estado = self.get_default_estado()
 
         if commit:
-            persona.save()
+            usuario.save()
             self.save_m2m()
 
-        return persona
+        return usuario
 
     def clean_nombres(self):
         nombres = self.cleaned_data.get("nombres", "").strip()
@@ -171,9 +239,9 @@ class BasePersonaForm(forms.ModelForm):
 
         return cleaned_data
 
-    def save_auth_user(self, persona):
+    def save_auth_user(self, usuario):
         password = self.cleaned_data.get("password1")
-        username = str(persona.dni)
+        username = str(usuario.dni)
         UserModel = get_user_model()
         user = None
 
@@ -189,9 +257,9 @@ class BasePersonaForm(forms.ModelForm):
             user = UserModel(username=username)
 
         user.username = username
-        user.email = persona.email
+        user.email = usuario.email
         if hasattr(user, "first_name"):
-            user.first_name = persona.nombres[:150]
+            user.first_name = usuario.nombres[:150]
 
         if password:
             user.set_password(password)
@@ -202,26 +270,114 @@ class BasePersonaForm(forms.ModelForm):
         return user
 
 
-class PsicologoForm(BasePersonaForm):
-    class Meta(BasePersonaForm.Meta):
+class PsicologoForm(UsuarioBaseForm):
+    class Meta(UsuarioBaseForm.Meta):
         model = Psicologo
-        fields = PERSONA_FIELDS + ["id_rama"]
+        fields = USUARIO_BASE_FIELDS + ["id_rama", "titulo"]
         widgets = {
-            **BasePersonaForm.Meta.widgets,
+            **UsuarioBaseForm.Meta.widgets,
             "id_rama": forms.Select(attrs={"class": "app-select"}),
+            "titulo": forms.ClearableFileInput(
+                attrs={"class": "app-input", "accept": "application/pdf,.pdf"}
+            ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["id_rama"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
+        self.fields["titulo"].label = "Titulo"
+        self.fields["titulo"].help_text = (
+            "Adjunta el titulo profesional en formato PDF. Es obligatorio para enviar la solicitud."
+        )
 
 
-class PacienteForm(BasePersonaForm):
-    class Meta(BasePersonaForm.Meta):
-        model = Paciente
-        fields = PERSONA_FIELDS + ["id_ocupacion", "id_grado_estudio"]
+class PsicologoPendienteForm(UsuarioBaseForm):
+    class Meta(UsuarioBaseForm.Meta):
+        model = PsicologoPendiente
+        fields = USUARIO_BASE_FIELDS + ["id_rama", "titulo"]
         widgets = {
-            **BasePersonaForm.Meta.widgets,
+            **UsuarioBaseForm.Meta.widgets,
+            "id_rama": forms.Select(attrs={"class": "app-select"}),
+            "titulo": forms.ClearableFileInput(
+                attrs={"class": "app-input", "accept": "application/pdf,.pdf"}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["id_rama"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
+        self.fields["titulo"].label = "Titulo"
+        self.fields["titulo"].help_text = (
+            "Adjunta el titulo profesional en formato PDF. Es obligatorio para enviar la solicitud."
+        )
+
+    @staticmethod
+    def get_active_solicitudes():
+        return PsicologoPendiente.objects.exclude(estado=PsicologoPendiente.ESTADO_RECHAZADO)
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email", "").strip().lower()
+        if Psicologo.objects.filter(email__iexact=email).exists():
+            raise ValidationError("Ya existe un psicologo aprobado con este correo electronico.")
+        if self.get_active_solicitudes().filter(email__iexact=email).exists():
+            raise ValidationError("Ya existe una solicitud pendiente o aprobada con este correo electronico.")
+        return email
+
+    def clean_dni(self):
+        dni = self.cleaned_data.get("dni")
+        if dni and not re.match(r"^\d{7,8}$", str(dni)):
+            raise ValidationError("El DNI debe tener 7 u 8 digitos.")
+
+        if dni and Psicologo.objects.filter(dni=dni).exists():
+            raise ValidationError("Ya existe un psicologo aprobado con este DNI.")
+        if dni and self.get_active_solicitudes().filter(dni=dni).exists():
+            raise ValidationError("Ya existe una solicitud pendiente o aprobada con este DNI.")
+
+        username = str(dni) if dni else ""
+        if username and get_user_model().objects.filter(username=username).exists():
+            raise ValidationError("Ya existe un usuario de acceso con este DNI.")
+
+        return dni
+
+    def clean_cuil(self):
+        cuil = self.cleaned_data.get("cuil")
+        dni = self.cleaned_data.get("dni")
+
+        if not cuil:
+            return cuil
+
+        cuil = str(cuil).strip()
+        if not re.match(r"^\d{11}$", cuil):
+            raise ValidationError("El CUIL debe tener 11 digitos sin guiones.")
+
+        if dni and cuil[2:10] != str(dni).zfill(8):
+            raise ValidationError("Los digitos centrales del CUIL deben coincidir con el DNI.")
+
+        if Psicologo.objects.filter(cuil=cuil).exists():
+            raise ValidationError("Ya existe un psicologo aprobado con este CUIL.")
+        if self.get_active_solicitudes().filter(cuil=cuil).exists():
+            raise ValidationError("Ya existe una solicitud pendiente o aprobada con este CUIL.")
+
+        return cuil
+
+    def save(self, commit=True):
+        solicitud = super().save(commit=False)
+        solicitud.password_hash = make_password(self.cleaned_data["password1"])
+        solicitud.estado = PsicologoPendiente.ESTADO_PENDIENTE
+
+        if commit:
+            solicitud.save()
+            self.save_m2m()
+
+        return solicitud
+
+
+class PacienteForm(UsuarioBaseForm):
+    class Meta(UsuarioBaseForm.Meta):
+        model = Paciente
+        fields = USUARIO_BASE_FIELDS + ["id_ocupacion", "id_grado_estudio"]
+        widgets = {
+            **UsuarioBaseForm.Meta.widgets,
             "id_ocupacion": forms.Select(attrs={"class": "app-select"}),
             "id_grado_estudio": forms.Select(attrs={"class": "app-select"}),
         }
