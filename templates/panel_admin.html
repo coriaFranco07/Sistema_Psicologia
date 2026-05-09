@@ -1,21 +1,62 @@
 {% extends "usuario/base.html" %}
 
 {% block title %}Panel Administrador{% endblock %}
+{% block main_class %}admin-dashboard-main{% endblock %}
+
+{% block extra_styles %}
+.admin-dashboard-main{max-width:1320px;margin:0 auto}.admin-dashboard{display:grid;gap:22px}.admin-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:1.4fr .85fr;gap:22px;padding:32px;border-radius:34px;background:radial-gradient(circle at 10% 10%,rgba(96,165,250,.34),transparent 28%),radial-gradient(circle at 88% 14%,rgba(45,212,191,.28),transparent 24%),linear-gradient(135deg,#08111f,#1e3a8a 50%,#0f766e);color:#fff;box-shadow:0 30px 80px rgba(15,23,42,.2)}.admin-hero:after{content:"";position:absolute;right:-100px;bottom:-120px;width:300px;height:300px;border-radius:999px;background:rgba(255,255,255,.12)}.admin-hero>*{position:relative;z-index:1}.admin-kicker{display:inline-flex;align-items:center;gap:9px;padding:8px 14px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(255,255,255,.1);font-size:.78rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:rgba(248,250,252,.9)}.admin-kicker:before{content:"";width:8px;height:8px;border-radius:999px;background:#93c5fd;box-shadow:0 0 0 5px rgba(147,197,253,.16)}.admin-hero h1{max-width:780px;margin:18px 0 12px;font-size:clamp(2.1rem,4vw,4.4rem);line-height:.96;letter-spacing:-.06em}.admin-hero p{max-width:700px;margin:0;color:rgba(226,232,240,.9);font-size:1.05rem;line-height:1.65}.admin-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}.admin-btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:15px;text-decoration:none;font-weight:900}.admin-btn.primary{background:#f8fafc;color:#0f172a;box-shadow:0 18px 34px rgba(15,23,42,.18)}.admin-btn.secondary{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.09);color:#fff}.admin-user-card{display:grid;gap:16px;padding:18px;border:1px solid rgba(255,255,255,.18);border-radius:26px;background:rgba(255,255,255,.12);backdrop-filter:blur(18px)}.admin-user-row{display:flex;align-items:center;gap:14px}.admin-avatar{width:68px;height:68px;display:grid;place-items:center;border-radius:22px;background:linear-gradient(135deg,#dbeafe,#ccfbf1);color:#0f172a;font-size:1.35rem;font-weight:900}.admin-user-row strong{font-size:1.05rem}.admin-user-row span,.admin-status span{color:rgba(226,232,240,.82);font-size:.9rem}.admin-status{display:grid;gap:10px}.admin-status div{display:flex;justify-content:space-between;gap:10px;padding:12px;border-radius:16px;background:rgba(255,255,255,.1)}.admin-status strong{color:#fff}.admin-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.metric-card,.admin-section,.admin-mini{border:1px solid rgba(216,227,239,.92);background:rgba(255,255,255,.88);box-shadow:0 18px 44px rgba(15,23,42,.06)}.metric-card{display:grid;gap:12px;min-height:148px;padding:20px;border-radius:24px}.metric-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(135deg,rgba(29,78,216,.12),rgba(15,118,110,.14));color:#1d4ed8;font-weight:900}.metric-card strong{font-size:2rem;line-height:1}.metric-card span,.muted{color:#64748b;line-height:1.45}.admin-layout{display:grid;grid-template-columns:1.35fr .75fr;gap:18px}.admin-section{overflow:hidden;border-radius:26px}.section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 22px 16px;border-bottom:1px solid rgba(216,227,239,.86)}.section-head h2,.admin-mini h3{margin:0}.section-head p{margin:6px 0 0}.admin-chip{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 12px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:.82rem;font-weight:900;white-space:nowrap}.quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:16px}.quick-card{position:relative;overflow:hidden;display:grid;gap:8px;min-height:134px;padding:18px;border-radius:22px;background:#fff;border:1px solid rgba(226,232,240,.9);text-decoration:none;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.quick-card:hover{transform:translateY(-3px);border-color:rgba(29,78,216,.25);box-shadow:0 18px 38px rgba(29,78,216,.1)}.quick-card:after{content:"";position:absolute;right:-28px;bottom:-32px;width:96px;height:96px;border-radius:999px;background:linear-gradient(135deg,rgba(29,78,216,.12),rgba(15,118,110,.12))}.quick-card strong{font-size:1.05rem}.quick-card span{max-width:280px;color:#64748b;line-height:1.45}.quick-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:#eef2ff;color:#3730a3;font-weight:900}.side-stack{display:grid;gap:18px}.admin-mini{border-radius:26px;padding:20px}.task-list,.audit-list{display:grid;gap:12px}.task-item,.audit-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px;border-radius:18px;background:#f8fafc}.copy{display:grid;gap:3px}.copy span{color:#64748b;font-size:.86rem;line-height:1.35}.badge{padding:7px 10px;border-radius:999px;background:#ecfeff;color:#0e7490;font-size:.76rem;font-weight:900}.badge.warn{background:#fff7ed;color:#c2410c}.badge.ok{background:#f0fdf4;color:#15803d}.ops-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:16px}.ops-card{display:grid;gap:8px;padding:16px;border-radius:20px;background:#f8fafc;border:1px solid #e2e8f0}.ops-card strong{font-size:1.05rem}.ops-card span{color:#64748b;font-size:.9rem}@media(max-width:1100px){.admin-hero,.admin-layout{grid-template-columns:1fr}.admin-metrics,.ops-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.admin-hero{padding:22px;border-radius:26px}.admin-metrics,.quick-grid,.ops-grid{grid-template-columns:1fr}.section-head{display:grid}.task-item,.audit-item{align-items:flex-start}}
+{% endblock %}
 
 {% block content %}
-<section class="card">
-    <h2>Panel de administracion</h2>
-    <p>Bienvenido {{ request.user.username }}.</p>
-    <p>Este panel esta disponible solo para usuarios staff o superusuarios.</p>
-</section>
+<div class="admin-dashboard">
+  <section class="admin-hero">
+    <div>
+      <span class="admin-kicker">Centro de control</span>
+      <h1>Panel administrativo del sistema.</h1>
+      <p>Gestiona psicologos, pacientes, solicitudes pendientes y configuraciones principales desde una pantalla clara, rapida y moderna.</p>
+      <div class="admin-actions">
+        <a class="admin-btn primary" href="{% url 'usuario:psicologo_pendiente_list' %}">Revisar solicitudes</a>
+        <a class="admin-btn secondary" href="{% url 'usuario:psicologo_list' %}">Ver psicologos</a>
+        <a class="admin-btn secondary" href="/admin/">Django admin</a>
+      </div>
+    </div>
+    <aside class="admin-user-card">
+      <div class="admin-user-row"><div class="admin-avatar">AD</div><div><strong>{{ request.user.username }}</strong><br><span>{% if request.user.is_superuser %}Superusuario{% else %}Staff administrativo{% endif %}</span></div></div>
+      <div class="admin-status">
+        <div><span>Acceso</span><strong>Autorizado</strong></div>
+        <div><span>Panel</span><strong>Administracion</strong></div>
+        <div><span>Sesion</span><strong>Activa</strong></div>
+      </div>
+    </aside>
+  </section>
 
-<section class="card">
-    <h3>Accesos rapidos</h3>
-    <ul>
-        <li><a href="/admin/">Administracion Django</a></li>
-        <li><a href="{% url 'usuario:psicologo_pendiente_list' %}">Solicitudes pendientes</a></li>
-        <li><a href="{% url 'usuario:psicologo_list' %}">Psicologos</a></li>
-        <li><a href="{% url 'usuario:paciente_list' %}">Pacientes</a></li>
-    </ul>
-</section>
+  <section class="admin-metrics">
+    <article class="metric-card"><div class="metric-icon">PS</div><strong>180</strong><span>Psicologos registrados o en gestion.</span></article>
+    <article class="metric-card"><div class="metric-icon">PX</div><strong>2400</strong><span>Pacientes dentro del ecosistema.</span></article>
+    <article class="metric-card"><div class="metric-icon">SP</div><strong>12</strong><span>Solicitudes pendientes de revision.</span></article>
+    <article class="metric-card"><div class="metric-icon">OK</div><strong>98%</strong><span>Perfiles activos y disponibles.</span></article>
+  </section>
+
+  <section class="admin-layout">
+    <div class="admin-section">
+      <div class="section-head"><div><h2>Accesos rapidos</h2><p class="muted">Las tareas mas usadas del panel administrativo.</p></div><span class="admin-chip">Gestion</span></div>
+      <div class="quick-grid">
+        <a class="quick-card" href="{% url 'usuario:psicologo_pendiente_list' %}"><div class="quick-icon">01</div><strong>Solicitudes pendientes</strong><span>Aprobar o rechazar psicologos que quieren sumarse.</span></a>
+        <a class="quick-card" href="{% url 'usuario:psicologo_list' %}"><div class="quick-icon">02</div><strong>Psicologos</strong><span>Ver perfiles profesionales, ramas, estado y datos.</span></a>
+        <a class="quick-card" href="{% url 'usuario:paciente_list' %}"><div class="quick-icon">03</div><strong>Pacientes</strong><span>Consultar fichas, datos personales y seguimiento general.</span></a>
+        <a class="quick-card" href="/admin/"><div class="quick-icon">04</div><strong>Admin Django</strong><span>Configuracion avanzada, catalogos y mantenimiento.</span></a>
+      </div>
+    </div>
+
+    <aside class="side-stack">
+      <section class="admin-mini"><h3>Tareas pendientes</h3><div class="task-list"><div class="task-item"><div class="copy"><strong>Revisar titulos PDF</strong><span>Validar documentacion profesional subida.</span></div><span class="badge warn">Alta</span></div><div class="task-item"><div class="copy"><strong>Completar ramas</strong><span>Mantener catalogos profesionales actualizados.</span></div><span class="badge">Media</span></div><div class="task-item"><div class="copy"><strong>Control de pacientes</strong><span>Revisar nuevos registros del dia.</span></div><span class="badge ok">Normal</span></div></div></section>
+      <section class="admin-mini"><h3>Actividad reciente</h3><div class="audit-list"><div class="audit-item"><div class="copy"><strong>Nueva solicitud</strong><span>Psicologo pendiente de revision.</span></div><span class="badge">Hoy</span></div><div class="audit-item"><div class="copy"><strong>Perfil actualizado</strong><span>Datos personales modificados.</span></div><span class="badge">Ayer</span></div></div></section>
+    </aside>
+  </section>
+
+  <section class="admin-section">
+    <div class="section-head"><div><h2>Estado operativo</h2><p class="muted">Resumen visual para monitorear el funcionamiento general.</p></div><span class="admin-chip">Sistema</span></div>
+    <div class="ops-grid"><article class="ops-card"><strong>Usuarios</strong><span>Autenticacion activa para staff, psicologos y pacientes.</span></article><article class="ops-card"><strong>Documentacion</strong><span>Archivos de titulos y fotos cargados en media.</span></article><article class="ops-card"><strong>Catalogos</strong><span>Estados, ramas, zonas y ubicaciones disponibles.</span></article></div>
+  </section>
+</div>
 {% endblock %}
