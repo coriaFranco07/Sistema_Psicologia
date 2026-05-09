@@ -22,6 +22,7 @@ from apps.parametro.models import (
     TipoCivil,
     Zona,
 )
+from apps.parametro.models.metodo_pago import MetodoPago
 
 
 MAX_SIZE_MB = 5
@@ -298,3 +299,65 @@ class Paciente(UsuarioBase):
         if self.fch_nacimiento:
             self.assign_ciclo_vida_from_birth_date()
         super().save(*args, **kwargs)
+
+
+class PsicologoMetodoPago(models.Model):
+    
+    id_psicologo = models.ForeignKey(
+        Psicologo,
+        on_delete=models.CASCADE,
+        related_name="metodos_pago",
+        verbose_name="Psicologo",
+    )
+    
+    id_metodo_pago = models.ForeignKey(MetodoPago, on_delete=models.RESTRICT, verbose_name="Método de pago")
+
+    id_estado = models.ForeignKey(
+        Estado,
+        on_delete=models.RESTRICT,
+        related_name="psicologo_metodo_pago",
+        verbose_name="Estado",
+    )
+
+    class Meta:
+        verbose_name = "Método de pago del psicólogo"
+        verbose_name_plural = "Métodos de pago de los psicólogos"
+
+    def __str__(self):
+        return f"{self.id_psicologo.nombres} - {self.id_metodo_pago.dsc_metodo_pago}"
+    
+
+class PsicologoOficina(models.Model):
+    id_psicologo = models.ForeignKey(
+        Psicologo,
+        on_delete=models.CASCADE,
+        related_name="oficinas",
+        verbose_name="Psicologo",
+    )
+    domicilio = models.CharField(max_length=200, verbose_name="Domicilio")
+    telefono = models.CharField(max_length=25, verbose_name="Teléfono")
+    id_pais = models.ForeignKey(Pais, on_delete=models.RESTRICT, verbose_name="Pais")
+    id_provincia = models.ForeignKey(
+        Provincia,
+        on_delete=models.RESTRICT,
+        verbose_name="Provincia",
+    )
+    id_localidad = models.ForeignKey(
+        Localidad,
+        on_delete=models.RESTRICT,
+        verbose_name="Localidad",
+    )
+    id_zona = models.ForeignKey(Zona, on_delete=models.RESTRICT, verbose_name="Zona")
+    id_estado = models.ForeignKey(
+        Estado,
+        on_delete=models.RESTRICT,
+        related_name="psicologo_oficina",
+        verbose_name="Estado",
+    )
+
+    class Meta:
+        verbose_name = "Oficina del psicólogo"
+        verbose_name_plural = "Oficinas de los psicólogos"
+
+    def __str__(self):
+        return f"{self.id_psicologo.nombres} - {self.domicilio}"
