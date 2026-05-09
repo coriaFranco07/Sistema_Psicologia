@@ -1,0 +1,30 @@
+{% extends "usuario/base.html" %}
+{% block title %}Método de pago{% endblock %}
+{% block content %}
+<section class="app-page-head">
+  <div>
+    <p class="app-kicker">Psicólogos</p>
+    <h1>{% if form.instance.pk %}Editar método de pago{% else %}Nuevo método de pago{% endif %}</h1>
+    <p>Configurá los métodos de cobro disponibles para el profesional.</p>
+  </div>
+</section>
+
+<form method="post" class="app-form-card">
+  {% csrf_token %}
+  <div class="app-form-grid">
+    {% for field in form %}
+      <div class="app-field">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+        {% for error in field.errors %}<p class="app-error">{{ error }}</p>{% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="app-form-actions">
+    <a class="app-btn" href="{% url 'usuario:psicologo_metodo_pago_list' %}">Cancelar</a>
+    <button class="app-btn app-btn-primary" type="submit">Guardar método</button>
+  </div>
+</form>
+{% endblock %}
