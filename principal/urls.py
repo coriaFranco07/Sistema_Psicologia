@@ -5,7 +5,7 @@ from django.contrib.auth.views import LogoutView
 from django.views.generic import TemplateView
 from django.urls import include, path
 
-from .views import PanelAdminView, StyledLoginView
+from .views import PanelAdminView, PanelPsicologoView, StyledLoginView
 
 
 urlpatterns = [
@@ -13,6 +13,7 @@ urlpatterns = [
     path("login/", StyledLoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("panel-admin/", PanelAdminView.as_view(), name="panel_admin"),
+    path("panel-psicologo/", PanelPsicologoView.as_view(), name="panel_psicologo"),
     path("admin/", admin.site.urls),
     path("", include(("apps.usuario.urls", "usuario"), namespace="usuario")),
 ]
