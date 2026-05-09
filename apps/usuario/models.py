@@ -22,6 +22,7 @@ from apps.parametro.models import (
     TipoCivil,
     Zona,
 )
+from apps.parametro.models.idioma import Idioma
 from apps.parametro.models.metodo_pago import MetodoPago
 
 
@@ -361,3 +362,32 @@ class PsicologoOficina(models.Model):
 
     def __str__(self):
         return f"{self.id_psicologo.nombres} - {self.domicilio}"
+    
+
+
+
+class PsicologoIdioma(models.Model):
+    id_psicologo = models.ForeignKey(
+        Psicologo,
+        on_delete=models.CASCADE,
+        related_name="idiomas",
+        verbose_name="Psicologo",
+    )
+    id_idioma = models.ForeignKey(
+        Idioma,
+        on_delete=models.RESTRICT,
+        verbose_name="Idioma",
+    )
+    id_estado = models.ForeignKey(
+        Estado,
+        on_delete=models.RESTRICT,
+        related_name="psicologo_idioma",
+        verbose_name="Estado",
+    )
+
+    class Meta:
+        verbose_name = "Idioma del psicólogo"
+        verbose_name_plural = "Idiomas de los psicólogos"
+
+    def __str__(self):
+        return f"{self.id_psicologo.nombres} - {self.id_idioma.dsc_idioma}"
