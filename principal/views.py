@@ -3,6 +3,8 @@ from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 
+from apps.usuario.models import Psicologo
+
 from .forms import LoginForm
 
 
@@ -15,6 +17,8 @@ class StyledLoginView(LoginView):
         user = self.request.user
         if user.is_staff or user.is_superuser:
             return reverse_lazy("panel_admin")
+        if Psicologo.objects.filter(dni=user.username).exists():
+            return reverse_lazy("panel_psicologo")
         return super().get_success_url()
 
     def form_valid(self, form):
@@ -32,3 +36,10 @@ class PanelAdminView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     def test_func(self):
         user = self.request.user
         return user.is_staff or user.is_superuser
+
+
+class PanelPsicologoView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = "psicologo/panel_psicologo.html"
+
+    def test_func(self):
+        return Psicologo.objects.filter(dni=self.request.user.username).exists()
