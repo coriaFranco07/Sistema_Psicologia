@@ -40,6 +40,46 @@ urlpatterns = [
         views.PsicologoDeleteView.as_view(),
         name="psicologo_delete",
     ),
+    path(
+        "psicologos/oficinas/",
+        views.PsicologoOficinaListView.as_view(),
+        name="psicologo_oficina_list",
+    ),
+    path(
+        "psicologos/oficinas/nueva/",
+        views.PsicologoOficinaCreateView.as_view(),
+        name="psicologo_oficina_create",
+    ),
+    path(
+        "psicologos/oficinas/<int:pk>/editar/",
+        views.PsicologoOficinaUpdateView.as_view(),
+        name="psicologo_oficina_update",
+    ),
+    path(
+        "psicologos/oficinas/<int:pk>/eliminar/",
+        views.PsicologoOficinaDeleteView.as_view(),
+        name="psicologo_oficina_delete",
+    ),
+    path(
+        "psicologos/metodos-pago/",
+        views.PsicologoMetodoPagoListView.as_view(),
+        name="psicologo_metodo_pago_list",
+    ),
+    path(
+        "psicologos/metodos-pago/nuevo/",
+        views.PsicologoMetodoPagoCreateView.as_view(),
+        name="psicologo_metodo_pago_create",
+    ),
+    path(
+        "psicologos/metodos-pago/<int:pk>/editar/",
+        views.PsicologoMetodoPagoUpdateView.as_view(),
+        name="psicologo_metodo_pago_update",
+    ),
+    path(
+        "psicologos/metodos-pago/<int:pk>/eliminar/",
+        views.PsicologoMetodoPagoDeleteView.as_view(),
+        name="psicologo_metodo_pago_delete",
+    ),
     path("pacientes/", views.PacienteListView.as_view(), name="paciente_list"),
     path("pacientes/nuevo/", views.PacienteCreateView.as_view(), name="paciente_create"),
     path(
