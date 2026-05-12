@@ -26,14 +26,39 @@ from .forms import (
 
 from .models import Paciente, Psicologo, PsicologoIdioma, PsicologoMetodoPago, PsicologoOficina, PsicologoPendiente
 
+class PsicologoMiPerfilView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        psicologo = Psicologo.objects.filter(
+            dni=request.user.username
+        ).first()
+
+        if psicologo is None:
+            messages.error(
+                request,
+                "No se encontro un perfil de psicologo asociado a este usuario."
+            )
+            return redirect("panel_psicologo")
+
+        return redirect(
+            "usuario:psicologo_detail",
+            pk=psicologo.pk
+        )
 
 class PsicologoOwnerOrStaffMixin(LoginRequiredMixin, UserPassesTestMixin):
     psicologo_owner_field = "id_psicologo"
 
     def get_logged_psicologo(self):
-        if not self.request.user.is_authenticated:
+        user = self.request.user
+
+        if user.is_staff or user.is_superuser:
             return None
-        return Psicologo.objects.filter(dni=self.request.user.username).first()
+
+        if not str(user.username).isdigit():
+            return None
+
+        return Psicologo.objects.filter(
+            dni=int(user.username)
+        ).first()
 
     def user_is_staff(self):
         user = self.request.user
