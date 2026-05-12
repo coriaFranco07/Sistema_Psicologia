@@ -1,15 +1,15 @@
 {% extends "usuario/base.html" %}
-{% block title %}Eliminar consultorio{% endblock %}
+{% block title %}Inactivar consultorio{% endblock %}
 {% block content %}
 <section class="app-delete-card">
-  <p class="app-kicker">Eliminar</p>
-  <h1>¿Eliminar consultorio?</h1>
-  <p>Se eliminará el consultorio <strong>{{ oficina.domicilio }}</strong>.</p>
+  <p class="app-kicker">Inactivar</p>
+  <h1>¿Inactivar consultorio?</h1>
+  <p>Se inactivará el consultorio <strong>{{ oficina.domicilio }}</strong>.</p>
 
   <form method="post" class="app-delete-actions">
     {% csrf_token %}
     <a class="app-btn" href="{% url 'usuario:psicologo_oficina_list' %}">Cancelar</a>
-    <button class="app-btn app-btn-danger" type="submit">Eliminar</button>
+    <button class="app-btn app-btn-danger" type="submit">Inactivar</button>
   </form>
 </section>
 {% endblock %}
