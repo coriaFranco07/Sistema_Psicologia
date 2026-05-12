@@ -316,8 +316,17 @@ class PsicologoOficinaForm(forms.ModelForm):
         self.fields["id_zona"].queryset = Zona.objects.filter(flg_activo=True).order_by("dsc_zona")
         self.fields["id_estado"].queryset = Estado.objects.filter(flg_activo=True).order_by("dsc_estado")
 
-        if self.is_psicologo_user:
-            self.fields["id_psicologo"].queryset = Psicologo.objects.filter(pk=self.psicologo.pk)
+        if self.instance and self.instance.pk and self.instance.id_psicologo_id:
+            self.fields["id_psicologo"].queryset = Psicologo.objects.filter(
+                pk=self.instance.id_psicologo_id
+            )
+            self.fields["id_psicologo"].initial = self.instance.id_psicologo
+            self.fields["id_psicologo"].disabled = True
+
+        elif self.is_psicologo_user:
+            self.fields["id_psicologo"].queryset = Psicologo.objects.filter(
+                pk=self.psicologo.pk
+            )
             self.fields["id_psicologo"].initial = self.psicologo
             self.fields["id_psicologo"].disabled = True
             self.fields["id_estado"].required = False
@@ -326,8 +335,11 @@ class PsicologoOficinaForm(forms.ModelForm):
 
     def save(self, commit=True):
         oficina = super().save(commit=False)
-        if self.psicologo and self.fields["id_psicologo"].disabled:
-            oficina.id_psicologo = self.psicologo
+        if self.fields["id_psicologo"].disabled:
+            if self.instance and self.instance.pk:
+                oficina.id_psicologo = self.instance.id_psicologo
+            elif self.psicologo:
+                oficina.id_psicologo = self.psicologo
         if self.is_psicologo_user:
             oficina.id_estado = get_estado_activo()
         if commit:
