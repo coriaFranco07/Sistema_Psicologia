@@ -9,7 +9,7 @@
 <div class="delete-wrap">
   <div class="delete-card">
     <h1>Inactivar método de pago</h1>
-    <p>Esta acción inactivará el método de pago. No se eliminará de la base de datos.</p>
+    <p>Esta acción inactivará el método de pago.</p>
     <div class="delete-highlight">{{ metodo_pago.id_metodo_pago }} — {{ metodo_pago.id_psicologo }}</div>
     <form method="post">{% csrf_token %}<div class="delete-actions"><a class="delete-btn light" href="{% url 'usuario:psicologo_metodo_pago_list' %}">Cancelar</a><button class="delete-btn danger" type="submit">Inactivar</button></div></form>
   </div>
