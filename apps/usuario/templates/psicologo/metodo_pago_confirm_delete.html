@@ -1,15 +1,15 @@
 {% extends "usuario/base.html" %}
-{% block title %}Eliminar método de pago{% endblock %}
+{% block title %}Inactivar método de pago{% endblock %}
 {% block content %}
 <section class="app-delete-card">
-  <p class="app-kicker">Eliminar</p>
-  <h1>¿Eliminar método de pago?</h1>
-  <p>Se eliminará el método <strong>{{ metodo_pago.id_metodo_pago }}</strong>.</p>
+  <p class="app-kicker">Inactivar</p>
+  <h1>Inactivar método de pago?</h1>
+  <p>Se inactivará el método <strong>{{ metodo_pago.id_metodo_pago }}</strong>.</p>
 
   <form method="post" class="app-delete-actions">
     {% csrf_token %}
     <a class="app-btn" href="{% url 'usuario:psicologo_metodo_pago_list' %}">Cancelar</a>
-    <button class="app-btn app-btn-danger" type="submit">Eliminar</button>
+    <button class="app-btn app-btn-danger" type="submit">Inactivar</button>
   </form>
 </section>
 {% endblock %}

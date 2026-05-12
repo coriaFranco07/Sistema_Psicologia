@@ -726,6 +726,12 @@ class PsicologoOficinaDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
     def get_queryset(self):
         queryset = PsicologoOficina.objects.select_related("id_psicologo")
         return self.get_owner_filtered_queryset(queryset)
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.pop("user", None)
+        kwargs.pop("psicologo", None)
+        return kwargs
 
     def form_valid(self, form):
         estado_inactivo = get_estado_inactivo()
@@ -805,6 +811,12 @@ class PsicologoMetodoPagoDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
     def get_queryset(self):
         queryset = PsicologoMetodoPago.objects.select_related("id_psicologo")
         return self.get_owner_filtered_queryset(queryset)
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.pop("user", None)
+        kwargs.pop("psicologo", None)
+        return kwargs
 
     def form_valid(self, form):
         estado_inactivo = get_estado_inactivo()
@@ -920,6 +932,12 @@ class PsicologoIdiomaDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
     def get_queryset(self):
         queryset = PsicologoIdioma.objects.select_related("id_psicologo")
         return self.get_owner_filtered_queryset(queryset)
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.pop("user", None)
+        kwargs.pop("psicologo", None)
+        return kwargs
 
     def form_valid(self, form):
         estado_inactivo = get_estado_inactivo()
