@@ -18,23 +18,23 @@
 
   <section class="pay-card">
     <form method="get" class="pay-toolbar">
-      <input class="pay-search" type="search" name="q" value="{{ query }}" placeholder="Buscar por psicólogo o método de pago">
+      <input class="pay-search" type="search" name="q" value="{{ query }}" placeholder="Buscar método de pago o estado">
       <button class="pay-btn primary" type="submit">Buscar</button>
     </form>
 
     <div class="pay-table-wrap">
       <table class="pay-table">
-        <thead><tr><th>Psicólogo</th><th>Método</th><th>Estado</th><th></th></tr></thead>
+        <thead><tr>{% if request.user.is_staff or request.user.is_superuser %}<th>Psicólogo</th>{% endif %}<th>Método</th><th>Estado</th><th></th></tr></thead>
         <tbody>
           {% for metodo in metodos_pago %}
           <tr>
-            <td><div class="pay-person"><div class="pay-avatar">{{ metodo.id_psicologo.nombres|slice:":1"|default:"P" }}</div><div class="pay-main"><strong>{{ metodo.id_psicologo.nombres }}</strong><span>DNI {{ metodo.id_psicologo.dni }}</span></div></div></td>
+            {% if request.user.is_staff or request.user.is_superuser %}<td><div class="pay-person"><div class="pay-avatar">{{ metodo.id_psicologo.nombres|slice:":1"|default:"P" }}</div><div class="pay-main"><strong>{{ metodo.id_psicologo.nombres }}</strong><span>DNI {{ metodo.id_psicologo.dni }}</span></div></div></td>{% endif %}
             <td><span class="pay-method"><span class="pay-dot"></span>{{ metodo.id_metodo_pago }}</span></td>
             <td><span class="pay-state">{{ metodo.id_estado }}</span></td>
             <td><div class="pay-actions"><a class="pay-action" href="{% url 'usuario:psicologo_metodo_pago_update' metodo.pk %}">Editar</a><a class="pay-action danger" href="{% url 'usuario:psicologo_metodo_pago_delete' metodo.pk %}">Eliminar</a></div></td>
           </tr>
           {% empty %}
-          <tr><td colspan="4" class="pay-empty">No hay métodos de pago cargados.</td></tr>
+          <tr><td colspan="{% if request.user.is_staff or request.user.is_superuser %}4{% else %}3{% endif %}" class="pay-empty">No hay métodos de pago cargados.</td></tr>
           {% endfor %}
         </tbody>
       </table>
