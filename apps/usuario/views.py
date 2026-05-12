@@ -10,6 +10,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
 
+from apps.core.views import get_estado_inactivo
 from apps.datos_personales.forms import DatosPersonalesForm
 from apps.datos_personales.models import DatosPersonales
 
@@ -727,8 +728,18 @@ class PsicologoOficinaDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
         return self.get_owner_filtered_queryset(queryset)
 
     def form_valid(self, form):
-        messages.success(self.request, "Oficina eliminada correctamente.")
-        return super().form_valid(form)
+        estado_inactivo = get_estado_inactivo()
+
+        if estado_inactivo is None:
+            messages.error(self.request, "No hay un estado INACTIVO configurado.")
+            return redirect(self.success_url)
+
+        self.object = self.get_object()
+        self.object.id_estado = estado_inactivo
+        self.object.save(update_fields=["id_estado"])
+
+        messages.success(self.request, "Oficina dada de baja correctamente.")
+        return redirect(self.success_url)
 
 
 class PsicologoMetodoPagoListView(PsicologoOwnerOrStaffMixin, ListView):
@@ -796,8 +807,18 @@ class PsicologoMetodoPagoDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
         return self.get_owner_filtered_queryset(queryset)
 
     def form_valid(self, form):
-        messages.success(self.request, "Metodo de pago eliminado correctamente.")
-        return super().form_valid(form)
+        estado_inactivo = get_estado_inactivo()
+
+        if estado_inactivo is None:
+            messages.error(self.request, "No hay un estado INACTIVO configurado.")
+            return redirect(self.success_url)
+
+        self.object = self.get_object()
+        self.object.id_estado = estado_inactivo
+        self.object.save(update_fields=["id_estado"])
+
+        messages.success(self.request, "Método de pago dado de baja correctamente.")
+        return redirect(self.success_url)
 
 
 class PsicologoDeleteView(DeleteView):
@@ -901,5 +922,15 @@ class PsicologoIdiomaDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
         return self.get_owner_filtered_queryset(queryset)
 
     def form_valid(self, form):
-        messages.success(self.request, "Idioma eliminado correctamente.")
-        return super().form_valid(form)
+        estado_inactivo = get_estado_inactivo()
+
+        if estado_inactivo is None:
+            messages.error(self.request, "No hay un estado INACTIVO configurado.")
+            return redirect(self.success_url)
+
+        self.object = self.get_object()
+        self.object.id_estado = estado_inactivo
+        self.object.save(update_fields=["id_estado"])
+
+        messages.success(self.request, "Idioma dado de baja correctamente.")
+        return redirect(self.success_url)

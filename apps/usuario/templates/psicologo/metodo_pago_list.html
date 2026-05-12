@@ -31,7 +31,9 @@
             {% if request.user.is_staff or request.user.is_superuser %}<td><div class="pay-person"><div class="pay-avatar">{{ metodo.id_psicologo.nombres|slice:":1"|default:"P" }}</div><div class="pay-main"><strong>{{ metodo.id_psicologo.nombres }}</strong><span>DNI {{ metodo.id_psicologo.dni }}</span></div></div></td>{% endif %}
             <td><span class="pay-method"><span class="pay-dot"></span>{{ metodo.id_metodo_pago }}</span></td>
             <td><span class="pay-state">{{ metodo.id_estado }}</span></td>
-            <td><div class="pay-actions"><a class="pay-action" href="{% url 'usuario:psicologo_metodo_pago_update' metodo.pk %}">Editar</a><a class="pay-action danger" href="{% url 'usuario:psicologo_metodo_pago_delete' metodo.pk %}">Eliminar</a></div></td>
+            <td><div class="pay-actions">
+              <a class="pay-action" href="{% url 'usuario:psicologo_metodo_pago_update' metodo.pk %}">Editar</a>
+              <a class="pay-action danger" href="{% url 'usuario:psicologo_metodo_pago_delete' metodo.pk %}">Inactivar</a></div></td>
           </tr>
           {% empty %}
           <tr><td colspan="{% if request.user.is_staff or request.user.is_superuser %}4{% else %}3{% endif %}" class="pay-empty">No hay métodos de pago cargados.</td></tr>

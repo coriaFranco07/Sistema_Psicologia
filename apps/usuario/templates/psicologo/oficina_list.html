@@ -44,7 +44,12 @@
             <td>{{ oficina.telefono|default:"-" }}</td>
             <td><strong>{{ oficina.id_localidad }}</strong><span class="office-muted">{{ oficina.id_provincia }} &middot; {{ oficina.id_zona }}</span></td>
             <td><span class="office-pill">{{ oficina.id_estado }}</span></td>
-            <td><div class="office-actions"><a class="office-action" href="{% url 'usuario:psicologo_oficina_update' oficina.pk %}">Editar</a><a class="office-action danger" href="{% url 'usuario:psicologo_oficina_delete' oficina.pk %}">Eliminar</a></div></td>
+            <td>
+              <div class="office-actions">
+                  <a class="office-action" href="{% url 'usuario:psicologo_oficina_update' oficina.pk %}">Editar</a>
+                  <a class="office-action danger" href="{% url 'usuario:psicologo_oficina_delete' oficina.pk %}">Inactivar</a>
+              </div>
+            </td>
           </tr>
           {% empty %}
           <tr><td colspan="{% if mostrar_columna_psicologo %}6{% else %}5{% endif %}" class="office-empty">No hay consultorios cargados todav&iacute;a.</td></tr>
