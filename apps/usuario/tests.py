@@ -21,7 +21,7 @@ from apps.parametro.models import (
 )
 
 from .forms import PacienteForm, PsicologoForm
-from .models import Paciente, Psicologo, PsicologoPendiente
+from .models import Paciente, Psicologo, PsicologoOficina, PsicologoPendiente
 
 
 TEST_STORAGES = {
@@ -462,7 +462,6 @@ class PsicologoCreateViewTests(TestCase):
         self.assertContains(response, "3515551234")
         self.assertContains(response, "San Martin 123")
         self.assertContains(response, "Abrir PDF adjunto")
-
     def test_psicologo_list_shows_complete_data_and_view_profile_action(self):
         self.create_solicitud(include_foto=True)
         solicitud = PsicologoPendiente.objects.get(dni=31111222)
@@ -495,3 +494,71 @@ class PsicologoCreateViewTests(TestCase):
         self.assertContains(response, "3515551234")
         self.assertContains(response, "San Martin 123")
         self.assertContains(response, "Abrir PDF adjunto")
+
+
+class PsicologoOficinaListViewTests(TestCase):
+    def setUp(self):
+        self.estado_activo = Estado.objects.create(dsc_estado="ACTIVO", flg_activo=True)
+        self.pais = Pais.objects.create(dsc_pais="ARGENTINA", flg_activo=True)
+        self.provincia = Provincia.objects.create(dsc_provincia="CORDOBA", flg_activo=True)
+        self.localidad = Localidad.objects.create(dsc_localidad="CORDOBA", flg_activo=True)
+        self.zona = Zona.objects.create(dsc_zona="CENTRO", flg_activo=True)
+        self.rama = Rama.objects.create(dsc_rama="CLINICA", flg_activo=True)
+
+        self.psicologo = Psicologo.objects.create(
+            nombres="Laura Psicologa",
+            email="laura@example.com",
+            dni=31111222,
+            cuil=20311112229,
+            fch_nacimiento="1988-06-10",
+            id_estado=self.estado_activo,
+            id_rama=self.rama,
+            titulo="psicologos/titulos/test.pdf",
+        )
+        self.usuario_psicologo = get_user_model().objects.create_user(
+            username="31111222",
+            email="laura@example.com",
+            password="ClaveSegura123",
+        )
+        self.usuario_staff = get_user_model().objects.create_user(
+            username="admin",
+            email="admin@example.com",
+            password="ClaveSegura123",
+        )
+        self.usuario_staff.is_staff = True
+        self.usuario_staff.save()
+
+        PsicologoOficina.objects.create(
+            id_psicologo=self.psicologo,
+            domicilio="San Martin 123",
+            telefono="3515551234",
+            id_pais=self.pais,
+            id_provincia=self.provincia,
+            id_localidad=self.localidad,
+            id_zona=self.zona,
+            id_estado=self.estado_activo,
+        )
+
+    def test_staff_sees_psicologo_column_in_office_list(self):
+        self.client.force_login(self.usuario_staff)
+
+        response = self.client.get(reverse("usuario:psicologo_oficina_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["mostrar_columna_psicologo"])
+        self.assertContains(response, 'class="office-person"', html=False)
+        self.assertContains(response, "DNI 31111222")
+        self.assertContains(response, "Buscar por psic")
+
+    def test_psicologo_does_not_see_psicologo_column_in_office_list(self):
+        self.client.force_login(self.usuario_psicologo)
+
+        response = self.client.get(reverse("usuario:psicologo_oficina_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["mostrar_columna_psicologo"])
+        self.assertNotContains(response, 'class="office-person"', html=False)
+        self.assertNotContains(response, "DNI 31111222")
+        self.assertNotContains(response, "Laura Psicologa")
+        self.assertNotContains(response, "Buscar por psic")
+        self.assertContains(response, "San Martin 123")

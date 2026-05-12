@@ -686,6 +686,7 @@ class PsicologoOficinaListView(PsicologoOwnerOrStaffMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["query"] = self.request.GET.get("q", "").strip()
         context["total_resultados"] = self.object_list.count()
+        context["mostrar_columna_psicologo"] = self.user_is_staff()
         return context
 
 
