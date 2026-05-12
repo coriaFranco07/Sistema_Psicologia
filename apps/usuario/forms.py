@@ -363,7 +363,11 @@ class PsicologoMetodoPagoForm(forms.ModelForm):
         self.fields["id_metodo_pago"].queryset = MetodoPago.objects.filter(flg_activo=True).order_by("dsc_met_pago")
         self.fields["id_estado"].queryset = Estado.objects.filter(flg_activo=True).order_by("dsc_estado")
 
-        if self.is_psicologo_user:
+        if self.instance and self.instance.pk and self.instance.id_psicologo_id:
+            self.fields["id_psicologo"].queryset = Psicologo.objects.filter(pk=self.instance.id_psicologo_id)
+            self.fields["id_psicologo"].initial = self.instance.id_psicologo
+            self.fields["id_psicologo"].disabled = True
+        elif self.is_psicologo_user:
             self.fields["id_psicologo"].queryset = Psicologo.objects.filter(pk=self.psicologo.pk)
             self.fields["id_psicologo"].initial = self.psicologo
             self.fields["id_psicologo"].disabled = True
@@ -373,7 +377,7 @@ class PsicologoMetodoPagoForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        psicologo = self.psicologo if self.fields["id_psicologo"].disabled else cleaned_data.get("id_psicologo")
+        psicologo = self.instance.id_psicologo if self.instance and self.instance.pk and self.fields["id_psicologo"].disabled else (self.psicologo if self.fields["id_psicologo"].disabled else cleaned_data.get("id_psicologo"))
         metodo_pago = cleaned_data.get("id_metodo_pago")
         if psicologo and metodo_pago:
             queryset = PsicologoMetodoPago.objects.filter(id_psicologo=psicologo, id_metodo_pago=metodo_pago)
@@ -385,8 +389,11 @@ class PsicologoMetodoPagoForm(forms.ModelForm):
 
     def save(self, commit=True):
         metodo_pago = super().save(commit=False)
-        if self.psicologo and self.fields["id_psicologo"].disabled:
-            metodo_pago.id_psicologo = self.psicologo
+        if self.fields["id_psicologo"].disabled:
+            if self.instance and self.instance.pk:
+                metodo_pago.id_psicologo = self.instance.id_psicologo
+            elif self.psicologo:
+                metodo_pago.id_psicologo = self.psicologo
         if self.is_psicologo_user:
             metodo_pago.id_estado = get_estado_activo()
         if commit:
