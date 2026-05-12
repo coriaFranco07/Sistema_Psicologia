@@ -9,6 +9,7 @@ app_name = "usuario"
 urlpatterns = [
     path("psicologos/", views.PsicologoListView.as_view(), name="psicologo_list"),
     path("psicologos/nuevo/", views.PsicologoCreateView.as_view(), name="psicologo_create"),
+    path("psicologos/mi-perfil/", views.PsicologoMiPerfilView.as_view(), name="psicologo_mi_perfil"),
     path("psicologos/<int:pk>/", views.PsicologoDetailView.as_view(), name="psicologo_detail"),
     path(
         "psicologos/pendientes/",
