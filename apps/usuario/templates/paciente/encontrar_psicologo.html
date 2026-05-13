@@ -1,113 +1,587 @@
 {% extends "usuario/base.html" %}
 
-{% block title %}Encontrar a mi Psicologo{% endblock %}
-{% block main_class %}find-psy-main{% endblock %}
+{% block title %}Encontrar mi Psicólogo{% endblock %}
+{% block main_class %}fp-main{% endblock %}
 
 {% block extra_styles %}
-.find-psy-main{max-width:1180px;margin:0 auto}.find-psy-page{display:grid;gap:18px}.find-psy-hero,.find-psy-toolbar,.find-psy-empty{border:1px solid rgba(216,227,239,.95);border-radius:24px;background:rgba(255,255,255,.94);box-shadow:0 18px 40px rgba(15,23,42,.06)}.find-psy-hero{position:relative;overflow:hidden;display:grid;gap:14px;padding:26px;background:radial-gradient(circle at top right,rgba(20,184,166,.18),transparent 24%),radial-gradient(circle at left top,rgba(29,78,216,.14),transparent 28%),#fff}.find-psy-kicker{display:inline-flex;align-items:center;gap:8px;min-height:30px;padding:0 12px;border-radius:999px;background:#ecfeff;color:#0f766e;font-size:.76rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;width:max-content}.find-psy-kicker:before{content:"";width:8px;height:8px;border-radius:999px;background:#14b8a6}.find-psy-hero h1{margin:0;color:#0f172a;font-size:clamp(1.8rem,3.4vw,2.8rem);line-height:1.04}.find-psy-hero p{margin:0;max-width:760px;color:#64748b;line-height:1.65}.find-psy-meta{display:flex;flex-wrap:wrap;gap:10px}.find-psy-pill{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0;color:#334155;font-size:.9rem;font-weight:800}.find-psy-pill.primary{background:#ecfeff;border-color:#99f6e4;color:#0f766e}.find-psy-toolbar{padding:16px 18px}.find-psy-form{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.find-psy-search{flex:1 1 320px;min-height:48px;padding:0 14px;border:1px solid #cbd5e1;border-radius:14px;background:#fff;color:#0f172a}.find-psy-search:focus{outline:2px solid rgba(37,99,235,.18);border-color:#2563eb}.find-psy-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 16px;border-radius:14px;border:1px solid transparent;background:#0f172a;color:#fff;text-decoration:none;font-weight:900;cursor:pointer}.find-psy-btn.secondary{background:#fff;color:#1d4ed8;border-color:#bfdbfe}.find-psy-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.find-psy-card{display:grid;gap:16px;padding:20px;border:1px solid rgba(216,227,239,.95);border-radius:26px;background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);box-shadow:0 18px 40px rgba(15,23,42,.06)}.find-psy-card-top{display:flex;align-items:flex-start;gap:14px}.find-psy-photo{width:78px;height:78px;flex:0 0 auto;object-fit:cover;border-radius:22px;background:#e2e8f0;box-shadow:0 12px 24px rgba(15,23,42,.08)}.find-psy-copy{min-width:0;display:grid;gap:6px}.find-psy-copy h2{margin:0;color:#0f172a;font-size:1.15rem;line-height:1.15}.find-psy-copy p{margin:0;color:#64748b;line-height:1.5}.find-psy-badges{display:flex;flex-wrap:wrap;gap:8px}.find-psy-badge{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:.78rem;font-weight:900}.find-psy-badge.success{background:#ecfdf5;color:#166534}.find-psy-detail-stack{display:grid;gap:8px}.find-psy-details{display:grid;gap:10px}.find-psy-detail{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:16px;background:#fff;border:1px solid #e2e8f0}.find-psy-detail span{display:block}.find-psy-label{color:#64748b;font-size:.76rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}.find-psy-value{margin-top:4px;color:#0f172a;font-weight:800;line-height:1.45;text-align:right}.find-psy-language-list{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}.find-psy-actions{display:flex;gap:10px;flex-wrap:wrap}.find-psy-empty{padding:24px}.find-psy-empty h2{margin:0 0 8px;color:#0f172a}.find-psy-empty p{margin:0;color:#64748b;line-height:1.6}@media(max-width:1040px){.find-psy-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:720px){.find-psy-grid{grid-template-columns:1fr}.find-psy-card-top,.find-psy-detail{flex-direction:column}.find-psy-value,.find-psy-language-list{text-align:left;justify-content:flex-start}.find-psy-main{padding:0}.find-psy-hero,.find-psy-toolbar,.find-psy-empty,.find-psy-card{border-radius:20px}}
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.fp-main {
+  --teal-50: #f0fdfa;
+  --teal-100: #ccfbf1;
+  --teal-200: #99f6e4;
+  --teal-500: #14b8a6;
+  --teal-600: #0d9488;
+  --teal-700: #0f766e;
+  --teal-800: #115e59;
+  --teal-900: #134e4a;
+  --navy-50: #f8fafc;
+  --navy-100: #f1f5f9;
+  --navy-200: #e2e8f0;
+  --navy-300: #cbd5e1;
+  --navy-400: #94a3b8;
+  --navy-500: #64748b;
+  --navy-700: #334155;
+  --navy-800: #1e293b;
+  --navy-900: #0f172a;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-body);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 64px;
+  background: transparent;
+}
+
+/* ── HERO ─────────────────────────────────── */
+.fp-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 56px 52px 52px;
+  margin-bottom: 12px;
+  border-radius: 28px;
+  background: var(--navy-900);
+  color: #fff;
+}
+
+.fp-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 85% -10%, rgba(20,184,166,.28) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 60% at -5% 110%, rgba(20,184,166,.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.fp-hero-inner { position: relative; z-index: 1; }
+
+.fp-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(20,184,166,.35);
+  background: rgba(20,184,166,.12);
+  color: var(--teal-200);
+  font-family: var(--font-body);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+
+.fp-kicker::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--teal-500);
+  box-shadow: 0 0 0 3px rgba(20,184,166,.25);
+}
+
+.fp-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -.01em;
+  color: #fff;
+  margin: 0 0 16px;
+  max-width: 640px;
+}
+
+.fp-hero p {
+  color: rgba(255,255,255,.58);
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.75;
+  max-width: 600px;
+  margin: 0 0 32px;
+}
+
+.fp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.fp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.7);
+  font-size: .82rem;
+  font-weight: 500;
+}
+
+.fp-pill.accent {
+  background: rgba(20,184,166,.18);
+  border-color: rgba(20,184,166,.35);
+  color: var(--teal-200);
+}
+
+.fp-pill.accent::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--teal-400, #2dd4bf);
+}
+
+/* ── TOOLBAR ──────────────────────────────── */
+.fp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid var(--navy-200);
+  box-shadow: 0 2px 12px rgba(15,23,42,.05);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.fp-search-wrap {
+  flex: 1 1 280px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.fp-search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--navy-400);
+  width: 18px; height: 18px;
+  pointer-events: none;
+}
+
+.fp-search {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px 0 42px;
+  border: 1px solid var(--navy-200);
+  border-radius: 12px;
+  background: var(--navy-50);
+  color: var(--navy-900);
+  font-family: var(--font-body);
+  font-size: .93rem;
+  transition: border-color .18s, box-shadow .18s;
+}
+
+.fp-search::placeholder { color: var(--navy-400); }
+.fp-search:focus {
+  outline: none;
+  border-color: var(--teal-500);
+  box-shadow: 0 0 0 3px rgba(20,184,166,.12);
+}
+
+.fp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 12px;
+  border: none;
+  background: var(--navy-900);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .18s, transform .1s;
+  white-space: nowrap;
+}
+
+.fp-btn:hover { background: var(--navy-800); }
+.fp-btn:active { transform: scale(.98); }
+
+.fp-btn.ghost {
+  background: transparent;
+  color: var(--navy-500);
+  border: 1px solid var(--navy-200);
+}
+.fp-btn.ghost:hover { background: var(--navy-50); }
+
+/* ── GRID ─────────────────────────────────── */
+.fp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* ── CARD ─────────────────────────────────── */
+.fp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 24px;
+  background: #fff;
+  border: 1px solid var(--navy-200);
+  box-shadow: 0 4px 24px rgba(15,23,42,.05);
+  overflow: hidden;
+  transition: box-shadow .22s, transform .22s;
+}
+
+.fp-card:hover {
+  box-shadow: 0 12px 40px rgba(15,23,42,.1);
+  transform: translateY(-2px);
+}
+
+.fp-card-header {
+  padding: 22px 22px 18px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.fp-photo-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.fp-photo {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  object-fit: cover;
+  background: var(--navy-100);
+  display: block;
+}
+
+.fp-status-dot {
+  position: absolute;
+  bottom: 4px; right: 4px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #fff;
+}
+
+.fp-card-identity { min-width: 0; }
+
+.fp-card-identity h2 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--navy-900);
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.fp-card-rama {
+  font-size: .82rem;
+  color: var(--teal-700);
+  font-weight: 500;
+  margin: 0 0 10px;
+}
+
+.fp-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fp-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 600;
+}
+
+.fp-badge.blue {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.fp-badge.teal {
+  background: var(--teal-50);
+  color: var(--teal-700);
+}
+
+/* ── DIVIDER ─────────────────────────────── */
+.fp-divider {
+  height: 1px;
+  background: var(--navy-100);
+  margin: 0 22px;
+}
+
+/* ── INFO ROWS ──────────────────────────── */
+.fp-info {
+  padding: 16px 22px;
+  display: grid;
+  gap: 10px;
+}
+
+.fp-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.fp-row-label {
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--navy-400);
+  white-space: nowrap;
+  padding-top: 1px;
+}
+
+.fp-row-value {
+  font-size: .88rem;
+  font-weight: 500;
+  color: var(--navy-800);
+  text-align: right;
+  line-height: 1.4;
+}
+
+.fp-lang-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: flex-end;
+}
+
+.fp-lang-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--navy-100);
+  color: var(--navy-700);
+  font-size: .72rem;
+  font-weight: 600;
+}
+
+/* ── CTA ─────────────────────────────────── */
+.fp-card-cta {
+  padding: 14px 22px 22px;
+  margin-top: auto;
+}
+
+.fp-cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--teal-700);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: .88rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .18s, transform .1s;
+}
+
+.fp-cta-btn:hover { background: var(--teal-800); }
+.fp-cta-btn:active { transform: scale(.98); }
+
+.fp-cta-btn svg {
+  width: 15px; height: 15px;
+  opacity: .8;
+}
+
+/* ── EMPTY STATE ─────────────────────────── */
+.fp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 24px;
+  border-radius: 24px;
+  background: #fff;
+  border: 1px dashed var(--navy-200);
+}
+
+.fp-empty-icon {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  background: var(--navy-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--navy-400);
+}
+
+.fp-empty h2 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--navy-900);
+  margin: 0 0 10px;
+}
+
+.fp-empty p {
+  color: var(--navy-500);
+  font-size: .92rem;
+  line-height: 1.65;
+  max-width: 440px;
+  margin: 0;
+}
+
+/* ── PAGE LAYOUT ─────────────────────────── */
+.fp-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── RESPONSIVE ──────────────────────────── */
+@media (max-width: 1040px) {
+  .fp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+  .fp-main { padding: 0 0 40px; }
+  .fp-hero { padding: 36px 28px 36px; border-radius: 20px; }
+  .fp-toolbar { border-radius: 16px; }
+  .fp-grid { grid-template-columns: 1fr; }
+  .fp-card { border-radius: 18px; }
+  .fp-row { flex-direction: column; gap: 4px; }
+  .fp-row-value, .fp-lang-list { text-align: left; justify-content: flex-start; }
+}
 {% endblock %}
 
 {% block content %}
-<div class="find-psy-page">
-  <section class="find-psy-hero">
-    <span class="find-psy-kicker">Buscar psicologo</span>
-    <h1>Encuentra un profesional activo que encaje contigo.</h1>
-    <p>Explora los psicologos disponibles de una forma mas clara, cercana y visual. Puedes buscar por nombre, especialidad o ubicacion para encontrar una opcion que te inspire confianza.</p>
-    <div class="find-psy-meta">
-      <span class="find-psy-pill primary">{{ total_resultados }} psicologos activos</span>
-      <span class="find-psy-pill">Listado visible para pacientes</span>
+<div class="fp-page">
+
+  <!-- HERO -->
+  <section class="fp-hero">
+    <div class="fp-hero-inner">
+      <span class="fp-kicker">Directorio de profesionales</span>
+      <h1>Encontrá al psicólogo que encaje con vos.</h1>
+      <p>Explorá perfiles verificados de profesionales activos. Filtrá por nombre, especialidad o ubicación para encontrar a alguien en quien confiar.</p>
+      <div class="fp-meta">
+        <span class="fp-pill accent">{{ total_resultados }} psicólogos activos</span>
+        <span class="fp-pill">Listado visible para pacientes</span>
+      </div>
     </div>
   </section>
 
-  <section class="find-psy-toolbar">
-    <form class="find-psy-form" method="get">
+  <!-- TOOLBAR -->
+  <section class="fp-toolbar">
+    <form class="fp-search-wrap" method="get">
+      <svg class="fp-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
       <input
-        class="find-psy-search"
+        class="fp-search"
         type="search"
         name="q"
         value="{{ query }}"
-        placeholder="Busca por nombre, rama o ubicacion"
-        aria-label="Buscar psicologo"
+        placeholder="Buscá por nombre, rama o ubicación…"
+        aria-label="Buscar psicólogo"
       >
-      <button class="find-psy-btn" type="submit">Buscar</button>
-      {% if query %}
-        <a class="find-psy-btn secondary" href="{% url 'usuario:paciente_encontrar_psicologo' %}">Limpiar</a>
-      {% endif %}
     </form>
+    <button class="fp-btn" type="submit" form="search-form">Buscar</button>
+    {% if query %}
+      <a class="fp-btn ghost" href="{% url 'usuario:paciente_encontrar_psicologo' %}">Limpiar</a>
+    {% endif %}
   </section>
 
+  <!-- RESULTS -->
   {% if psicologos %}
-    <section class="find-psy-grid" aria-label="Listado de psicologos activos">
+    <section class="fp-grid" aria-label="Listado de psicólogos activos">
       {% for psicologo in psicologos %}
-        <article class="find-psy-card">
-          <div class="find-psy-card-top">
-            <img class="find-psy-photo" src="{{ psicologo.foto_url }}" alt="Foto de perfil de {{ psicologo.nombres }}">
-            <div class="find-psy-copy">
+        <article class="fp-card">
+
+          <div class="fp-card-header">
+            <div class="fp-photo-wrap">
+              <img class="fp-photo" src="{{ psicologo.foto_url }}" alt="Foto de {{ psicologo.nombres }}">
+              <span class="fp-status-dot" aria-label="Activo"></span>
+            </div>
+            <div class="fp-card-identity">
               <h2>{{ psicologo.nombres }}</h2>
-              <p>{{ psicologo.id_rama.dsc_rama }}</p>
-              <div class="find-psy-badges">
-                <span class="find-psy-badge success">Activo</span>
-                <span class="find-psy-badge">
-                  {% if psicologo.oficinas_activas %}
-                    Sesiones virtuales y presenciales
-                  {% else %}
-                    Sesiones virtuales
-                  {% endif %}
+              <p class="fp-card-rama">{{ psicologo.id_rama.dsc_rama }}</p>
+              <div class="fp-badges">
+                <span class="fp-badge teal">Activo</span>
+                <span class="fp-badge blue">
+                  {% if psicologo.oficinas_activas %}Virtual &amp; Presencial{% else %}Solo virtual{% endif %}
                 </span>
               </div>
             </div>
           </div>
 
-          <div class="find-psy-details">
-            <div class="find-psy-detail">
-              <div>
-                <span class="find-psy-label">Especialidad</span>
-                <span class="find-psy-value">{{ psicologo.id_rama.dsc_rama }}</span>
-              </div>
+          <div class="fp-divider"></div>
+
+          <div class="fp-info">
+            <div class="fp-row">
+              <span class="fp-row-label">Especialidad</span>
+              <span class="fp-row-value">{{ psicologo.id_rama.dsc_rama }}</span>
             </div>
-            <div class="find-psy-detail">
-              <div>
-                <span class="find-psy-label">Ubicacion</span>
-                <span class="find-psy-value">
-                  {% if psicologo.datos_personales_rel and psicologo.datos_personales_rel.id_localidad %}
-                    {{ psicologo.datos_personales_rel.id_localidad.dsc_localidad }}
-                  {% elif psicologo.datos_personales_rel and psicologo.datos_personales_rel.id_provincia %}
-                    {{ psicologo.datos_personales_rel.id_provincia.dsc_provincia }}
-                  {% else %}
-                    Ubicacion a confirmar
-                  {% endif %}
-                </span>
-              </div>
-            </div>
-            <div class="find-psy-detail">
-              <div class="find-psy-detail-stack">
-                <span class="find-psy-label">Idiomas</span>
-                {% if psicologo.idiomas_activos %}
-                  <div class="find-psy-language-list">
-                    {% for idioma in psicologo.idiomas_activos %}
-                      <span class="find-psy-badge">{{ idioma.id_idioma.dsc_idioma }}</span>
-                    {% endfor %}
-                  </div>
+            <div class="fp-row">
+              <span class="fp-row-label">Ubicación</span>
+              <span class="fp-row-value">
+                {% if psicologo.datos_personales_rel and psicologo.datos_personales_rel.id_provincia %}
+                  {{ psicologo.datos_personales_rel.id_provincia.dsc_provincia }}, {{ psicologo.datos_personales_rel.id_localidad.dsc_localidad }}
                 {% else %}
-                  <span class="find-psy-value">No especificados</span>
+                  A confirmar
                 {% endif %}
-              </div>
+              </span>
+            </div>
+            <div class="fp-row">
+              <span class="fp-row-label">Idiomas</span>
+              {% if psicologo.idiomas_activos %}
+                <div class="fp-lang-list">
+                  {% for idioma in psicologo.idiomas_activos %}
+                    <span class="fp-lang-tag">{{ idioma.id_idioma.dsc_idioma }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <span class="fp-row-value">No especificados</span>
+              {% endif %}
             </div>
           </div>
 
-          <div class="find-psy-actions">
-            <a class="find-psy-btn" href="{% url 'usuario:psicologo_detail' psicologo.pk %}">Quiero que sea mi psicologo</a>
+          <div class="fp-card-cta">
+            <a class="fp-cta-btn" href="{% url 'usuario:psicologo_detail' psicologo.pk %}">
+              Quiero que sea mi psicólogo
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
           </div>
+
         </article>
       {% endfor %}
     </section>
 
     {% include "includes/pagination.html" %}
+
   {% else %}
-    <section class="find-psy-empty">
-      <h2>No encontramos psicologos con esa busqueda.</h2>
-      <p>Prueba con otro nombre, una rama distinta o una ubicacion mas general para volver a explorar el listado.</p>
+    <section class="fp-empty">
+      <div class="fp-empty-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6M11 8v6"/>
+        </svg>
+      </div>
+      <h2>Sin resultados para esa búsqueda.</h2>
+      <p>Probá con otro nombre, una rama distinta o una ubicación más general para volver a explorar el listado.</p>
     </section>
   {% endif %}
+
 </div>
 {% endblock %}
