@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
-from django.db.models import CharField, Q
+from django.db.models import CharField, Prefetch, Q
 from django.db.models.functions import Cast
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -10,9 +10,10 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
 
-from apps.core.views import get_estado_inactivo
+from apps.core.views import get_estado_activo, get_estado_inactivo
 from apps.datos_personales.forms import DatosPersonalesForm
 from apps.datos_personales.models import DatosPersonales
+from principal.auth_utils import get_panel_role_for_user
 
 from .forms import (
     DatosPersonalesSolicitudForm,
@@ -43,6 +44,31 @@ class PsicologoMiPerfilView(LoginRequiredMixin, View):
             "usuario:psicologo_detail",
             pk=psicologo.pk
         )
+
+
+class PacienteMiPerfilView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        paciente = Paciente.objects.filter(
+            dni=request.user.username
+        ).first()
+
+        if paciente is None:
+            messages.error(
+                request,
+                "No se encontro un perfil de paciente asociado a este usuario."
+            )
+            return redirect("panel_paciente")
+
+        return redirect(
+            "usuario:paciente_detail",
+            pk=paciente.pk
+        )
+
+
+class PacienteRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        return get_panel_role_for_user(self.request.user) == "paciente"
+
 
 class PsicologoOwnerOrStaffMixin(LoginRequiredMixin, UserPassesTestMixin):
     psicologo_owner_field = "id_psicologo"
@@ -90,7 +116,7 @@ class PsicologoOwnerOrStaffMixin(LoginRequiredMixin, UserPassesTestMixin):
         return kwargs
 
 
-class DashboardView(TemplateView):
+class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "usuario/dashboard.html"
 
     def get_context_data(self, **kwargs):
@@ -109,10 +135,11 @@ class DashboardView(TemplateView):
         return context
 
 
-class PsicologoPendienteListView(ListView):
+class PsicologoPendienteListView(LoginRequiredMixin, ListView):
     model = PsicologoPendiente
     template_name = "psicologo/psicologo_pendiente.html"
     context_object_name = "solicitudes"
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = PsicologoPendiente.objects.select_related(
@@ -154,7 +181,7 @@ class PsicologoPendienteListView(ListView):
         return context
 
 
-class PsicologoPendienteDetailView(DetailView):
+class PsicologoPendienteDetailView(LoginRequiredMixin, DetailView):
     model = PsicologoPendiente
     template_name = "psicologo/psicologo_pendiente_detail.html"
     context_object_name = "solicitud"
@@ -172,10 +199,11 @@ class PsicologoPendienteDetailView(DetailView):
         )
 
 
-class PsicologoListView(ListView):
+class PsicologoListView(LoginRequiredMixin, ListView):
     model = Psicologo
     template_name = "psicologo/psicologo_list.html"
     context_object_name = "psicologos"
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = (
@@ -226,7 +254,7 @@ class PsicologoListView(ListView):
         return context
 
 
-class PsicologoDetailView(DetailView):
+class PsicologoDetailView(LoginRequiredMixin, DetailView):
     model = Psicologo
     template_name = "psicologo/psicologo_detail.html"
     context_object_name = "psicologo"
@@ -242,6 +270,23 @@ class PsicologoDetailView(DetailView):
             "datos_personales__id_provincia",
             "datos_personales__id_localidad",
             "datos_personales__id_zona",
+        ).prefetch_related(
+            Prefetch(
+                "oficinas",
+                queryset=PsicologoOficina.objects.select_related("id_estado").filter(
+                    id_estado__dsc_estado__iexact="ACTIVO",
+                    id_estado__flg_activo=True,
+                ),
+                to_attr="oficinas_activas",
+            ),
+            Prefetch(
+                "idiomas",
+                queryset=PsicologoIdioma.objects.select_related("id_idioma", "id_estado").filter(
+                    id_estado__dsc_estado__iexact="ACTIVO",
+                    id_estado__flg_activo=True,
+                ),
+                to_attr="idiomas_activos",
+            ),
         )
 
     def get_context_data(self, **kwargs):
@@ -250,10 +295,11 @@ class PsicologoDetailView(DetailView):
         return context
 
 
-class PacienteListView(ListView):
+class PacienteListView(LoginRequiredMixin, ListView):
     model = Paciente
     template_name = "paciente/paciente_list.html"
     context_object_name = "pacientes"
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = (
@@ -293,7 +339,102 @@ class PacienteListView(ListView):
         return context
 
 
-class PsicologoFormView(View):
+class PacienteDetailView(LoginRequiredMixin, DetailView):
+    model = Paciente
+    template_name = "paciente/paciente_detail.html"
+    context_object_name = "paciente"
+
+    def get_queryset(self):
+        return Paciente.objects.select_related(
+            "id_estado",
+            "id_ocupacion",
+            "id_ciclo_vida",
+            "id_grado_estudio",
+            "datos_personales",
+            "datos_personales__id_sexo",
+            "datos_personales__id_std_civil",
+            "datos_personales__id_pais",
+            "datos_personales__id_provincia",
+            "datos_personales__id_localidad",
+            "datos_personales__id_zona",
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["datos_personales"] = self.object.datos_personales_rel
+        return context
+
+
+class PacienteMisPsicologosView(PacienteRequiredMixin, TemplateView):
+    template_name = "paciente/mis_psicologos.html"
+
+
+class PacienteEncontrarPsicologoListView(PacienteRequiredMixin, ListView):
+    model = Psicologo
+    template_name = "paciente/encontrar_psicologo.html"
+    context_object_name = "psicologos"
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = (
+            Psicologo.objects.select_related(
+                "id_estado",
+                "id_rama",
+                "datos_personales",
+                "datos_personales__id_provincia",
+                "datos_personales__id_localidad",
+                "datos_personales__id_zona",
+            )
+            .prefetch_related(
+                Prefetch(
+                    "oficinas",
+                    queryset=PsicologoOficina.objects.select_related("id_estado").filter(
+                        id_estado__dsc_estado__iexact="ACTIVO",
+                        id_estado__flg_activo=True,
+                    ),
+                    to_attr="oficinas_activas",
+                ),
+                Prefetch(
+                    "idiomas",
+                    queryset=PsicologoIdioma.objects.select_related("id_idioma", "id_estado").filter(
+                        id_estado__dsc_estado__iexact="ACTIVO",
+                        id_estado__flg_activo=True,
+                    ),
+                    to_attr="idiomas_activos",
+                ),
+            )
+            .annotate(
+                dni_text=Cast("dni", output_field=CharField()),
+            )
+            .filter(
+                id_estado__dsc_estado__iexact="ACTIVO",
+                id_estado__flg_activo=True,
+            )
+            .order_by("nombres", "dni")
+        )
+
+        query = self.request.GET.get("q", "").strip()
+        if not query:
+            return queryset
+
+        return queryset.filter(
+            Q(nombres__icontains=query)
+            | Q(email__icontains=query)
+            | Q(dni_text__icontains=query)
+            | Q(id_rama__dsc_rama__icontains=query)
+            | Q(datos_personales__id_localidad__dsc_localidad__icontains=query)
+            | Q(datos_personales__id_provincia__dsc_provincia__icontains=query)
+            | Q(datos_personales__id_zona__dsc_zona__icontains=query)
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["query"] = self.request.GET.get("q", "").strip()
+        context["total_resultados"] = self.object_list.count()
+        return context
+
+
+class PsicologoFormView(LoginRequiredMixin, View):
     template_name = "psicologo/psicologo_form.html"
     success_url = reverse_lazy("usuario:psicologo_list")
     success_action = "guardado"
@@ -448,7 +589,7 @@ class PsicologoUpdateView(PsicologoFormView):
     success_action = "actualizado"
 
 
-class PsicologoPendienteApproveView(View):
+class PsicologoPendienteApproveView(LoginRequiredMixin, View):
     success_url = reverse_lazy("usuario:psicologo_pendiente_list")
 
     def post(self, request, pk, *args, **kwargs):
@@ -524,7 +665,7 @@ class PsicologoPendienteApproveView(View):
         return user
 
 
-class PsicologoPendienteRejectView(View):
+class PsicologoPendienteRejectView(LoginRequiredMixin, View):
     success_url = reverse_lazy("usuario:psicologo_pendiente_list")
 
     def post(self, request, pk, *args, **kwargs):
@@ -542,7 +683,7 @@ class PsicologoPendienteRejectView(View):
         return redirect(self.success_url)
 
 
-class PacienteFormView(View):
+class PacienteFormView(LoginRequiredMixin, View):
     template_name = "paciente/paciente_form.html"
     success_url = reverse_lazy("usuario:paciente_list")
     success_action = "guardado"
@@ -683,6 +824,7 @@ class PsicologoOficinaListView(PsicologoOwnerOrStaffMixin, ListView):
     model = PsicologoOficina
     template_name = "psicologo/oficina_list.html"
     context_object_name = "oficinas"
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = PsicologoOficina.objects.select_related(
@@ -742,11 +884,56 @@ class PsicologoOficinaUpdateView(PsicologoOwnerOrStaffMixin, UpdateView):
         return super().form_valid(form)
 
 
-class PsicologoOficinaDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
+class EstadoToggleMixin:
+    activate_success_message = ""
+    deactivate_success_message = ""
+
+    @staticmethod
+    def estado_es_inactivo(estado):
+        return bool(
+            estado and (getattr(estado, "dsc_estado", "") or "").strip().upper() == "INACTIVO"
+        )
+
+    def object_is_inactive(self, obj=None):
+        current_object = obj or getattr(self, "object", None) or self.get_object()
+        return self.estado_es_inactivo(getattr(current_object, "id_estado", None))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_object = getattr(self, "object", None) or self.get_object()
+        context["is_inactive"] = self.object_is_inactive(current_object)
+        return context
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+
+        if self.object_is_inactive(self.object):
+            estado_destino = get_estado_activo()
+            if estado_destino is None:
+                messages.error(self.request, "No hay un estado ACTIVO configurado.")
+                return redirect(self.success_url)
+            success_message = self.activate_success_message
+        else:
+            estado_destino = get_estado_inactivo()
+            if estado_destino is None:
+                messages.error(self.request, "No hay un estado INACTIVO configurado.")
+                return redirect(self.success_url)
+            success_message = self.deactivate_success_message
+
+        self.object.id_estado = estado_destino
+        self.object.save(update_fields=["id_estado"])
+
+        messages.success(self.request, success_message)
+        return redirect(self.success_url)
+
+
+class PsicologoOficinaDeleteView(EstadoToggleMixin, PsicologoOwnerOrStaffMixin, DeleteView):
     model = PsicologoOficina
     template_name = "psicologo/oficina_confirm_delete.html"
     context_object_name = "oficina"
     success_url = reverse_lazy("usuario:psicologo_oficina_list")
+    activate_success_message = "Oficina activada correctamente."
+    deactivate_success_message = "Oficina dada de baja correctamente."
 
     def get_queryset(self):
         queryset = PsicologoOficina.objects.select_related("id_psicologo")
@@ -758,25 +945,11 @@ class PsicologoOficinaDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
         kwargs.pop("psicologo", None)
         return kwargs
 
-    def form_valid(self, form):
-        estado_inactivo = get_estado_inactivo()
-
-        if estado_inactivo is None:
-            messages.error(self.request, "No hay un estado INACTIVO configurado.")
-            return redirect(self.success_url)
-
-        self.object = self.get_object()
-        self.object.id_estado = estado_inactivo
-        self.object.save(update_fields=["id_estado"])
-
-        messages.success(self.request, "Oficina dada de baja correctamente.")
-        return redirect(self.success_url)
-
-
 class PsicologoMetodoPagoListView(PsicologoOwnerOrStaffMixin, ListView):
     model = PsicologoMetodoPago
     template_name = "psicologo/metodo_pago_list.html"
     context_object_name = "metodos_pago"
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = PsicologoMetodoPago.objects.select_related(
@@ -798,6 +971,7 @@ class PsicologoMetodoPagoListView(PsicologoOwnerOrStaffMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["query"] = self.request.GET.get("q", "").strip()
         context["total_resultados"] = self.object_list.count()
+        context["mostrar_columna_psicologo"] = self.user_is_staff()
         return context
 
 
@@ -827,11 +1001,13 @@ class PsicologoMetodoPagoUpdateView(PsicologoOwnerOrStaffMixin, UpdateView):
         return super().form_valid(form)
 
 
-class PsicologoMetodoPagoDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
+class PsicologoMetodoPagoDeleteView(EstadoToggleMixin, PsicologoOwnerOrStaffMixin, DeleteView):
     model = PsicologoMetodoPago
     template_name = "psicologo/metodo_pago_confirm_delete.html"
     context_object_name = "metodo_pago"
     success_url = reverse_lazy("usuario:psicologo_metodo_pago_list")
+    activate_success_message = "Metodo de pago activado correctamente."
+    deactivate_success_message = "Metodo de pago dado de baja correctamente."
 
     def get_queryset(self):
         queryset = PsicologoMetodoPago.objects.select_related("id_psicologo")
@@ -843,30 +1019,13 @@ class PsicologoMetodoPagoDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
         kwargs.pop("psicologo", None)
         return kwargs
 
-    def form_valid(self, form):
-        estado_inactivo = get_estado_inactivo()
-
-        if estado_inactivo is None:
-            messages.error(self.request, "No hay un estado INACTIVO configurado.")
-            return redirect(self.success_url)
-
-        self.object = self.get_object()
-        self.object.id_estado = estado_inactivo
-        self.object.save(update_fields=["id_estado"])
-
-        messages.success(self.request, "Método de pago dado de baja correctamente.")
-        return redirect(self.success_url)
-
-
-class PsicologoDeleteView(DeleteView):
+class PsicologoDeleteView(EstadoToggleMixin, LoginRequiredMixin, DeleteView):
     model = Psicologo
     template_name = "psicologo/psicologo_confirm_delete.html"
     context_object_name = "psicologo"
     success_url = reverse_lazy("usuario:psicologo_list")
-
-    def form_valid(self, form):
-        messages.success(self.request, "Psicologo eliminado correctamente.")
-        return super().form_valid(form)
+    activate_success_message = "Psicologo activado correctamente."
+    deactivate_success_message = "Psicologo dado de baja correctamente."
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -874,15 +1033,13 @@ class PsicologoDeleteView(DeleteView):
         return context
 
 
-class PacienteDeleteView(DeleteView):
+class PacienteDeleteView(EstadoToggleMixin, LoginRequiredMixin, DeleteView):
     model = Paciente
     template_name = "paciente/paciente_confirm_delete.html"
     context_object_name = "paciente"
     success_url = reverse_lazy("usuario:paciente_list")
-
-    def form_valid(self, form):
-        messages.success(self.request, "Paciente eliminado correctamente.")
-        return super().form_valid(form)
+    activate_success_message = "Paciente activado correctamente."
+    deactivate_success_message = "Paciente dado de baja correctamente."
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -895,6 +1052,7 @@ class PsicologoIdiomaListView(PsicologoOwnerOrStaffMixin, ListView):
     model = PsicologoIdioma
     template_name = "psicologo/idioma_list.html"
     context_object_name = "idiomas"
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = PsicologoIdioma.objects.select_related(
@@ -919,6 +1077,7 @@ class PsicologoIdiomaListView(PsicologoOwnerOrStaffMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["query"] = self.request.GET.get("q", "").strip()
         context["total_resultados"] = self.object_list.count()
+        context["mostrar_columna_psicologo"] = self.user_is_staff()
         return context
 
 
@@ -948,11 +1107,13 @@ class PsicologoIdiomaUpdateView(PsicologoOwnerOrStaffMixin, UpdateView):
         return super().form_valid(form)
 
 
-class PsicologoIdiomaDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
+class PsicologoIdiomaDeleteView(EstadoToggleMixin, PsicologoOwnerOrStaffMixin, DeleteView):
     model = PsicologoIdioma
     template_name = "psicologo/idioma_confirm_delete.html"
     context_object_name = "idioma"
     success_url = reverse_lazy("usuario:psicologo_idioma_list")
+    activate_success_message = "Idioma activado correctamente."
+    deactivate_success_message = "Idioma dado de baja correctamente."
 
     def get_queryset(self):
         queryset = PsicologoIdioma.objects.select_related("id_psicologo")
@@ -964,16 +1125,3 @@ class PsicologoIdiomaDeleteView(PsicologoOwnerOrStaffMixin, DeleteView):
         kwargs.pop("psicologo", None)
         return kwargs
 
-    def form_valid(self, form):
-        estado_inactivo = get_estado_inactivo()
-
-        if estado_inactivo is None:
-            messages.error(self.request, "No hay un estado INACTIVO configurado.")
-            return redirect(self.success_url)
-
-        self.object = self.get_object()
-        self.object.id_estado = estado_inactivo
-        self.object.save(update_fields=["id_estado"])
-
-        messages.success(self.request, "Idioma dado de baja correctamente.")
-        return redirect(self.success_url)

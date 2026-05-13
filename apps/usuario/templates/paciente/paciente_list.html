@@ -127,11 +127,16 @@ main.list-main {
 }
 
 .table-panel {
-    overflow: hidden;
+    overflow: visible;
     border: 1px solid #dbe3ef;
     border-radius: 8px;
     background: #ffffff;
     box-shadow: 0 18px 44px rgba(15, 23, 42, 0.07);
+}
+
+.table-scroll {
+    overflow: visible;
+    border-radius: 8px 8px 0 0;
 }
 
 .modern-table {
@@ -212,32 +217,118 @@ main.list-main {
     font-weight: 800;
 }
 
+.status-pill.inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
 .table-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
+    text-align: right;
+    width: 132px;
 }
 
 .action-link {
-    min-height: 34px;
+    min-height: 38px;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: 0 10px;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 12px;
     border-radius: 8px;
     text-decoration: none;
     font-size: 0.88rem;
     font-weight: 800;
+    border: 1px solid transparent;
+}
+
+.action-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.action-menu[open] {
+    z-index: 3;
+}
+
+.action-menu-summary {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 0.88rem;
+    font-weight: 800;
+    cursor: pointer;
+    list-style: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+    user-select: none;
+}
+
+.action-menu-summary::-webkit-details-marker {
+    display: none;
+}
+
+.action-menu-summary:hover,
+.action-menu[open] .action-menu-summary {
+    border-color: #93c5fd;
+    background: #f8fbff;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+}
+
+.action-menu-caret {
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.18s ease;
+}
+
+.action-menu[open] .action-menu-caret {
+    transform: rotate(225deg);
+}
+
+.action-menu-panel {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    min-width: 180px;
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid #dbe3ef;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.16);
 }
 
 .action-link-edit {
     background: #eff6ff;
     color: #1d4ed8;
+    border-color: #dbeafe;
 }
 
 .action-link-delete {
     background: #fef2f2;
     color: #b91c1c;
+    border-color: #fee2e2;
+}
+
+.action-link-success {
+    background: #ecfdf5;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+.action-link-view {
+    background: #fefce8;
+    color: #a16207;
+    border-color: #fef3c7;
 }
 
 .empty-table {
@@ -269,7 +360,7 @@ main.list-main {
         width: 100%;
     }
 
-    .table-panel {
+    .table-scroll {
         overflow-x: auto;
     }
 
@@ -302,6 +393,7 @@ main.list-main {
     </div>
 
     <div class="table-panel">
+    <div class="table-scroll">
     <table class="modern-table">
         <thead>
             <tr>
@@ -330,10 +422,19 @@ main.list-main {
                     </td>
                     <td>{{ paciente.dni }}</td>
                     <td>{{ paciente.email }}</td>
-                    <td><span class="status-pill">{{ paciente.id_estado }}</span></td>
+                    <td><span class="status-pill {% if paciente.id_estado.dsc_estado|upper == 'INACTIVO' %}inactive{% endif %}">{{ paciente.id_estado }}</span></td>
                     <td class="table-actions">
-                        <a class="action-link action-link-edit" href="{% url 'usuario:paciente_update' paciente.pk %}">Editar</a>
-                        <a class="action-link action-link-delete" href="{% url 'usuario:paciente_delete' paciente.pk %}">Eliminar</a>
+                        <details class="action-menu">
+                            <summary class="action-menu-summary">
+                                <span>Acciones</span>
+                                <span class="action-menu-caret"></span>
+                            </summary>
+                            <div class="action-menu-panel">
+                                <a class="action-link action-link-view" href="{% url 'usuario:paciente_detail' paciente.pk %}">Ver ficha</a>
+                                <a class="action-link action-link-edit" href="{% url 'usuario:paciente_update' paciente.pk %}">Editar</a>
+                                <a class="action-link {% if paciente.id_estado.dsc_estado|upper == 'INACTIVO' %}action-link-success{% else %}action-link-delete{% endif %}" href="{% url 'usuario:paciente_delete' paciente.pk %}">{% if paciente.id_estado.dsc_estado|upper == 'INACTIVO' %}Activar{% else %}Inactivar{% endif %}</a>
+                            </div>
+                        </details>
                     </td>
                 </tr>
             {% empty %}
@@ -343,6 +444,8 @@ main.list-main {
             {% endfor %}
         </tbody>
     </table>
+    </div>
+    {% include "includes/pagination.html" %}
     </div>
 </section>
 {% endblock %}

@@ -1,0 +1,28 @@
+{% load querystring %}
+{% if is_paginated %}
+<style>
+.app-pagination{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:16px 18px;border-top:1px solid #e2e8f0;background:#fff}.app-pagination-summary{color:#64748b;font-size:.9rem;font-weight:700}.app-pagination-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.app-pagination-link,.app-pagination-current{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 12px;border-radius:12px;border:1px solid #dbe3ef;background:#fff;color:#334155;text-decoration:none;font-size:.9rem;font-weight:800}.app-pagination-link:hover{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}.app-pagination-link.is-disabled{background:#f8fafc;color:#94a3b8;pointer-events:none}.app-pagination-current{background:#0f172a;border-color:#0f172a;color:#fff}@media(max-width:720px){.app-pagination{padding:14px}.app-pagination-summary,.app-pagination-links{width:100%}.app-pagination-links{justify-content:flex-start}}
+</style>
+<nav class="app-pagination" aria-label="Paginacion">
+  <span class="app-pagination-summary">
+    Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ paginator.count }} registros
+  </span>
+  <div class="app-pagination-links">
+    {% if page_obj.has_previous %}
+      <a class="app-pagination-link" href="{% querystring page=1 %}">Primera</a>
+      <a class="app-pagination-link" href="{% querystring page=page_obj.previous_page_number %}">Anterior</a>
+    {% else %}
+      <span class="app-pagination-link is-disabled">Primera</span>
+      <span class="app-pagination-link is-disabled">Anterior</span>
+    {% endif %}
+    <span class="app-pagination-current">Pagina {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a class="app-pagination-link" href="{% querystring page=page_obj.next_page_number %}">Siguiente</a>
+      <a class="app-pagination-link" href="{% querystring page=paginator.num_pages %}">Ultima</a>
+    {% else %}
+      <span class="app-pagination-link is-disabled">Siguiente</span>
+      <span class="app-pagination-link is-disabled">Ultima</span>
+    {% endif %}
+  </div>
+</nav>
+{% endif %}

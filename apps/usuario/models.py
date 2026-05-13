@@ -366,7 +366,6 @@ class PsicologoOficina(models.Model):
     
 
 
-
 class PsicologoIdioma(models.Model):
     id_psicologo = models.ForeignKey(
         Psicologo,

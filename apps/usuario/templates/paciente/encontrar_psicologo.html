@@ -1,0 +1,113 @@
+{% extends "usuario/base.html" %}
+
+{% block title %}Encontrar a mi Psicologo{% endblock %}
+{% block main_class %}find-psy-main{% endblock %}
+
+{% block extra_styles %}
+.find-psy-main{max-width:1180px;margin:0 auto}.find-psy-page{display:grid;gap:18px}.find-psy-hero,.find-psy-toolbar,.find-psy-empty{border:1px solid rgba(216,227,239,.95);border-radius:24px;background:rgba(255,255,255,.94);box-shadow:0 18px 40px rgba(15,23,42,.06)}.find-psy-hero{position:relative;overflow:hidden;display:grid;gap:14px;padding:26px;background:radial-gradient(circle at top right,rgba(20,184,166,.18),transparent 24%),radial-gradient(circle at left top,rgba(29,78,216,.14),transparent 28%),#fff}.find-psy-kicker{display:inline-flex;align-items:center;gap:8px;min-height:30px;padding:0 12px;border-radius:999px;background:#ecfeff;color:#0f766e;font-size:.76rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;width:max-content}.find-psy-kicker:before{content:"";width:8px;height:8px;border-radius:999px;background:#14b8a6}.find-psy-hero h1{margin:0;color:#0f172a;font-size:clamp(1.8rem,3.4vw,2.8rem);line-height:1.04}.find-psy-hero p{margin:0;max-width:760px;color:#64748b;line-height:1.65}.find-psy-meta{display:flex;flex-wrap:wrap;gap:10px}.find-psy-pill{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0;color:#334155;font-size:.9rem;font-weight:800}.find-psy-pill.primary{background:#ecfeff;border-color:#99f6e4;color:#0f766e}.find-psy-toolbar{padding:16px 18px}.find-psy-form{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.find-psy-search{flex:1 1 320px;min-height:48px;padding:0 14px;border:1px solid #cbd5e1;border-radius:14px;background:#fff;color:#0f172a}.find-psy-search:focus{outline:2px solid rgba(37,99,235,.18);border-color:#2563eb}.find-psy-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 16px;border-radius:14px;border:1px solid transparent;background:#0f172a;color:#fff;text-decoration:none;font-weight:900;cursor:pointer}.find-psy-btn.secondary{background:#fff;color:#1d4ed8;border-color:#bfdbfe}.find-psy-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.find-psy-card{display:grid;gap:16px;padding:20px;border:1px solid rgba(216,227,239,.95);border-radius:26px;background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);box-shadow:0 18px 40px rgba(15,23,42,.06)}.find-psy-card-top{display:flex;align-items:flex-start;gap:14px}.find-psy-photo{width:78px;height:78px;flex:0 0 auto;object-fit:cover;border-radius:22px;background:#e2e8f0;box-shadow:0 12px 24px rgba(15,23,42,.08)}.find-psy-copy{min-width:0;display:grid;gap:6px}.find-psy-copy h2{margin:0;color:#0f172a;font-size:1.15rem;line-height:1.15}.find-psy-copy p{margin:0;color:#64748b;line-height:1.5}.find-psy-badges{display:flex;flex-wrap:wrap;gap:8px}.find-psy-badge{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:.78rem;font-weight:900}.find-psy-badge.success{background:#ecfdf5;color:#166534}.find-psy-detail-stack{display:grid;gap:8px}.find-psy-details{display:grid;gap:10px}.find-psy-detail{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:16px;background:#fff;border:1px solid #e2e8f0}.find-psy-detail span{display:block}.find-psy-label{color:#64748b;font-size:.76rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}.find-psy-value{margin-top:4px;color:#0f172a;font-weight:800;line-height:1.45;text-align:right}.find-psy-language-list{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}.find-psy-actions{display:flex;gap:10px;flex-wrap:wrap}.find-psy-empty{padding:24px}.find-psy-empty h2{margin:0 0 8px;color:#0f172a}.find-psy-empty p{margin:0;color:#64748b;line-height:1.6}@media(max-width:1040px){.find-psy-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:720px){.find-psy-grid{grid-template-columns:1fr}.find-psy-card-top,.find-psy-detail{flex-direction:column}.find-psy-value,.find-psy-language-list{text-align:left;justify-content:flex-start}.find-psy-main{padding:0}.find-psy-hero,.find-psy-toolbar,.find-psy-empty,.find-psy-card{border-radius:20px}}
+{% endblock %}
+
+{% block content %}
+<div class="find-psy-page">
+  <section class="find-psy-hero">
+    <span class="find-psy-kicker">Buscar psicologo</span>
+    <h1>Encuentra un profesional activo que encaje contigo.</h1>
+    <p>Explora los psicologos disponibles de una forma mas clara, cercana y visual. Puedes buscar por nombre, especialidad o ubicacion para encontrar una opcion que te inspire confianza.</p>
+    <div class="find-psy-meta">
+      <span class="find-psy-pill primary">{{ total_resultados }} psicologos activos</span>
+      <span class="find-psy-pill">Listado visible para pacientes</span>
+    </div>
+  </section>
+
+  <section class="find-psy-toolbar">
+    <form class="find-psy-form" method="get">
+      <input
+        class="find-psy-search"
+        type="search"
+        name="q"
+        value="{{ query }}"
+        placeholder="Busca por nombre, rama o ubicacion"
+        aria-label="Buscar psicologo"
+      >
+      <button class="find-psy-btn" type="submit">Buscar</button>
+      {% if query %}
+        <a class="find-psy-btn secondary" href="{% url 'usuario:paciente_encontrar_psicologo' %}">Limpiar</a>
+      {% endif %}
+    </form>
+  </section>
+
+  {% if psicologos %}
+    <section class="find-psy-grid" aria-label="Listado de psicologos activos">
+      {% for psicologo in psicologos %}
+        <article class="find-psy-card">
+          <div class="find-psy-card-top">
+            <img class="find-psy-photo" src="{{ psicologo.foto_url }}" alt="Foto de perfil de {{ psicologo.nombres }}">
+            <div class="find-psy-copy">
+              <h2>{{ psicologo.nombres }}</h2>
+              <p>{{ psicologo.id_rama.dsc_rama }}</p>
+              <div class="find-psy-badges">
+                <span class="find-psy-badge success">Activo</span>
+                <span class="find-psy-badge">
+                  {% if psicologo.oficinas_activas %}
+                    Sesiones virtuales y presenciales
+                  {% else %}
+                    Sesiones virtuales
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="find-psy-details">
+            <div class="find-psy-detail">
+              <div>
+                <span class="find-psy-label">Especialidad</span>
+                <span class="find-psy-value">{{ psicologo.id_rama.dsc_rama }}</span>
+              </div>
+            </div>
+            <div class="find-psy-detail">
+              <div>
+                <span class="find-psy-label">Ubicacion</span>
+                <span class="find-psy-value">
+                  {% if psicologo.datos_personales_rel and psicologo.datos_personales_rel.id_localidad %}
+                    {{ psicologo.datos_personales_rel.id_localidad.dsc_localidad }}
+                  {% elif psicologo.datos_personales_rel and psicologo.datos_personales_rel.id_provincia %}
+                    {{ psicologo.datos_personales_rel.id_provincia.dsc_provincia }}
+                  {% else %}
+                    Ubicacion a confirmar
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+            <div class="find-psy-detail">
+              <div class="find-psy-detail-stack">
+                <span class="find-psy-label">Idiomas</span>
+                {% if psicologo.idiomas_activos %}
+                  <div class="find-psy-language-list">
+                    {% for idioma in psicologo.idiomas_activos %}
+                      <span class="find-psy-badge">{{ idioma.id_idioma.dsc_idioma }}</span>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <span class="find-psy-value">No especificados</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="find-psy-actions">
+            <a class="find-psy-btn" href="{% url 'usuario:psicologo_detail' psicologo.pk %}">Quiero que sea mi psicologo</a>
+          </div>
+        </article>
+      {% endfor %}
+    </section>
+
+    {% include "includes/pagination.html" %}
+  {% else %}
+    <section class="find-psy-empty">
+      <h2>No encontramos psicologos con esa busqueda.</h2>
+      <p>Prueba con otro nombre, una rama distinta o una ubicacion mas general para volver a explorar el listado.</p>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}

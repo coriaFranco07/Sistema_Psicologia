@@ -5,15 +5,16 @@ from django.contrib.auth.views import LogoutView
 from django.views.generic import TemplateView
 from django.urls import include, path
 
-from .views import PanelAdminView, PanelPsicologoView, StyledLoginView
+from .views import PanelAdminView, PanelPacienteView, PanelPsicologoView, StyledLoginView
 
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="inicio.html"), name="home"),
     path("login/", StyledLoginView.as_view(), name="login"),
-    path("logout/", LogoutView.as_view(), name="logout"),
+    path("logout/", LogoutView.as_view(next_page="login"), name="logout"),
     path("panel-admin/", PanelAdminView.as_view(), name="panel_admin"),
     path("panel-psicologo/", PanelPsicologoView.as_view(), name="panel_psicologo"),
+    path("panel-paciente/", PanelPacienteView.as_view(), name="panel_paciente"),
     path("admin/", admin.site.urls),
     path("", include(("apps.usuario.urls", "usuario"), namespace="usuario")),
 ]

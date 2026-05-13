@@ -243,6 +243,11 @@ main.list-main {
     font-weight: 800;
 }
 
+.status-pill.inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
 .table-actions {
     text-align: right;
     width: 132px;
@@ -338,6 +343,12 @@ main.list-main {
     background: #fef2f2;
     color: #b91c1c;
     border-color: #fee2e2;
+}
+
+.action-link-success {
+    background: #ecfdf5;
+    color: #166534;
+    border-color: #bbf7d0;
 }
 
 .action-link-view {
@@ -473,7 +484,7 @@ main.list-main {
                         </td>
 
                         <td>
-                            <span class="status-pill">{{ psicologo.id_estado }}</span>
+                            <span class="status-pill {% if psicologo.id_estado.dsc_estado|upper == 'INACTIVO' %}inactive{% endif %}">{{ psicologo.id_estado }}</span>
                         </td>
                         <td>
                             <span class="cell-title">{{ psicologo.fch_creacion|date:"d/m/Y H:i" }}</span>
@@ -488,7 +499,7 @@ main.list-main {
                                 <div class="action-menu-panel">
                                     <a class="action-link action-link-view" href="{% url 'usuario:psicologo_detail' psicologo.pk %}">Ver ficha</a>
                                     <a class="action-link action-link-edit" href="{% url 'usuario:psicologo_update' psicologo.pk %}">Editar</a>
-                                    <a class="action-link action-link-delete" href="{% url 'usuario:psicologo_delete' psicologo.pk %}">Eliminar</a>
+                                    <a class="action-link {% if psicologo.id_estado.dsc_estado|upper == 'INACTIVO' %}action-link-success{% else %}action-link-delete{% endif %}" href="{% url 'usuario:psicologo_delete' psicologo.pk %}">{% if psicologo.id_estado.dsc_estado|upper == 'INACTIVO' %}Activar{% else %}Inactivar{% endif %}</a>
                                 </div>
                             </details>
                         </td>
@@ -501,6 +512,7 @@ main.list-main {
             {% endfor %}
         </tbody>
     </table>
+    {% include "includes/pagination.html" %}
     </div>
 </section>
 {% endblock %}

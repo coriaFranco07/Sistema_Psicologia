@@ -103,6 +103,18 @@ urlpatterns = [
     ),
     path("pacientes/", views.PacienteListView.as_view(), name="paciente_list"),
     path("pacientes/nuevo/", views.PacienteCreateView.as_view(), name="paciente_create"),
+    path("pacientes/mi-perfil/", views.PacienteMiPerfilView.as_view(), name="paciente_mi_perfil"),
+    path(
+        "pacientes/mis-psicologos/",
+        views.PacienteMisPsicologosView.as_view(),
+        name="paciente_mis_psicologos",
+    ),
+    path(
+        "pacientes/encontrar-psicologo/",
+        views.PacienteEncontrarPsicologoListView.as_view(),
+        name="paciente_encontrar_psicologo",
+    ),
+    path("pacientes/<int:pk>/", views.PacienteDetailView.as_view(), name="paciente_detail"),
     path(
         "pacientes/<int:pk>/editar/",
         views.PacienteUpdateView.as_view(),

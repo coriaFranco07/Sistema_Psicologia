@@ -1,6 +1,6 @@
 {% extends "usuario/base.html" %}
 
-{% block title %}Ficha de Psicologo{% endblock %}
+{% block title %}Ficha de Paciente{% endblock %}
 
 {% block main_class %}detail-main{% endblock %}
 
@@ -54,7 +54,7 @@ main.detail-main {
 .detail-topbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 12px;
     padding: 16px;
     border: 1px solid #dbe3ef;
@@ -194,18 +194,6 @@ main.detail-main {
     color: #ffffff;
 }
 
-.btn-modern-secondary {
-    border-color: #cbd5e1;
-    background: #ffffff;
-    color: #334155;
-}
-
-.btn-modern-info {
-    border-color: #0ea5e9;
-    background: #eff6ff;
-    color: #0369a1;
-}
-
 @media (max-width: 920px) {
     main.detail-main {
         padding: 20px 14px 34px;
@@ -233,35 +221,30 @@ main.detail-main {
 <section class="detail-page">
     <div class="detail-hero">
         <div>
-            <span class="detail-kicker">Ficha profesional</span>
-            <h1>Psicologo {{ psicologo.nombres }}</h1>
-            <p>Vista completa del perfil profesional aprobado y activo dentro del sistema.</p>
+            <span class="detail-kicker">Ficha del paciente</span>
+            <h1>Paciente {{ paciente.nombres }}</h1>
+            <p>Vista completa de la ficha personal y clinica cargada en el sistema.</p>
         </div>
     </div>
 
     <div class="detail-topbar">
-        
         <div class="detail-actions">
-            {% if psicologo.titulo %}
-                <a class="btn-modern btn-modern-info" href="{{ psicologo.titulo.url }}" target="_blank" rel="noopener">Ver titulo PDF</a>
-            {% endif %}
-            <a class="btn-modern btn-modern-primary" href="{% url 'usuario:psicologo_update' psicologo.pk %}">Editar ficha</a>
+            <a class="btn-modern btn-modern-primary" href="{% url 'usuario:paciente_update' paciente.pk %}">Editar ficha</a>
         </div>
     </div>
 
     <div class="detail-layout">
         <aside class="detail-card profile-card">
-            <img class="profile-photo" src="{{ psicologo.foto_url }}" alt="Foto de perfil de {{ psicologo.nombres }}">
-            <h2 class="profile-name">{{ psicologo.nombres }}</h2>
-            <p class="profile-meta">Rama {{ psicologo.id_rama }}</p>
-            <p class="profile-meta">Correo {{ psicologo.email }}</p>
-            <p class="profile-meta">DNI {{ psicologo.dni }}</p>
-            {% if psicologo.cuil %}
-                <p class="profile-meta">CUIL {{ psicologo.cuil }}</p>
+            <img class="profile-photo" src="{{ paciente.foto_url }}" alt="Foto de perfil de {{ paciente.nombres }}">
+            <h2 class="profile-name">{{ paciente.nombres }}</h2>
+            <p class="profile-meta">Correo {{ paciente.email }}</p>
+            <p class="profile-meta">DNI {{ paciente.dni }}</p>
+            {% if paciente.cuil %}
+                <p class="profile-meta">CUIL {{ paciente.cuil }}</p>
             {% endif %}
-            <span class="status-pill">{{ psicologo.id_estado }}</span>
+            <span class="status-pill">{{ paciente.id_estado }}</span>
             <div class="profile-note">
-                Perfil creado el {{ psicologo.fch_creacion|date:"d/m/Y H:i" }} y actualizado el {{ psicologo.fch_actualizacion|date:"d/m/Y H:i" }}.
+                Perfil creado el {{ paciente.fch_creacion|date:"d/m/Y H:i" }} y actualizado el {{ paciente.fch_actualizacion|date:"d/m/Y H:i" }}.
             </div>
         </aside>
 
@@ -272,15 +255,15 @@ main.detail-main {
                     <div class="info-list">
                         <div class="info-item">
                             <span class="info-label">Nombre completo</span>
-                            <span class="info-value">{{ psicologo.nombres }}</span>
+                            <span class="info-value">{{ paciente.nombres }}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Fecha de nacimiento</span>
-                            <span class="info-value">{{ psicologo.fch_nacimiento|date:"d/m/Y" }}</span>
+                            <span class="info-value">{{ paciente.fch_nacimiento|date:"d/m/Y" }}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Edad</span>
-                            <span class="info-value">{{ psicologo.edad }} años</span>
+                            <span class="info-value">{{ paciente.edad }} anos</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Sexo</span>
@@ -310,7 +293,7 @@ main.detail-main {
                     <div class="info-list">
                         <div class="info-item">
                             <span class="info-label">Correo</span>
-                            <span class="info-value">{{ psicologo.email }}</span>
+                            <span class="info-value">{{ paciente.email }}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Telefono</span>
@@ -382,55 +365,31 @@ main.detail-main {
                 </section>
 
                 <section class="info-block">
-                    <h2>Datos profesionales</h2>
+                    <h2>Ficha del paciente</h2>
                     <div class="info-list">
                         <div class="info-item">
-                            <span class="info-label">Rama</span>
-                            <span class="info-value">{{ psicologo.id_rama }}</span>
+                            <span class="info-label">Ocupacion</span>
+                            <span class="info-value">{{ paciente.id_ocupacion }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Ciclo de vida</span>
+                            <span class="info-value">{{ paciente.id_ciclo_vida }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Grado de estudio</span>
+                            <span class="info-value">{{ paciente.id_grado_estudio }}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Estado</span>
-                            <span class="info-value">{{ psicologo.id_estado }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Tipo de sesiones</span>
-                            <span class="info-value">
-                                {% if psicologo.oficinas_activas %}
-                                    Sesiones virtuales y presenciales
-                                {% else %}
-                                    Sesiones virtuales
-                                {% endif %}
-                            </span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Idiomas</span>
-                            <span class="info-value">
-                                {% if psicologo.idiomas_activos %}
-                                    {% for idioma in psicologo.idiomas_activos %}
-                                        {{ idioma.id_idioma.dsc_idioma }}{% if not forloop.last %}, {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    No especificados
-                                {% endif %}
-                            </span>
+                            <span class="info-value">{{ paciente.id_estado }}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Fecha de alta</span>
-                            <span class="info-value">{{ psicologo.fch_creacion|date:"d/m/Y H:i" }}</span>
+                            <span class="info-value">{{ paciente.fch_creacion|date:"d/m/Y H:i" }}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Ultima actualizacion</span>
-                            <span class="info-value">{{ psicologo.fch_actualizacion|date:"d/m/Y H:i" }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Titulo</span>
-                            <span class="info-value">
-                                {% if psicologo.titulo %}
-                                    <a href="{{ psicologo.titulo.url }}" target="_blank" rel="noopener">Abrir PDF adjunto</a>
-                                {% else %}
-                                    Sin cargar
-                                {% endif %}
-                            </span>
+                            <span class="info-value">{{ paciente.fch_actualizacion|date:"d/m/Y H:i" }}</span>
                         </div>
                     </div>
                 </section>

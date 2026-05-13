@@ -1,0 +1,27 @@
+{% extends "usuario/base.html" %}
+
+{% block title %}Mis Psicologos{% endblock %}
+{% block main_class %}patient-empty-main{% endblock %}
+
+{% block extra_styles %}
+.patient-empty-main{max-width:920px;margin:0 auto}.patient-empty-page{display:grid;gap:18px}.patient-empty-shell,.patient-empty-card{border:1px solid rgba(216,227,239,.95);border-radius:24px;background:rgba(255,255,255,.94);box-shadow:0 18px 40px rgba(15,23,42,.06)}.patient-empty-shell{display:grid;gap:12px;padding:24px}.patient-empty-kicker{display:inline-flex;align-items:center;gap:8px;min-height:30px;padding:0 12px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:.76rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;width:max-content}.patient-empty-kicker:before{content:"";width:8px;height:8px;border-radius:999px;background:#2563eb}.patient-empty-shell h1{margin:0;color:#0f172a;font-size:clamp(1.7rem,3vw,2.3rem);line-height:1.08}.patient-empty-shell p{margin:0;max-width:680px;color:#64748b;line-height:1.6}.patient-empty-card{padding:22px}.patient-empty-card h2{margin:0 0 10px;color:#0f172a}.patient-empty-card p{margin:0;color:#64748b;line-height:1.6}.patient-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.patient-link{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 16px;border-radius:14px;text-decoration:none;font-weight:900}.patient-link.primary{background:#0f172a;color:#fff}.patient-link.secondary{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+{% endblock %}
+
+{% block content %}
+<div class="patient-empty-page">
+  <section class="patient-empty-shell">
+    <span class="patient-empty-kicker">Mis psicologos</span>
+    <h1>Tu espacio de seguimiento va a vivir aca.</h1>
+    <p>Por ahora esta seccion todavia no tiene contenido vinculado. La deje preparada para cuando empecemos a asociar pacientes con profesionales dentro del sistema.</p>
+  </section>
+
+  <section class="patient-empty-card">
+    <h2>Aun no tienes psicologos vinculados.</h2>
+    <p>Mientras tanto, puedes entrar a la seccion de busqueda para conocer los psicologos activos disponibles en la plataforma.</p>
+    <div class="patient-actions">
+      <a class="patient-link primary" href="{% url 'usuario:paciente_encontrar_psicologo' %}">Encontrar a mi psicologo</a>
+      <a class="patient-link secondary" href="{% url 'panel_paciente' %}">Volver al panel</a>
+    </div>
+  </section>
+</div>
+{% endblock %}

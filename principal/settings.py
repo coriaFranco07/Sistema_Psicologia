@@ -45,6 +45,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "principal.context_processors.panel_context",
             ],
         },
     },
@@ -93,6 +94,10 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+AUTHENTICATION_BACKENDS = [
+    "principal.auth_backends.ActiveProfileModelBackend",
+]
+
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "usuario:psicologo_list"
-LOGOUT_REDIRECT_URL = "login"
+LOGOUT_REDIRECT_URL = "home"
