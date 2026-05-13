@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
-
+from apps.parametro.models import Rama, Sexo
 from apps.core.views import get_estado_activo, get_estado_inactivo
 from apps.datos_personales.forms import DatosPersonalesForm
 from apps.datos_personales.models import DatosPersonales
@@ -414,8 +414,18 @@ class PacienteEncontrarPsicologoListView(PacienteRequiredMixin, ListView):
         )
 
         query = self.request.GET.get("q", "").strip()
+
+        rama = self.request.GET.get("rama", "").strip()
+        sexo = self.request.GET.get("sexo", "").strip()
+
+        if rama.isdigit():
+            queryset = queryset.filter(id_rama_id=int(rama))
+
+        if sexo.isdigit():
+            queryset = queryset.filter(datos_personales__id_sexo_id=int(sexo))
+
         if not query:
-            return queryset
+            return queryset.distinct()
 
         return queryset.filter(
             Q(nombres__icontains=query)
@@ -425,11 +435,15 @@ class PacienteEncontrarPsicologoListView(PacienteRequiredMixin, ListView):
             | Q(datos_personales__id_localidad__dsc_localidad__icontains=query)
             | Q(datos_personales__id_provincia__dsc_provincia__icontains=query)
             | Q(datos_personales__id_zona__dsc_zona__icontains=query)
-        )
+        ).distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["query"] = self.request.GET.get("q", "").strip()
+        context["rama_seleccionada"] = self.request.GET.get("rama", "").strip()
+        context["sexo_seleccionado"] = self.request.GET.get("sexo", "").strip()
+        context["ramas"] = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
+        context["sexos"] = Sexo.objects.filter(flg_activo=True).order_by("dsc_tipo")
         context["total_resultados"] = self.object_list.count()
         return context
 

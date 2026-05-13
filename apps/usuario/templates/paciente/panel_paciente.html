@@ -1,67 +1,545 @@
 {% extends "usuario/base.html" %}
 
 {% block title %}Panel del Paciente{% endblock %}
-{% block main_class %}patient-dashboard-main{% endblock %}
+{% block main_class %}pd-main{% endblock %}
 {% block back_button %}{% endblock %}
 
 {% block extra_styles %}
-.patient-dashboard-main{max-width:980px;margin:0 auto}.patient-dashboard{display:grid;gap:18px}.patient-shell,.patient-section{border:1px solid rgba(216,227,239,.95);border-radius:24px;background:rgba(255,255,255,.92);box-shadow:0 18px 40px rgba(15,23,42,.06)}.patient-shell{display:grid;gap:14px;padding:24px 24px 22px}.patient-kicker{display:inline-flex;align-items:center;gap:8px;min-height:30px;padding:0 12px;border-radius:999px;background:#ecfeff;color:#0f766e;font-size:.76rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;width:max-content}.patient-kicker:before{content:"";width:8px;height:8px;border-radius:999px;background:#14b8a6}.patient-shell h1{margin:0;font-size:clamp(1.6rem,3vw,2.2rem);line-height:1.08;color:#0f172a}.patient-shell p{margin:0;max-width:700px;color:#64748b;line-height:1.55}.patient-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}.patient-pill{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0;color:#334155;font-weight:800}.patient-pill.primary{background:#ecfeff;border-color:#99f6e4;color:#0f766e}.patient-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.quick-card,.patient-section{padding:18px}.quick-card{display:grid;gap:10px;border:1px solid #e2e8f0;border-radius:22px;background:#fff;text-decoration:none;color:#0f172a;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.quick-card:hover{transform:translateY(-1px);border-color:#99f6e4;box-shadow:0 14px 28px rgba(15,118,110,.1)}.quick-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,rgba(20,184,166,.12),rgba(29,78,216,.12));color:#0f766e;font-weight:900}.quick-card strong{font-size:1rem}.quick-card span,.patient-section p,.patient-item span{color:#64748b;line-height:1.45}.patient-section h2{margin:0 0 8px;color:#0f172a}.patient-list{display:grid;gap:10px;margin-top:14px}.patient-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0}.patient-badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:0 10px;border-radius:999px;background:#ecfdf5;color:#166534;font-size:.76rem;font-weight:900}.patient-badge.neutral{background:#f1f5f9;color:#475569}@media(max-width:860px){.patient-grid{grid-template-columns:1fr 1fr}}@media(max-width:720px){.patient-grid{grid-template-columns:1fr}.patient-shell,.patient-section{padding:18px}}
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.pd-main {
+  --ink:       #0c1220;
+  --ink-mid:   #3d4a5c;
+  --ink-soft:  #7a8799;
+  --ink-ghost: #b8c2cc;
+  --surface:   #ffffff;
+  --surface-2: #f6f8fb;
+  --surface-3: #edf1f6;
+  --teal-xlt:  #edfaf7;
+  --teal-lt:   #b2eed9;
+  --teal-mid:  #0d9e80;
+  --teal-dk:   #087a61;
+  --teal-xdk:  #055a47;
+  --line:      rgba(12,18,32,.08);
+  --line-mid:  rgba(12,18,32,.13);
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-sans:  'Geist', system-ui, sans-serif;
+  font-family: var(--font-sans);
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 24px 72px;
+}
+
+/* ── HERO ─────────────────────────────────────────── */
+.pd-hero {
+  position: relative;
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--ink);
+  padding: 52px 52px 48px;
+  margin-bottom: 14px;
+}
+
+.pd-hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 70% at 95% 0%, rgba(13,158,128,.22) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 50% at 0% 100%, rgba(13,158,128,.12) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.pd-hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: end;
+}
+
+.pd-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(13,158,128,.3);
+  background: rgba(13,158,128,.1);
+  color: var(--teal-lt);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.pd-eyebrow::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--teal-mid);
+  box-shadow: 0 0 0 3px rgba(13,158,128,.2);
+}
+
+.pd-hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 2.9rem);
+  font-weight: 400;
+  font-style: italic;
+  color: #fff;
+  line-height: 1.06;
+  letter-spacing: -.01em;
+  margin: 0 0 14px;
+}
+
+.pd-hero h1 em {
+  font-style: normal;
+  color: rgba(255,255,255,.45);
+}
+
+.pd-hero-desc {
+  color: rgba(255,255,255,.48);
+  font-size: .9rem;
+  font-weight: 300;
+  line-height: 1.75;
+  max-width: 480px;
+  margin: 0;
+}
+
+.pd-user-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.pd-avatar {
+  width: 52px; height: 52px;
+  border-radius: 16px;
+  background: rgba(13,158,128,.2);
+  border: 1px solid rgba(13,158,128,.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  color: var(--teal-lt);
+  margin-left: auto;
+}
+
+.pd-username {
+  color: rgba(255,255,255,.65);
+  font-size: .82rem;
+  font-weight: 500;
+}
+
+.pd-session-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,.4);
+  font-size: .75rem;
+  font-weight: 400;
+}
+
+.pd-session-dot::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+}
+
+/* ── QUICK ACTIONS ──────────────────────────────── */
+.pd-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.pd-action-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  overflow: hidden;
+  transition: box-shadow .2s, transform .2s, border-color .2s;
+}
+
+.pd-action-card:hover {
+  border-color: var(--teal-mid);
+  box-shadow: 0 8px 32px rgba(13,158,128,.12);
+  transform: translateY(-2px);
+}
+
+.pd-action-top {
+  padding: 22px 22px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.pd-action-icon {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-mid);
+  font-size: 20px;
+  transition: background .2s, color .2s;
+}
+
+.pd-action-card:hover .pd-action-icon {
+  background: var(--teal-xlt);
+  color: var(--teal-dk);
+  border-color: var(--teal-lt);
+}
+
+.pd-action-arrow {
+  width: 28px; height: 28px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-ghost);
+  font-size: 14px;
+  transition: background .2s, color .2s;
+}
+
+.pd-action-card:hover .pd-action-arrow {
+  background: var(--teal-mid);
+  color: #fff;
+}
+
+.pd-action-body {
+  padding: 18px 22px 22px;
+}
+
+.pd-action-body strong {
+  display: block;
+  font-size: .96rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.pd-action-body span {
+  font-size: .82rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+/* ── STATUS SECTION ─────────────────────────────── */
+.pd-status-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.pd-panel {
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.pd-panel-head {
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pd-panel-head h2 {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0;
+}
+
+.pd-panel-tag {
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--teal-xlt);
+  color: var(--teal-xdk);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  display: inline-flex;
+  align-items: center;
+}
+
+.pd-panel-body {
+  padding: 6px 0;
+}
+
+.pd-status-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 22px;
+  border-bottom: 1px solid var(--line);
+  transition: background .14s;
+}
+
+.pd-status-item:last-child { border-bottom: none; }
+.pd-status-item:hover { background: var(--surface-2); }
+
+.pd-status-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .86rem;
+  color: var(--ink-mid);
+  font-weight: 400;
+}
+
+.pd-status-label i {
+  font-size: 16px;
+  color: var(--ink-ghost);
+}
+
+.pd-badge {
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: .7rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+
+.pd-badge.ok   { background: #ecfdf5; color: #166534; }
+.pd-badge.info { background: #eff6ff; color: #1d4ed8; }
+.pd-badge.soft { background: var(--surface-3); color: var(--ink-mid); }
+
+/* ── PROMO PANEL ────────────────────────────────── */
+.pd-promo {
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+}
+
+.pd-promo-icon {
+  width: 44px; height: 44px;
+  border-radius: 14px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal-lt);
+  font-size: 20px;
+}
+
+.pd-promo h3 {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.pd-promo p {
+  font-size: .83rem;
+  color: var(--ink-soft);
+  line-height: 1.65;
+  margin: 0;
+  flex: 1;
+}
+
+.pd-promo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: .83rem;
+  font-weight: 600;
+  text-decoration: none;
+  width: max-content;
+  transition: background .18s;
+}
+
+.pd-promo-btn:hover { background: var(--ink-mid); }
+.pd-promo-btn i { font-size: 15px; opacity: .7; }
+
+/* ── LAYOUT ─────────────────────────────────────── */
+.pd-dashboard { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── RESPONSIVE ─────────────────────────────────── */
+@media (max-width: 860px) {
+  .pd-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pd-status-wrap { grid-template-columns: 1fr; }
+  .pd-hero-grid { grid-template-columns: 1fr; }
+  .pd-user-badge { align-items: flex-start; flex-direction: row; align-items: center; }
+  .pd-avatar { margin-left: 0; }
+}
+
+@media (max-width: 600px) {
+  .pd-main { padding: 0 0 48px; }
+  .pd-hero { border-radius: 18px; padding: 30px 24px 28px; }
+  .pd-actions { grid-template-columns: 1fr; }
+  .pd-panel, .pd-action-card { border-radius: 16px; }
+}
 {% endblock %}
 
 {% block content %}
-<div class="patient-dashboard">
-  <section class="patient-shell">
-    <span class="patient-kicker">Panel paciente</span>
-    <h1>Tu espacio personal, simple y claro.</h1>
-    <p>Desde aca podes entrar rapido a tu ficha, revisar tus datos y confirmar que tu cuenta esta activa dentro de la plataforma.</p>
-    <div class="patient-meta">
-      <span class="patient-pill primary">{{ request.user.username }}</span>
-      <span class="patient-pill">Sesion activa</span>
-    </div>
-  </section>
+<div class="pd-dashboard">
 
-  <section class="patient-grid">
-    <a class="quick-card" href="{% url 'usuario:paciente_mi_perfil' %}">
-      <div class="quick-icon">PF</div>
-      <strong>Mi ficha</strong>
-      <span>Ver todos los datos cargados en tu perfil de paciente.</span>
-    </a>
-
-    <a class="quick-card" href="{% url 'usuario:paciente_mis_psicologos' %}">
-      <div class="quick-icon">MP</div>
-      <strong>Mis psicologos</strong>
-      <span>Espacio reservado para tus profesionales vinculados.</span>
-    </a>
-
-    <a class="quick-card" href="{% url 'usuario:paciente_encontrar_psicologo' %}">
-      <div class="quick-icon">EP</div>
-      <strong>Encontrar a mi psicologo</strong>
-      <span>Explora psicologos activos en un formato mas cercano y facil de elegir.</span>
-    </a>
-  </section>
-
-  <section class="patient-section">
-    <h2>Accesos rapidos</h2>
-    <p>Deje este panel liviano para que solo tengas lo importante a mano.</p>
-
-    <div class="patient-list">
-      <div class="patient-item">
-        <span>Consulta de datos personales y contacto</span>
-        <span class="patient-badge">Disponible</span>
+  <!-- HERO -->
+  <section class="pd-hero">
+    <div class="pd-hero-bg"></div>
+    <div class="pd-hero-grid">
+      <div>
+        <div class="pd-eyebrow">Panel del paciente</div>
+        <h1>Tu espacio de <em>bienestar</em>,<br>organizado para vos.</h1>
+        <p class="pd-hero-desc">Accedé a tu ficha, conectate con profesionales y gestioná tu experiencia dentro de la plataforma desde un solo lugar.</p>
       </div>
-      <div class="patient-item">
-        <span>Visualizacion del estado de tu perfil</span>
-        <span class="patient-badge">Activo</span>
-      </div>
-      <div class="patient-item">
-        <span>Buscador de psicologos activos</span>
-        <span class="patient-badge">Disponible</span>
-      </div>
-      <div class="patient-item">
-        <span>Seccion Mis psicologos</span>
-        <span class="patient-badge neutral">Simplificada</span>
+      <div class="pd-user-badge">
+        <div class="pd-avatar">{{ request.user.username|first|upper }}</div>
+        <span class="pd-username">{{ request.user.username }}</span>
+        <span class="pd-session-dot">Sesión activa</span>
       </div>
     </div>
   </section>
+
+  <!-- QUICK ACTIONS -->
+  <nav class="pd-actions" aria-label="Accesos rápidos">
+
+    <a class="pd-action-card" href="{% url 'usuario:paciente_mi_perfil' %}">
+      <div class="pd-action-top">
+        <div class="pd-action-icon" aria-hidden="true">
+          <i class="ti ti-user-circle"></i>
+        </div>
+        <div class="pd-action-arrow" aria-hidden="true">
+          <i class="ti ti-arrow-right"></i>
+        </div>
+      </div>
+      <div class="pd-action-body">
+        <strong>Mi ficha</strong>
+        <span>Revisá y actualizá los datos cargados en tu perfil de paciente.</span>
+      </div>
+    </a>
+
+    <a class="pd-action-card" href="{% url 'usuario:paciente_mis_psicologos' %}">
+      <div class="pd-action-top">
+        <div class="pd-action-icon" aria-hidden="true">
+          <i class="ti ti-heart-handshake"></i>
+        </div>
+        <div class="pd-action-arrow" aria-hidden="true">
+          <i class="ti ti-arrow-right"></i>
+        </div>
+      </div>
+      <div class="pd-action-body">
+        <strong>Mis psicólogos</strong>
+        <span>Tus profesionales vinculados, reunidos en un espacio reservado para vos.</span>
+      </div>
+    </a>
+
+    <a class="pd-action-card" href="{% url 'usuario:paciente_encontrar_psicologo' %}">
+      <div class="pd-action-top">
+        <div class="pd-action-icon" aria-hidden="true">
+          <i class="ti ti-search"></i>
+        </div>
+        <div class="pd-action-arrow" aria-hidden="true">
+          <i class="ti ti-arrow-right"></i>
+        </div>
+      </div>
+      <div class="pd-action-body">
+        <strong>Encontrar mi psicólogo</strong>
+        <span>Explorá profesionales activos con un formato claro y fácil de navegar.</span>
+      </div>
+    </a>
+
+  </nav>
+
+  <!-- STATUS + PROMO -->
+  <div class="pd-status-wrap">
+
+    <div class="pd-panel">
+      <div class="pd-panel-head">
+        <h2>Estado de tu cuenta</h2>
+        <span class="pd-panel-tag">Todo en orden</span>
+      </div>
+      <div class="pd-panel-body">
+        <div class="pd-status-item">
+          <span class="pd-status-label">
+            <i class="ti ti-id-badge" aria-hidden="true"></i>
+            Datos personales y contacto
+          </span>
+          <span class="pd-badge ok">Disponible</span>
+        </div>
+        <div class="pd-status-item">
+          <span class="pd-status-label">
+            <i class="ti ti-shield-check" aria-hidden="true"></i>
+            Estado del perfil
+          </span>
+          <span class="pd-badge ok">Activo</span>
+        </div>
+        <div class="pd-status-item">
+          <span class="pd-status-label">
+            <i class="ti ti-search" aria-hidden="true"></i>
+            Buscador de psicólogos
+          </span>
+          <span class="pd-badge ok">Disponible</span>
+        </div>
+        <div class="pd-status-item">
+          <span class="pd-status-label">
+            <i class="ti ti-users" aria-hidden="true"></i>
+            Mis psicólogos
+          </span>
+          <span class="pd-badge soft">Simplificado</span>
+        </div>
+        <div class="pd-status-item">
+          <span class="pd-status-label">
+            <i class="ti ti-calendar" aria-hidden="true"></i>
+            Turnos y reservas
+          </span>
+          <span class="pd-badge info">Próximamente</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pd-panel">
+      <div class="pd-promo">
+        <div class="pd-promo-icon" aria-hidden="true">
+          <i class="ti ti-brain"></i>
+        </div>
+        <h3>Encontrá el acompañamiento que necesitás.</h3>
+        <p>Tenemos más de 48 profesionales activos esperando conocerte. Filtrá por especialidad, modalidad o ubicación y agendá tu primera sesión hoy.</p>
+        <a class="pd-promo-btn" href="{% url 'usuario:paciente_encontrar_psicologo' %}">
+          Explorar psicólogos
+          <i class="ti ti-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
 </div>
 {% endblock %}
