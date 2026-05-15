@@ -296,6 +296,12 @@ class PsicologoDetailView(LoginRequiredMixin, DetailView):
     template_name = "psicologo/psicologo_detail.html"
     context_object_name = "psicologo"
 
+    def get_template_names(self):
+        if get_panel_role_for_user(self.request.user) == "paciente":
+            return ["psicologo/psicologo_detail.html"]
+
+        return ["psicologo/psicologo_detail_admin.html"]
+
     def get_queryset(self):
         return Psicologo.objects.select_related(
             "id_estado",
