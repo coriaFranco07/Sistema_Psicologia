@@ -16,8 +16,6 @@
       <span class="psy-role">Psicólogo</span>
       <p class="psy-subtitle">Especialista en {{ ramas_activas_texto|lower }}</p>
       <div class="psy-meta">
-        <span>M.N. {{ psicologo.dni }}</span>
-        <span class="psy-dot">•</span>
         <span>{% if datos_personales and datos_personales.id_provincia %}{{ datos_personales.id_provincia }}{% else %}Perfil verificado{% endif %}</span>
         <span class="psy-rating">★ 4.8</span>
         <span>(96 opiniones)</span>
@@ -36,9 +34,14 @@
   <div class="psy-grid">
     <article class="psy-card psy-about">
       <h2 class="psy-card-title">Sobre mí</h2>
-      <p>{% if ramas_activas|length > 1 %}Soy psicólogo con experiencia acompañando procesos en ramas como {{ ramas_activas_texto|lower }}.{% else %}Soy psicólogo con experiencia acompañando procesos desde el enfoque de {{ ramas_activas_texto|lower }}.{% endif %}</p>
-      <p>Me enfoco en ayudarte a comprender lo que te pasa, manejar tus emociones y encontrar herramientas concretas para avanzar en tu proceso.</p>
-      <p>Trabajo desde un enfoque cercano y basado en la evidencia, adaptado a tus necesidades y objetivos. Mi propósito es que encuentres un espacio seguro para sentirte escuchado.</p>
+      {% if psicologo.sobre_mi %}
+  <p>{{ psicologo.sobre_mi|linebreaksbr }}</p>
+{% else %}
+  <p>
+    Soy psicólogo con experiencia acompañando procesos desde una mirada profesional,
+    cercana y adaptada a las necesidades de cada persona.
+  </p>
+{% endif %}
       <h2 class="psy-card-title">Ramas y valor de sesión</h2>
       <div class="psy-branches">
         {% for rama in ramas_activas %}

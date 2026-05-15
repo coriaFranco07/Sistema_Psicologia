@@ -236,23 +236,31 @@ class PsicologoPendienteForm(UsuarioBaseForm):
 
     class Meta(UsuarioBaseForm.Meta):
         model = PsicologoPendiente
-        fields = USUARIO_BASE_FIELDS + ["titulo"]
+        fields = USUARIO_BASE_FIELDS + ["titulo", "sobre_mi"]
         widgets = {
             **UsuarioBaseForm.Meta.widgets,
             "titulo": forms.ClearableFileInput(
                 attrs={"class": "app-input", "accept": "application/pdf,.pdf"}
             ),
+            "sobre_mi": forms.Textarea(
+                attrs={"class": "app-input", "rows": 4}
+            ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
         self.fields["ramas"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
         if self.instance and self.instance.pk:
             self.fields["ramas"].initial = [
                 rama.pk for rama in self.instance.get_ramas_pendientes()
             ]
+
+        self.fields["sobre_mi"].required = False
         self.fields["titulo"].label = "Titulo"
         self.fields["titulo"].help_text = "Adjunta el titulo profesional en formato PDF. Es obligatorio para enviar la solicitud."
+        self.fields["sobre_mi"].label = "Sobre mí"
+        self.fields["sobre_mi"].help_text = "Descripción breve del enfoque, experiencia y forma de trabajo del psicólogo."
 
     @staticmethod
     def get_active_solicitudes():

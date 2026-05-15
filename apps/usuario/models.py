@@ -326,6 +326,12 @@ class PsicologoPendiente(models.Model):
         verbose_name="Titulo",
         validators=[FileExtensionValidator(["pdf"])],
     )
+    sobre_mi = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Sobre mí",
+        help_text="Descripción breve del enfoque, experiencia y forma de trabajo del psicólogo.",
+    )
     telefono = models.CharField(max_length=25)
     domicilio = models.CharField(max_length=200)
     id_sexo = models.ForeignKey(Sexo, on_delete=models.RESTRICT, verbose_name="Sexo")
