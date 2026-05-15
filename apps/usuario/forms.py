@@ -201,25 +201,11 @@ class UsuarioBaseForm(forms.ModelForm):
 
 
 class PsicologoForm(UsuarioBaseForm):
-    id_rama = forms.ModelChoiceField(
+    ramas = forms.ModelMultipleChoiceField(
         queryset=Rama.objects.none(),
-        label="Rama",
-        widget=forms.Select(attrs={"class": "app-select"}),
-    )
-    valor_sesion = forms.DecimalField(
-        label="Valor de sesion",
-        required=False,
-        min_value=0,
-        max_digits=10,
-        decimal_places=2,
-        widget=forms.NumberInput(
-            attrs={
-                "class": "app-input",
-                "placeholder": "Valor sugerido por sesion",
-                "step": "0.01",
-                "min": "0",
-            }
-        ),
+        label="Ramas",
+        widget=forms.CheckboxSelectMultiple,
+        help_text="Marca todas las ramas en las que querés ofrecer atención profesional.",
     )
 
     class Meta(UsuarioBaseForm.Meta):
@@ -234,23 +220,91 @@ class PsicologoForm(UsuarioBaseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["id_rama"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
-        if self.instance and self.instance.pk and self.instance.id_rama:
-            self.fields["id_rama"].initial = self.instance.id_rama
-            self.fields["valor_sesion"].initial = self.instance.valor_sesion
-        else:
-            self.fields["valor_sesion"].initial = 0
-        self.fields["valor_sesion"].help_text = "Puedes dejarlo en 0 si todavia no quieres definir un valor."
+
+        self.fields["ramas"].queryset = Rama.objects.filter(
+            flg_activo=True
+        ).order_by("dsc_rama")
+
+        if self.instance and self.instance.pk:
+            self.fields["ramas"].initial = list(
+                self.instance.ramas.filter(
+                    id_estado__dsc_estado__iexact="ACTIVO",
+                    id_estado__flg_activo=True,
+                ).values_list("id_rama_id", flat=True)
+            )
+
         self.fields["titulo"].label = "Titulo"
-        self.fields["titulo"].help_text = "Adjunta el titulo profesional en formato PDF. Es obligatorio para enviar la solicitud."
+        self.fields["titulo"].help_text = (
+            "Adjunta el titulo profesional en formato PDF. "
+            "Es obligatorio para enviar la solicitud."
+        )
+
+    def clean_ramas(self):
+        ramas = self.cleaned_data.get("ramas")
+
+        if not ramas:
+            raise ValidationError("Debés seleccionar al menos una rama.")
+
+        return ramas
+
+    def sync_ramas(self, psicologo):
+        estado_activo = get_estado_activo()
+        estado_inactivo = Estado.objects.filter(
+            dsc_estado__iexact="INACTIVO",
+            flg_activo=True,
+        ).first()
+
+        if estado_activo is None:
+            raise ValidationError("No hay un estado ACTIVO configurado.")
+
+        if estado_inactivo is None:
+            raise ValidationError("No hay un estado INACTIVO configurado.")
+
+        ramas_seleccionadas = set(
+            self.cleaned_data["ramas"].values_list("pk", flat=True)
+        )
+
+        relaciones = {
+            relacion.id_rama_id: relacion
+            for relacion in PsicologoRama.objects.filter(
+                id_psicologo=psicologo
+            ).select_related("id_estado", "id_rama")
+        }
+
+        for rama_id in ramas_seleccionadas:
+            relacion = relaciones.get(rama_id)
+
+            if relacion is None:
+                PsicologoRama.objects.create(
+                    id_psicologo=psicologo,
+                    id_rama_id=rama_id,
+                    valor_sesion=0,
+                    id_estado=estado_activo,
+                )
+                continue
+
+            if relacion.id_estado_id != estado_activo.pk:
+                relacion.id_estado = estado_activo
+                relacion.valor_sesion = 0
+                relacion.save(update_fields=["id_estado", "valor_sesion"])
+
+        for rama_id, relacion in relaciones.items():
+            if rama_id not in ramas_seleccionadas and relacion.id_estado_id != estado_inactivo.pk:
+                relacion.id_estado = estado_inactivo
+                relacion.valor_sesion = 0
+                relacion.save(update_fields=["id_estado", "valor_sesion"])
+
+        if hasattr(psicologo, "ramas_activas"):
+            delattr(psicologo, "ramas_activas")
 
     def save(self, commit=True):
         psicologo = super().save(commit=False)
-        psicologo.id_rama = self.cleaned_data.get("id_rama")
-        psicologo.valor_sesion = self.cleaned_data.get("valor_sesion") or 0
+
         if commit:
             psicologo.save()
+            self.sync_ramas(psicologo)
             self.save_m2m()
+
         return psicologo
 
 
