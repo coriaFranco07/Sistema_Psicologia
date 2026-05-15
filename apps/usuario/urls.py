@@ -145,4 +145,9 @@ urlpatterns = [
         views.PacienteDeleteView.as_view(),
         name="paciente_delete",
     ),
+    path(
+        "psicologos/<int:pk>/sobre-mi/",
+        views.PsicologoSobreMiUpdateView.as_view(),
+        name="psicologo_sobre_mi_update",
+    ),
 ]

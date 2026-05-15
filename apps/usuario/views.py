@@ -24,6 +24,7 @@ from .forms import (
     PsicologoOficinaForm,
     PsicologoPendienteForm,
     PsicologoRamaForm,
+    PsicologoSobreMiForm,
 )
 
 from .models import (
@@ -1313,4 +1314,18 @@ class PsicologoIdiomaDeleteView(EstadoToggleMixin, PsicologoOwnerOrStaffMixin, D
         kwargs.pop("user", None)
         kwargs.pop("psicologo", None)
         return kwargs
+    
+
+class PsicologoSobreMiUpdateView(LoginRequiredMixin, UpdateView):
+    model = Psicologo
+    form_class = PsicologoSobreMiForm
+    template_name = "psicologo/psicologo_sobre_mi_form.html"
+    context_object_name = "psicologo"
+
+    def get_success_url(self):
+        return reverse_lazy("usuario:psicologo_detail", kwargs={"pk": self.object.pk})
+
+    def form_valid(self, form):
+        messages.success(self.request, "Sobre mí actualizado correctamente.")
+        return super().form_valid(form)
 

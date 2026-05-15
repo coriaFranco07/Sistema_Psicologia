@@ -43,6 +43,9 @@
       <p>Vista interna con todos los datos del profesional, ramas, contacto, ubicación, título y estado.</p>
     </div>
     <div class="admin-actions">
+              <a class="admin-btn primary" href="{% url 'usuario:psicologo_sobre_mi_update' psicologo.pk %}">
+          Sobre mí
+        </a>
       {% if psicologo.titulo %}
         <a class="admin-btn" href="{{ psicologo.titulo.url }}" target="_blank" rel="noopener">Ver título PDF</a>
       {% endif %}

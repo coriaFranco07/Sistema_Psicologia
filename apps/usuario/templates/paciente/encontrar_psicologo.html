@@ -773,25 +773,6 @@
     </div>
 
     <div class="fp-field">
-      <label class="fp-field-label" for="fp-rama">Especialidad</label>
-      <select id="fp-rama" class="fp-select" name="rama">
-        <option value="">Todas</option>
-        {% for rama in ramas %}
-          <option value="{{ rama.pk }}" {% if rama_seleccionada == rama.pk|stringformat:'s' %}selected{% endif %}>{{ rama.dsc_rama }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="fp-field">
-      <label class="fp-field-label" for="fp-modalidad">Modalidad</label>
-      <select id="fp-modalidad" class="fp-select" name="modalidad">
-        <option value="">Todas</option>
-        <option value="virtual" {% if modalidad_seleccionada == "virtual" %}selected{% endif %}>Online</option>
-        <option value="presencial" {% if modalidad_seleccionada == "presencial" %}selected{% endif %}>Presencial</option>
-      </select>
-    </div>
-
-    <div class="fp-field">
       <label class="fp-field-label" for="fp-provincia">Ubicacion</label>
       <select id="fp-provincia" class="fp-select" name="provincia">
         <option value="">Todas</option>
@@ -840,7 +821,7 @@
       <section class="fp-panel">
         <h2 class="fp-panel-title">Especialidades</h2>
         <div class="fp-chip-grid">
-          {% for rama in ramas|slice:":8" %}
+          {% for rama in ramas %}
             <a class="fp-chip {% if rama_seleccionada == rama.pk|stringformat:'s' %}active{% endif %}" href="{% querystring rama=rama.pk page='' %}">{{ rama.dsc_rama }}</a>
           {% endfor %}
         </div>

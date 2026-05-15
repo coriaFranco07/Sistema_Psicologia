@@ -24,6 +24,9 @@
       </div>
       {% if panel_role != "paciente" %}
       <div class="psy-admin-actions">
+        <a class="admin-btn primary" href="{% url 'usuario:psicologo_sobre_mi_update' psicologo.pk %}">
+          Sobre mí
+        </a>
         {% if psicologo.titulo %}<a class="psy-admin-btn" href="{{ psicologo.titulo.url }}" target="_blank" rel="noopener">Ver título PDF</a>{% endif %}
         <a class="psy-admin-btn primary" href="{% url 'usuario:psicologo_update' psicologo.pk %}">Editar ficha</a>
       </div>
@@ -38,8 +41,7 @@
         <p>{{ psicologo.sobre_mi|linebreaksbr }}</p>
       {% else %}
         <p>
-          Soy psicólogo con experiencia acompañando procesos desde una mirada profesional,
-          cercana y adaptada a las necesidades de cada persona.
+          Cargando...
         </p>
       {% endif %}
       <h2 class="psy-card-title">Ramas y valor de sesión</h2>

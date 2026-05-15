@@ -1,0 +1,179 @@
+{% extends "usuario/base.html" %}
+
+{% block title %}Editar Sobre mí{% endblock %}
+{% block main_class %}about-main{% endblock %}
+
+{% block extra_styles %}
+.about-main{
+    max-width:980px;
+    margin:0 auto;
+    padding:32px 18px 52px;
+    background:#f8fafc;
+}
+.about-page{
+    display:grid;
+    gap:20px;
+}
+.about-hero{
+    padding:30px;
+    border-radius:28px;
+    background:
+        radial-gradient(circle at top right,rgba(20,184,166,.18),transparent 32%),
+        linear-gradient(135deg,#0f172a,#134e4a);
+    color:#fff;
+    box-shadow:0 24px 58px rgba(15,23,42,.16);
+}
+.about-kicker{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.16);
+    font-size:.76rem;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#ccfbf1;
+}
+.about-hero h1{
+    margin:14px 0 8px;
+    font-size:clamp(2rem,4vw,3.3rem);
+    line-height:.96;
+    letter-spacing:-.05em;
+}
+.about-hero p{
+    margin:0;
+    max-width:680px;
+    color:rgba(255,255,255,.78);
+    line-height:1.65;
+}
+.about-card{
+    border:1px solid #e2e8f0;
+    border-radius:28px;
+    background:#fff;
+    box-shadow:0 20px 48px rgba(15,23,42,.07);
+    overflow:hidden;
+}
+.about-form{
+    display:grid;
+    gap:18px;
+    padding:24px;
+}
+.about-field{
+    display:grid;
+    gap:10px;
+}
+.about-label{
+    color:#0f172a;
+    font-size:.9rem;
+    font-weight:950;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+}
+.about-input{
+    width:100%;
+    min-height:280px;
+    resize:vertical;
+    padding:18px;
+    border:1px solid #cbd5e1;
+    border-radius:20px;
+    background:#f8fafc;
+    color:#0f172a;
+    font:inherit;
+    line-height:1.65;
+    box-sizing:border-box;
+}
+.about-input:focus{
+    outline:none;
+    border-color:#14b8a6;
+    box-shadow:0 0 0 4px rgba(20,184,166,.13);
+    background:#fff;
+}
+.about-help{
+    padding:16px 18px;
+    border-radius:20px;
+    background:#ecfeff;
+    border:1px solid #cffafe;
+    color:#155e75;
+    line-height:1.6;
+    font-size:.9rem;
+}
+.about-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    padding-top:6px;
+}
+.about-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:48px;
+    padding:0 18px;
+    border-radius:15px;
+    border:1px solid #cbd5e1;
+    background:#fff;
+    color:#334155;
+    text-decoration:none;
+    font-weight:950;
+    cursor:pointer;
+}
+.about-btn.primary{
+    border-color:#0f766e;
+    background:linear-gradient(135deg,#14b8a6,#0f766e);
+    color:#fff;
+    box-shadow:0 14px 28px rgba(15,118,110,.2);
+}
+.about-btn:hover{
+    transform:translateY(-1px);
+}
+.errorlist{
+    margin:0;
+    padding-left:18px;
+    color:#b91c1c;
+    font-weight:800;
+}
+@media(max-width:640px){
+    .about-hero,.about-form{padding:20px}
+    .about-actions{display:grid}
+    .about-btn{width:100%}
+}
+{% endblock %}
+
+{% block content %}
+<section class="about-page">
+    <header class="about-hero">
+        <span class="about-kicker">Perfil profesional</span>
+        <h1>Editar Sobre mí</h1>
+        <p>
+            Escribí una presentación clara y humana. Esta descripción ayuda a que los pacientes conozcan tu enfoque,
+            tu forma de trabajar y qué pueden esperar de una primera sesión.
+        </p>
+    </header>
+
+    <section class="about-card">
+        <form method="post" class="about-form">
+            {% csrf_token %}
+
+            <div class="about-help">
+                Podés contar tu experiencia, orientación terapéutica, tipo de acompañamiento, población con la que trabajás
+                y qué hace único tu espacio clínico.
+            </div>
+
+            <div class="about-field">
+                <label class="about-label" for="{{ form.sobre_mi.id_for_label }}">Sobre mí</label>
+                {{ form.sobre_mi }}
+                {{ form.sobre_mi.errors }}
+            </div>
+
+            <div class="about-actions">
+                <a class="about-btn" href="{% url 'usuario:psicologo_detail' psicologo.pk %}">Cancelar</a>
+                <button class="about-btn primary" type="submit">Guardar descripción</button>
+            </div>
+        </form>
+    </section>
+</section>
+{% endblock %}

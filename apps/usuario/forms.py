@@ -621,3 +621,23 @@ class PsicologoIdiomaForm(forms.ModelForm):
             self.save_m2m()
 
         return idioma
+
+
+class PsicologoSobreMiForm(forms.ModelForm):
+    class Meta:
+        model = Psicologo
+        fields = ["sobre_mi"]
+        widgets = {
+            "sobre_mi": forms.Textarea(
+                attrs={
+                    "class": "about-input",
+                    "rows": 10,
+                    "placeholder": "Contá quién sos, tu experiencia, tu enfoque terapéutico, cómo trabajás y qué puede esperar una persona en sesión con vos.",
+                }
+            )
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["sobre_mi"].label = "Sobre mí"
+        self.fields["sobre_mi"].required = False
