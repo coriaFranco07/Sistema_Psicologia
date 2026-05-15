@@ -72,12 +72,19 @@ class UsuarioBaseForm(forms.ModelForm):
             "email": forms.EmailInput(attrs={"class": "app-input", "placeholder": "Correo electronico"}),
             "dni": forms.NumberInput(attrs={"class": "app-input", "placeholder": "DNI"}),
             "cuil": forms.TextInput(attrs={"class": "app-input", "placeholder": "CUIL sin guiones"}),
-            "fch_nacimiento": forms.DateInput(attrs={"class": "app-input", "type": "date"}),
+            "fch_nacimiento": forms.DateInput(
+                format="%Y-%m-%d",
+                attrs={
+                    "class": "app-input",
+                    "type": "date",
+                },
+            ),
             "foto": forms.ClearableFileInput(attrs={"class": "app-input"}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["fch_nacimiento"].input_formats = ["%Y-%m-%d"]
         self.original_username = str(self.instance.dni) if self.instance and self.instance.pk and self.instance.dni else None
         is_editing = bool(self.instance and self.instance.pk)
         self.fields["password1"].required = not is_editing
