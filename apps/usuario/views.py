@@ -717,6 +717,7 @@ class PsicologoPendienteApproveView(LoginRequiredMixin, View):
                 foto=solicitud.foto,
                 id_estado=estado_activo,
                 titulo=solicitud.titulo,
+                sobre_mi=solicitud.sobre_mi,
             )
             PsicologoRama.objects.bulk_create(
                 [

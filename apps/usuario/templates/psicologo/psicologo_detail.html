@@ -35,13 +35,13 @@
     <article class="psy-card psy-about">
       <h2 class="psy-card-title">Sobre mí</h2>
       {% if psicologo.sobre_mi %}
-  <p>{{ psicologo.sobre_mi|linebreaksbr }}</p>
-{% else %}
-  <p>
-    Soy psicólogo con experiencia acompañando procesos desde una mirada profesional,
-    cercana y adaptada a las necesidades de cada persona.
-  </p>
-{% endif %}
+        <p>{{ psicologo.sobre_mi|linebreaksbr }}</p>
+      {% else %}
+        <p>
+          Soy psicólogo con experiencia acompañando procesos desde una mirada profesional,
+          cercana y adaptada a las necesidades de cada persona.
+        </p>
+      {% endif %}
       <h2 class="psy-card-title">Ramas y valor de sesión</h2>
       <div class="psy-branches">
         {% for rama in ramas_activas %}
