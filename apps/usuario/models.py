@@ -79,6 +79,12 @@ class UsuarioBase(models.Model):
             validate_photo_size,
         ],
     )
+    sobre_mi = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Sobre mí",
+        help_text="Descripción sobre la persona.",
+    )
     id_estado = models.ForeignKey(
         Estado,
         on_delete=models.RESTRICT,
@@ -132,6 +138,8 @@ class Psicologo(UsuarioBase):
         verbose_name="Titulo",
         validators=[FileExtensionValidator(["pdf"])],
     )
+
+    
 
     class Meta(UsuarioBase.Meta):
         verbose_name = "Psicologo"
