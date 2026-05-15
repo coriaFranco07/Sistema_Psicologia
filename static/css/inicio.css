@@ -142,10 +142,17 @@ input {
   padding: 30px 0 0;
 }
 
-.hero-layout {
+.hero-layout,
+.hero-side,
+.content-grid,
+.resources-block {
   display: grid;
-  grid-template-columns: 1fr;
   gap: 24px;
+}
+
+.hero-layout,
+.hero-side {
+  grid-template-columns: 1fr;
   align-items: start;
 }
 
@@ -177,8 +184,7 @@ input {
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 30% 54%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 40%);
+  background: radial-gradient(circle at 30% 54%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 40%);
   pointer-events: none;
   z-index: 1;
 }
@@ -319,13 +325,6 @@ input {
   transform: scale(1.04);
   transform-origin: center;
   filter: saturate(0.96) brightness(1.02);
-}
-
-.hero-side {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-  align-items: stretch;
 }
 
 .card {
@@ -473,8 +472,7 @@ input {
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(280px, 0.55fr);
   overflow: hidden;
-  background:
-    linear-gradient(135deg, #26184a 0%, #4f24c7 100%);
+  background: linear-gradient(135deg, #26184a 0%, #4f24c7 100%);
   color: #fff;
 }
 
@@ -575,8 +573,6 @@ input {
 
 .content-grid {
   margin-top: 24px;
-  display: grid;
-  gap: 24px;
 }
 
 .psych-cards,
@@ -706,14 +702,13 @@ input {
 }
 
 .content-grid--bottom {
-  grid-template-columns: minmax(0, 1fr) 360px;
-  align-items: start;
-  margin-bottom: 28px;
+  grid-template-columns: minmax(0, 1fr) 390px;
+  align-items: stretch;
+  margin-bottom: 34px;
 }
 
 .resources-block {
-  display: grid;
-  gap: 18px;
+  align-self: stretch;
 }
 
 .resource-cards {
@@ -741,62 +736,105 @@ input {
 }
 
 .newsletter-block {
-  position: sticky;
-  top: 100px;
+  position: relative;
+  top: auto;
+  align-self: stretch;
+  min-height: 100%;
   border-radius: var(--radius-xl);
-  padding: 28px;
+  padding: 34px 30px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(182, 148, 255, 0.24), transparent 34%),
+    linear-gradient(180deg, #ffffff 0%, #fbf8ff 100%);
+}
+
+.newsletter-block::before {
+  content: "";
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  right: -70px;
+  top: -70px;
+  border-radius: 999px;
+  background: rgba(109, 61, 240, 0.08);
+  pointer-events: none;
 }
 
 .newsletter-copy {
   position: relative;
   z-index: 2;
+  display: grid;
+  gap: 10px;
+}
+
+.newsletter-copy h2 {
+  max-width: 310px;
+  color: var(--ink);
+}
+
+.newsletter-copy p {
+  max-width: 320px;
 }
 
 .newsletter-form {
   position: relative;
   z-index: 2;
-  margin-top: 20px;
-  display: flex;
-  gap: 8px;
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  gap: 10px;
 }
 
 .newsletter-form input {
   min-width: 0;
-  flex: 1;
-  min-height: 48px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 0 14px;
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid rgba(109, 61, 240, 0.14);
+  border-radius: 18px;
+  padding: 0 16px;
   outline: 0;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 12px 28px rgba(51, 30, 93, 0.045);
+}
+
+.newsletter-form input:focus {
+  border-color: rgba(109, 61, 240, 0.4);
+  box-shadow: 0 0 0 4px rgba(109, 61, 240, 0.1);
 }
 
 .newsletter-form button {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border: 0;
-  border-radius: 14px;
-  background: var(--brand);
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-deep));
   color: #fff;
   cursor: pointer;
+  box-shadow: 0 14px 28px rgba(109, 61, 240, 0.22);
 }
 
 .newsletter-note {
   position: relative;
   z-index: 2;
-  margin: 12px 0 0;
+  margin: 14px 0 0;
   color: var(--ink-muted);
   font-size: .82rem;
   line-height: 1.55;
+  max-width: 320px;
 }
 
 .newsletter-envelope {
   position: absolute;
-  right: -40px;
-  bottom: -46px;
-  width: 180px;
-  height: 130px;
-  opacity: .14;
+  right: -34px;
+  bottom: -38px;
+  width: 190px;
+  height: 138px;
+  opacity: .1;
+  pointer-events: none;
 }
 
 .site-footer {
@@ -892,6 +930,10 @@ input {
   .site-footer__cols {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .newsletter-block {
+    min-height: auto;
+  }
 }
 
 @media (max-width: 720px) {
@@ -929,6 +971,15 @@ input {
   }
 
   .newsletter-block {
-    position: static;
+    position: relative;
+    padding: 28px 22px;
+  }
+
+  .newsletter-form {
+    grid-template-columns: 1fr;
+  }
+
+  .newsletter-form button {
+    width: 100%;
   }
 }
