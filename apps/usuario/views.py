@@ -562,7 +562,6 @@ class PsicologoFormView(LoginRequiredMixin, View):
         else:
             perfil_description = "Selecciona la rama profesional, define el valor por sesion y agrega una foto si deseas."
             perfil_fields = [
-                form["ramas"],
                 form["titulo"],
                 form["foto"],
             ]
