@@ -1,7 +1,32 @@
+import os
 from pathlib import Path
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def _load_env_file(env_path):
+    values = {}
+    if not env_path.exists():
+        return values
+
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key:
+            values[key] = value
+    return values
+
+
+ENV_VALUES = _load_env_file(BASE_DIR / ".env")
+
+
+def env(name, default=""):
+    return os.getenv(name, ENV_VALUES.get(name, default))
 
 SECRET_KEY = "django-insecure-(6)9+nt=!u!frx$+3fm#jlrng63z=&9w9xc6==8eaq2)vx83r2"
 
@@ -101,3 +126,32 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "usuario:psicologo_list"
 LOGOUT_REDIRECT_URL = "home"
+
+
+CORREO_OFICIAL = env("CORREO_OFICIAL", "no-reply@menteclara.local")
+PASSWORD_CORREO = env("PASSWORD_CORREO", "")
+
+
+def _infer_email_host(address):
+    domain = address.split("@", 1)[1].lower() if "@" in address else ""
+    if domain in {"gmail.com", "googlemail.com"}:
+        return "smtp.gmail.com"
+    if domain in {"outlook.com", "hotmail.com", "live.com", "office365.com"}:
+        return "smtp.office365.com"
+    if domain:
+        return f"smtp.{domain}"
+    return "localhost"
+
+
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.smtp.EmailBackend" if PASSWORD_CORREO else "django.core.mail.backends.console.EmailBackend",
+)
+EMAIL_HOST = env("EMAIL_HOST", _infer_email_host(CORREO_OFICIAL))
+EMAIL_PORT = int(env("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", CORREO_OFICIAL)
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", PASSWORD_CORREO)
+EMAIL_USE_TLS = env("EMAIL_USE_TLS", "true").lower() in {"1", "true", "yes", "on"}
+EMAIL_USE_SSL = env("EMAIL_USE_SSL", "false").lower() in {"1", "true", "yes", "on"}
+DEFAULT_FROM_EMAIL = CORREO_OFICIAL
+SERVER_EMAIL = CORREO_OFICIAL

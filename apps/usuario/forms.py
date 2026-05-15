@@ -25,6 +25,7 @@ from apps.parametro.models.metodo_pago import MetodoPago
 from .models import (
     MAX_SIZE_MB,
     Paciente,
+    PacientePendiente,
     Psicologo,
     PsicologoIdioma,
     PsicologoMetodoPago,
@@ -63,6 +64,25 @@ class DatosPersonalesSolicitudForm(forms.Form):
         self.fields["id_provincia"].queryset = Provincia.objects.filter(flg_activo=True).order_by("dsc_provincia")
         self.fields["id_localidad"].queryset = Localidad.objects.filter(flg_activo=True).order_by("dsc_localidad")
         self.fields["id_zona"].queryset = Zona.objects.filter(flg_activo=True).order_by("dsc_zona")
+
+
+class ObservacionRechazoForm(forms.Form):
+    observacion_rechazo = forms.CharField(
+        label="Motivo del rechazo",
+        widget=forms.Textarea(
+            attrs={
+                "class": "app-input",
+                "rows": 5,
+                "placeholder": "Escribe el motivo por el que se rechaza la solicitud.",
+            }
+        ),
+    )
+
+    def clean_observacion_rechazo(self):
+        observacion = self.cleaned_data["observacion_rechazo"].strip()
+        if not observacion:
+            raise ValidationError("Debes indicar el motivo del rechazo.")
+        return observacion
 
 
 class UsuarioBaseForm(forms.ModelForm):
@@ -390,13 +410,92 @@ class PacienteForm(UsuarioBaseForm):
     class Meta(UsuarioBaseForm.Meta):
         model = Paciente
         fields = USUARIO_BASE_FIELDS + ["id_ocupacion", "id_grado_estudio"]
-        widgets = {**UsuarioBaseForm.Meta.widgets, "id_ocupacion": forms.Select(attrs={"class": "app-select"}), "id_grado_estudio": forms.Select(attrs={"class": "app-select"})}
+        widgets = {
+            **UsuarioBaseForm.Meta.widgets,
+            "sobre_mi": forms.Textarea(attrs={"class": "app-textarea", "rows": 4}),
+            "id_ocupacion": forms.Select(attrs={"class": "app-select"}),
+            "id_grado_estudio": forms.Select(attrs={"class": "app-select"}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["fch_nacimiento"].help_text = "Con esta fecha el sistema calcula automaticamente el ciclo de vida."
         self.fields["id_ocupacion"].queryset = Ocupacion.objects.filter(flg_activo=True).order_by("dsc_ocupacion")
         self.fields["id_grado_estudio"].queryset = GradoEstudio.objects.filter(flg_activo=True).order_by("dsc_grado_estudio")
+
+
+class PacientePendienteForm(UsuarioBaseForm):
+    class Meta(UsuarioBaseForm.Meta):
+        model = PacientePendiente
+        fields = USUARIO_BASE_FIELDS + ["id_ocupacion", "id_grado_estudio"]
+        widgets = {
+            **UsuarioBaseForm.Meta.widgets,
+            "sobre_mi": forms.Textarea(attrs={"class": "app-textarea", "rows": 4}),
+            "id_ocupacion": forms.Select(attrs={"class": "app-select"}),
+            "id_grado_estudio": forms.Select(attrs={"class": "app-select"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["fch_nacimiento"].help_text = (
+            "Con esta fecha el sistema calcula automaticamente el ciclo de vida."
+        )
+        self.fields["id_ocupacion"].queryset = Ocupacion.objects.filter(
+            flg_activo=True
+        ).order_by("dsc_ocupacion")
+        self.fields["id_grado_estudio"].queryset = GradoEstudio.objects.filter(
+            flg_activo=True
+        ).order_by("dsc_grado_estudio")
+
+    @staticmethod
+    def get_active_solicitudes():
+        return PacientePendiente.objects.exclude(estado=PacientePendiente.ESTADO_RECHAZADO)
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email", "").strip().lower()
+        if Paciente.objects.filter(email__iexact=email).exists():
+            raise ValidationError("Ya existe un paciente aprobado con este correo electronico.")
+        if self.get_active_solicitudes().filter(email__iexact=email).exists():
+            raise ValidationError("Ya existe una solicitud pendiente o aprobada con este correo electronico.")
+        return email
+
+    def clean_dni(self):
+        dni = self.cleaned_data.get("dni")
+        if dni and not re.match(r"^\d{7,8}$", str(dni)):
+            raise ValidationError("El DNI debe tener 7 u 8 digitos.")
+        if dni and Paciente.objects.filter(dni=dni).exists():
+            raise ValidationError("Ya existe un paciente aprobado con este DNI.")
+        if dni and self.get_active_solicitudes().filter(dni=dni).exists():
+            raise ValidationError("Ya existe una solicitud pendiente o aprobada con este DNI.")
+        username = str(dni) if dni else ""
+        if username and get_user_model().objects.filter(username=username).exists():
+            raise ValidationError("Ya existe un usuario de acceso con este DNI.")
+        return dni
+
+    def clean_cuil(self):
+        cuil = self.cleaned_data.get("cuil")
+        dni = self.cleaned_data.get("dni")
+        if not cuil:
+            return cuil
+        cuil = str(cuil).strip()
+        if not re.match(r"^\d{11}$", cuil):
+            raise ValidationError("El CUIL debe tener 11 digitos sin guiones.")
+        if dni and cuil[2:10] != str(dni).zfill(8):
+            raise ValidationError("Los digitos centrales del CUIL deben coincidir con el DNI.")
+        if Paciente.objects.filter(cuil=cuil).exists():
+            raise ValidationError("Ya existe un paciente aprobado con este CUIL.")
+        if self.get_active_solicitudes().filter(cuil=cuil).exists():
+            raise ValidationError("Ya existe una solicitud pendiente o aprobada con este CUIL.")
+        return cuil
+
+    def save(self, commit=True):
+        solicitud = super().save(commit=False)
+        solicitud.password_hash = make_password(self.cleaned_data["password1"])
+        solicitud.estado = PacientePendiente.ESTADO_PENDIENTE
+        solicitud.assign_ciclo_vida_from_birth_date()
+        if commit:
+            solicitud.save()
+        return solicitud
 
 
 class PsicologoOficinaForm(forms.ModelForm):

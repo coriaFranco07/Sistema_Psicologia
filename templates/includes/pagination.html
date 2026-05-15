@@ -1,28 +1,61 @@
 {% load querystring %}
-{% if is_paginated %}
 <style>
-.app-pagination{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:16px 18px;border-top:1px solid #e2e8f0;background:#fff}.app-pagination-summary{color:#64748b;font-size:.9rem;font-weight:700}.app-pagination-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.app-pagination-link,.app-pagination-current{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 12px;border-radius:12px;border:1px solid #dbe3ef;background:#fff;color:#334155;text-decoration:none;font-size:.9rem;font-weight:800}.app-pagination-link:hover{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}.app-pagination-link.is-disabled{background:#f8fafc;color:#94a3b8;pointer-events:none}.app-pagination-current{background:#0f172a;border-color:#0f172a;color:#fff}@media(max-width:720px){.app-pagination{padding:14px}.app-pagination-summary,.app-pagination-links{width:100%}.app-pagination-links{justify-content:flex-start}}
+.app-pagination{display:grid;gap:14px;padding:18px;border-top:1px solid #e2e8f0;background:#fff}.app-pagination-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.app-pagination-summary{color:#64748b;font-size:.9rem;font-weight:700}.app-pagination-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.app-pagination-size-form{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.app-pagination-label{color:#475569;font-size:.85rem;font-weight:800}.app-pagination-select{min-width:110px;min-height:40px;padding:0 40px 0 12px;border-radius:12px;border:1px solid #dbe3ef;background:#fff;color:#334155;font-size:.9rem;font-weight:800;appearance:none;background-image:linear-gradient(45deg,transparent 50%,#64748b 50%),linear-gradient(135deg,#64748b 50%,transparent 50%);background-position:calc(100% - 18px) calc(50% - 2px),calc(100% - 12px) calc(50% - 2px);background-size:6px 6px,6px 6px;background-repeat:no-repeat}.app-pagination-export,.app-pagination-link,.app-pagination-current{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 12px;border-radius:12px;border:1px solid #dbe3ef;background:#fff;color:#334155;text-decoration:none;font-size:.9rem;font-weight:800}.app-pagination-export:hover,.app-pagination-link:hover{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}.app-pagination-export{background:#f8fafc}.app-pagination-export.excel{border-color:#bbf7d0;background:#f0fdf4;color:#166534}.app-pagination-export.pdf{border-color:#fecaca;background:#fef2f2;color:#b91c1c}.app-export-icon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:7px;font-size:.72rem;font-weight:950;letter-spacing:.03em}.app-pagination-export.excel .app-export-icon{background:#16a34a;color:#fff}.app-pagination-export.pdf .app-export-icon{background:#dc2626;color:#fff}.app-pagination-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.app-pagination-link.is-disabled{background:#f8fafc;color:#94a3b8;pointer-events:none}.app-pagination-current{background:#0f172a;border-color:#0f172a;color:#fff}@media(max-width:720px){.app-pagination{padding:14px}.app-pagination-top,.app-pagination-links,.app-pagination-tools,.app-pagination-size-form{width:100%}.app-pagination-top,.app-pagination-tools{align-items:flex-start}.app-pagination-links{justify-content:flex-start}.app-pagination-select{width:100%}}
 </style>
+
 <nav class="app-pagination" aria-label="Paginacion">
-  <span class="app-pagination-summary">
-    Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ paginator.count }} registros
-  </span>
-  <div class="app-pagination-links">
-    {% if page_obj.has_previous %}
-      <a class="app-pagination-link" href="{% querystring page=1 %}">Primera</a>
-      <a class="app-pagination-link" href="{% querystring page=page_obj.previous_page_number %}">Anterior</a>
-    {% else %}
-      <span class="app-pagination-link is-disabled">Primera</span>
-      <span class="app-pagination-link is-disabled">Anterior</span>
-    {% endif %}
-    <span class="app-pagination-current">Pagina {{ page_obj.number }} de {{ paginator.num_pages }}</span>
-    {% if page_obj.has_next %}
-      <a class="app-pagination-link" href="{% querystring page=page_obj.next_page_number %}">Siguiente</a>
-      <a class="app-pagination-link" href="{% querystring page=paginator.num_pages %}">Ultima</a>
-    {% else %}
-      <span class="app-pagination-link is-disabled">Siguiente</span>
-      <span class="app-pagination-link is-disabled">Ultima</span>
-    {% endif %}
+  <div class="app-pagination-top">
+    <div class="app-pagination-tools">
+      <form method="get" class="app-pagination-size-form">
+        {% for key, value in request.GET.items %}
+          {% if key != 'per_page' and key != 'page' and key != 'export' %}
+            <input type="hidden" name="{{ key }}" value="{{ value }}">
+          {% endif %}
+        {% endfor %}
+        <label class="app-pagination-label" for="per-page-select">Mostrar:</label>
+        <select id="per-page-select" class="app-pagination-select" name="per_page" onchange="this.form.submit()">
+          {% for option in per_page_options %}
+            <option value="{{ option.value }}" {% if selected_per_page == option.value %}selected{% endif %}>{{ option.label }}</option>
+          {% endfor %}
+        </select>
+      </form>
+
+      {% if table_export_enabled %}
+        <a class="app-pagination-export excel" href="{% querystring export='excel' page='' %}" aria-label="Descargar Excel" title="Descargar Excel">
+          <span class="app-export-icon">XLS</span>
+        </a>
+        <a class="app-pagination-export pdf" href="{% querystring export='pdf' page='' %}" aria-label="Descargar PDF" title="Descargar PDF">
+          <span class="app-export-icon">PDF</span>
+        </a>
+      {% endif %}
+    </div>
+
+    <span class="app-pagination-summary">
+      {% if is_paginated %}
+        Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ paginator.count }} registros
+      {% else %}
+        Mostrando {{ table_total_count }} registros
+      {% endif %}
+    </span>
   </div>
+
+  {% if is_paginated %}
+    <div class="app-pagination-links">
+      {% if page_obj.has_previous %}
+        <a class="app-pagination-link" href="{% querystring page=1 %}">Primera</a>
+        <a class="app-pagination-link" href="{% querystring page=page_obj.previous_page_number %}">Anterior</a>
+      {% else %}
+        <span class="app-pagination-link is-disabled">Primera</span>
+        <span class="app-pagination-link is-disabled">Anterior</span>
+      {% endif %}
+      <span class="app-pagination-current">Pagina {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a class="app-pagination-link" href="{% querystring page=page_obj.next_page_number %}">Siguiente</a>
+        <a class="app-pagination-link" href="{% querystring page=paginator.num_pages %}">Ultima</a>
+      {% else %}
+        <span class="app-pagination-link is-disabled">Siguiente</span>
+        <span class="app-pagination-link is-disabled">Ultima</span>
+      {% endif %}
+    </div>
+  {% endif %}
 </nav>
-{% endif %}

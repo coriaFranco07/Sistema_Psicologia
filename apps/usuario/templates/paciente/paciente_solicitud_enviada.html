@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solicitud enviada | MenteClara</title>
+  <meta http-equiv="refresh" content="6;url={% url 'home' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#fcfaf7;--panel:#ffffff;--ink:#25174a;--ink-soft:#61597c;--line:rgba(74,52,124,.12);--brand:#6d3df0;--brand-deep:#4f24c7;--shadow:0 28px 60px rgba(51,30,93,.12)}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:"Plus Jakarta Sans",sans-serif;background:radial-gradient(circle at top left,rgba(182,148,255,.18),transparent 24%),radial-gradient(circle at top right,rgba(208,191,255,.2),transparent 22%),linear-gradient(180deg,#fffdfb 0%,var(--bg) 100%);color:var(--ink)}.success-shell{min-height:100vh;display:grid;place-items:center;padding:28px}.success-card{width:min(860px,100%);display:grid;gap:24px;padding:44px 42px;border:1px solid var(--line);border-radius:32px;background:linear-gradient(135deg,#fff,rgba(251,248,255,.96));box-shadow:var(--shadow)}.success-brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:inherit}.success-logo{width:64px;height:64px;object-fit:contain}.success-brand strong{display:block;font-size:1.2rem}.success-brand span{display:block;color:var(--ink-soft);font-size:.92rem}.success-badge{display:inline-flex;width:max-content;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;background:rgba(109,61,240,.1);color:var(--brand-deep);font-weight:800;font-size:.86rem}.success-badge::before{content:"";width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg,var(--brand),#9c7eff)}h1{margin:0;font-family:"Instrument Serif",Georgia,serif;font-size:clamp(2.6rem,5vw,4.4rem);line-height:.94;letter-spacing:-.05em}p{margin:0;color:var(--ink-soft);font-size:1.02rem;line-height:1.8}.success-highlight{padding:18px 20px;border-radius:22px;background:#f8f4ff;border:1px solid rgba(109,61,240,.12)}.success-highlight strong{display:block;margin-bottom:8px;color:var(--ink);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}.success-highlight span{color:var(--brand-deep);font-size:1.05rem;font-weight:800;word-break:break-word}.success-actions{display:flex;flex-wrap:wrap;gap:14px;padding-top:8px}.success-btn{display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 24px;border-radius:18px;text-decoration:none;font-weight:800;transition:transform .18s ease,filter .18s ease}.success-btn:hover{transform:translateY(-1px)}.success-btn--primary{background:linear-gradient(135deg,var(--brand),var(--brand-deep));color:#fff;box-shadow:0 18px 34px rgba(109,61,240,.22)}.success-btn--ghost{border:1px solid var(--line);background:#fff;color:var(--ink)}.success-note{font-size:.88rem}@media(max-width:720px){.success-shell{padding:18px}.success-card{padding:30px 22px;border-radius:24px}.success-logo{width:54px;height:54px}.success-actions{display:grid}.success-btn{width:100%}}
+  </style>
+</head>
+<body>
+  <main class="success-shell">
+    <section class="success-card">
+      <a class="success-brand" href="{% url 'home' %}">
+        <img class="success-logo" src="{% static 'images/MenteClara_sinFondo.png' %}" alt="MenteClara">
+        <span>
+          <strong>MenteClara</strong>
+          <span>Alta de pacientes</span>
+        </span>
+      </a>
+
+      <span class="success-badge">Solicitud enviada exitosamente</span>
+
+      <div>
+        <h1>Tu solicitud quedó en revisión.</h1>
+        <p>En menos de 24 hs se te aprobará el perfil y serás notificado al correo asignado que cargaste en la solicitud.</p>
+      </div>
+
+      <div class="success-highlight">
+        <strong>Correo de notificación</strong>
+        <span>{% if email_solicitud %}{{ email_solicitud }}{% else %}Se usará el correo que indicaste en el formulario.{% endif %}</span>
+      </div>
+
+      <div class="success-actions">
+        <a class="success-btn success-btn--primary" href="{% url 'home' %}">Volver al inicio</a>
+        <a class="success-btn success-btn--ghost" href="{% url 'login' %}">Ir al login</a>
+      </div>
+
+      <p class="success-note">Te redirigiremos automáticamente al inicio en unos segundos.</p>
+    </section>
+  </main>
+</body>
+</html>

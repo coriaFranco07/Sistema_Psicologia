@@ -259,12 +259,21 @@ main.list-main {
     align-items: center;
     justify-content: flex-start;
     width: 100%;
-    padding: 0 12px;
-    border-radius: 8px;
+    padding: 0 14px;
+    border-radius: 13px;
     text-decoration: none;
-    font-size: 0.88rem;
-    font-weight: 800;
+    font-size: 0.84rem;
+    font-weight: 950;
+    letter-spacing: 0.01em;
     border: 1px solid transparent;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+}
+
+.action-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.14);
+    filter: saturate(1.08);
 }
 
 .action-menu {
@@ -277,22 +286,24 @@ main.list-main {
 }
 
 .action-menu-summary {
-    min-height: 40px;
+    min-height: 38px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     padding: 0 14px;
     border: 1px solid #cbd5e1;
-    border-radius: 10px;
+    border-radius: 13px;
     background: #ffffff;
     color: #334155;
-    font-size: 0.88rem;
-    font-weight: 800;
+    font-size: 0.84rem;
+    font-weight: 950;
+    letter-spacing: 0.01em;
     cursor: pointer;
     list-style: none;
-    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background-color 0.16s ease;
     user-select: none;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
 }
 
 .action-menu-summary::-webkit-details-marker {
@@ -303,7 +314,8 @@ main.list-main {
 .action-menu[open] .action-menu-summary {
     border-color: #93c5fd;
     background: #f8fbff;
-    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.14);
+    transform: translateY(-2px);
 }
 
 .action-menu-caret {
@@ -416,6 +428,7 @@ main.list-main {
     </div>
 
     <div class="table-panel">
+    {% include "includes/pagination.html" %}
     <table class="modern-table">
         <thead>
             <tr>
@@ -508,7 +521,6 @@ main.list-main {
             {% endfor %}
         </tbody>
     </table>
-    {% include "includes/pagination.html" %}
     </div>
 </section>
 {% endblock %}

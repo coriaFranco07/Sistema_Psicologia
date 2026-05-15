@@ -1,0 +1,95 @@
+{% extends "usuario/base.html" %}
+
+{% block title %}Solicitudes de Pacientes{% endblock %}
+{% block main_class %}pending-main{% endblock %}
+
+{% block extra_styles %}
+main.pending-main{max-width:1240px;margin:0 auto;padding:32px 20px 48px}.pending-page{display:grid;gap:18px}.pending-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;padding:22px 0 10px}.pending-kicker{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:#e0f2fe;color:#0369a1;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.pending-hero h1{margin:12px 0 6px;color:#0f172a;font-size:2rem;line-height:1.1}.pending-hero p{margin:0;color:#64748b;line-height:1.55}.pending-count{min-width:150px;padding:14px 16px;border:1px solid #dbe3ef;border-radius:8px;background:#fff;color:#475569;text-align:right}.pending-count strong{display:block;color:#0f172a;font-size:1.45rem}.pending-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px;border:1px solid #dbe3ef;border-radius:8px;background:#fff;box-shadow:0 14px 32px rgba(15,23,42,.06)}.pending-search{display:flex;flex:1;gap:10px}.pending-input,.pending-select{min-height:44px;padding:0 14px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#0f172a}.pending-input{width:100%}.pending-table-panel{overflow:hidden;border:1px solid #dbe3ef;border-radius:8px;background:#fff;box-shadow:0 18px 44px rgba(15,23,42,.07)}.pending-table{width:100%;border-collapse:separate;border-spacing:0}.pending-table th{padding:14px 18px;border-bottom:1px solid #e2e8f0;background:#f8fafc;color:#475569;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}.pending-table td{padding:16px 18px;border-bottom:1px solid #edf2f7;color:#334155;vertical-align:top}.pending-table tr:last-child td{border-bottom:none}.pending-name{display:block;color:#0f172a;font-weight:800}.pending-sub{display:block;margin-top:4px;color:#64748b;font-size:.9rem}.status-pill{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:.84rem;font-weight:800}.status-pill.is-aprobado{background:#dcfce7;color:#166534}.status-pill.is-rechazado{background:#fee2e2;color:#991b1b}.pending-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.btn-modern{min-height:38px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 14px;border-radius:13px;border:1px solid transparent;font-size:.84rem;font-weight:950;letter-spacing:.01em;text-decoration:none;white-space:nowrap;cursor:pointer;box-shadow:0 10px 22px rgba(15,23,42,.08);transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}.btn-modern:hover{transform:translateY(-2px);box-shadow:0 16px 30px rgba(15,23,42,.14);filter:saturate(1.08)}.btn-modern-primary{border-color:#bbf7d0;background:#ecfdf5;color:#166534}.btn-modern-danger{border-color:#fee2e2;background:#fef2f2;color:#b91c1c}.btn-modern-secondary{border-color:#cbd5e1;background:#fff;color:#334155}.btn-modern-info{border-color:#0ea5e9;background:#eff6ff;color:#0369a1}.empty-table{padding:44px 18px;color:#64748b;text-align:center}@media(max-width:860px){main.pending-main{padding:20px 14px 34px}.pending-hero,.pending-toolbar,.pending-search{flex-direction:column;align-items:stretch}.pending-count{text-align:left}.pending-table-panel{overflow-x:auto}.pending-table{min-width:880px}}
+{% endblock %}
+
+{% block content %}
+<section class="pending-page">
+  <div class="pending-hero">
+    <div>
+      <span class="pending-kicker">Revisión de pacientes</span>
+      <h1>Solicitudes de Pacientes</h1>
+      <p>Revisa las solicitudes enviadas y aprueba solo las que deban pasar a la tabla final de pacientes.</p>
+    </div>
+    <div class="pending-count">
+      <strong>{{ total_resultados }}</strong>
+      solicitudes encontradas
+    </div>
+  </div>
+
+  <form class="pending-toolbar" method="get">
+    <div class="pending-search">
+      <input class="pending-input" type="search" name="q" value="{{ query }}" placeholder="Buscar por nombre, DNI, correo, ocupación o estado">
+      <select class="pending-select" name="estado">
+        <option value="">Todos los estados</option>
+        {% for estado_value, estado_label in estados %}
+          <option value="{{ estado_value }}" {% if estado_seleccionado == estado_value %}selected{% endif %}>{{ estado_label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="btn-modern btn-modern-secondary" type="submit">Filtrar</button>
+  </form>
+
+  <div class="pending-table-panel">
+    {% include "includes/pagination.html" with page_obj=page_obj %}
+    <table class="pending-table">
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Contacto</th>
+          <th>Perfil</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for solicitud in solicitudes %}
+          <tr>
+            <td>
+              <span class="pending-name">{{ solicitud.nombres }}</span>
+              <span class="pending-sub">DNI {{ solicitud.dni }}</span>
+            </td>
+            <td>
+              <span class="pending-name">{{ solicitud.email }}</span>
+              <span class="pending-sub">{{ solicitud.telefono }}</span>
+            </td>
+            <td>
+              <span class="pending-name">{{ solicitud.id_ocupacion }}</span>
+              <span class="pending-sub">{{ solicitud.id_ciclo_vida }} · {{ solicitud.id_grado_estudio }}</span>
+            </td>
+            <td>
+              <span class="status-pill{% if solicitud.estado == 'APROBADO' %} is-aprobado{% elif solicitud.estado == 'RECHAZADO' %} is-rechazado{% endif %}">
+                {{ solicitud.get_estado_display }}
+              </span>
+            </td>
+            <td>
+              <div class="pending-actions">
+                <a class="btn-modern btn-modern-info" href="{% url 'usuario:paciente_pendiente_detail' solicitud.pk %}">Ver ficha</a>
+                {% if solicitud.estado == 'PENDIENTE' %}
+                  <form method="post" action="{% url 'usuario:paciente_pendiente_confirmar' solicitud.pk %}">
+                    {% csrf_token %}
+                    <button class="btn-modern btn-modern-primary" type="submit">Aprobar</button>
+                  </form>
+                  <form method="post" action="{% url 'usuario:paciente_pendiente_rechazar' solicitud.pk %}">
+                    {% csrf_token %}
+                    <button class="btn-modern btn-modern-danger" type="submit">Rechazar</button>
+                  </form>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td class="empty-table" colspan="5">No hay solicitudes de pacientes para mostrar.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</section>
+{% endblock %}

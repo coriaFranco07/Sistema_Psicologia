@@ -5,19 +5,23 @@ from django.db import transaction
 from django.db.models import CharField, Prefetch, Q
 from django.db.models.functions import Cast
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.encoding import force_str
 from django.utils import timezone
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
 from apps.parametro.models import Provincia, Rama
-from apps.core.views import get_estado_activo, get_estado_inactivo
+from apps.core.notifications import send_profile_approved_email, send_profile_submission_email
+from apps.core.views import TableListSupportMixin, get_estado_activo, get_estado_inactivo
 from apps.datos_personales.forms import DatosPersonalesForm
 from apps.datos_personales.models import DatosPersonales
 from principal.auth_utils import get_panel_role_for_user
 
 from .forms import (
     DatosPersonalesSolicitudForm,
+    ObservacionRechazoForm,
     PacienteForm,
+    PacientePendienteForm,
     PacienteSobreMiForm,
     PsicologoForm,
     PsicologoIdiomaForm,
@@ -30,6 +34,7 @@ from .forms import (
 
 from .models import (
     Paciente,
+    PacientePendiente,
     Psicologo,
     PsicologoIdioma,
     PsicologoMetodoPago,
@@ -171,11 +176,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class PsicologoPendienteListView(LoginRequiredMixin, ListView):
+class PsicologoPendienteListView(TableListSupportMixin, LoginRequiredMixin, ListView):
     model = PsicologoPendiente
     template_name = "psicologo/psicologo_pendiente.html"
     context_object_name = "solicitudes"
     paginate_by = 10
+    export_filename = "solicitudes_psicologos"
+    export_title = "Solicitudes de psicologos"
 
     def get_queryset(self):
         queryset = (
@@ -219,6 +226,16 @@ class PsicologoPendienteListView(LoginRequiredMixin, ListView):
         context["total_resultados"] = self.object_list.count()
         return context
 
+    def get_export_columns(self):
+        return [
+            ("Solicitante", lambda solicitud: solicitud.nombres),
+            ("Email", lambda solicitud: solicitud.email),
+            ("DNI", lambda solicitud: solicitud.dni),
+            ("Ramas", lambda solicitud: solicitud.ramas_descripcion),
+            ("Estado", lambda solicitud: solicitud.get_estado_display()),
+            ("Fecha", lambda solicitud: timezone.localtime(solicitud.fch_creacion).strftime("%d/%m/%Y %H:%M")),
+        ]
+
 
 class PsicologoPendienteDetailView(LoginRequiredMixin, DetailView):
     model = PsicologoPendiente
@@ -236,12 +253,19 @@ class PsicologoPendienteDetailView(LoginRequiredMixin, DetailView):
             "psicologo",
         ).prefetch_related(get_psicologo_pendiente_ramas_prefetch())
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mostrar_boton_observacion"] = bool(self.object.observacion_rechazo)
+        return context
 
-class PsicologoListView(LoginRequiredMixin, ListView):
+
+class PsicologoListView(TableListSupportMixin, LoginRequiredMixin, ListView):
     model = Psicologo
     template_name = "psicologo/psicologo_list.html"
     context_object_name = "psicologos"
     paginate_by = 10
+    export_filename = "psicologos"
+    export_title = "Listado de psicologos"
 
     def get_queryset(self):
         queryset = (
@@ -291,6 +315,36 @@ class PsicologoListView(LoginRequiredMixin, ListView):
         context["query"] = self.request.GET.get("q", "").strip()
         context["total_resultados"] = self.object_list.count()
         return context
+
+    def get_export_columns(self):
+        return [
+            ("Perfil", lambda psicologo: psicologo.nombres),
+            ("DNI", lambda psicologo: psicologo.dni),
+            ("CUIL", lambda psicologo: psicologo.cuil or ""),
+            ("Email", lambda psicologo: psicologo.email),
+            (
+                "Telefono",
+                lambda psicologo: getattr(psicologo.datos_personales_rel, "telefono", ""),
+            ),
+            (
+                "Fecha nacimiento",
+                lambda psicologo: psicologo.fch_nacimiento.strftime("%d/%m/%Y") if psicologo.fch_nacimiento else "",
+            ),
+            (
+                "Ubicacion",
+                lambda psicologo: " - ".join(
+                    filter(
+                        None,
+                        [
+                            force_str(getattr(psicologo.datos_personales_rel, "id_pais", "")),
+                            force_str(getattr(psicologo.datos_personales_rel, "id_provincia", "")),
+                        ],
+                    )
+                ),
+            ),
+            ("Estado", lambda psicologo: psicologo.id_estado),
+            ("Fecha alta", lambda psicologo: timezone.localtime(psicologo.fch_creacion).strftime("%d/%m/%Y %H:%M")),
+        ]
 
 
 class PsicologoDetailView(LoginRequiredMixin, DetailView):
@@ -359,11 +413,13 @@ class PsicologoDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class PacienteListView(LoginRequiredMixin, ListView):
+class PacienteListView(TableListSupportMixin, LoginRequiredMixin, ListView):
     model = Paciente
     template_name = "paciente/paciente_list.html"
     context_object_name = "pacientes"
     paginate_by = 10
+    export_filename = "pacientes"
+    export_title = "Listado de pacientes"
 
     def get_queryset(self):
         queryset = (
@@ -401,6 +457,15 @@ class PacienteListView(LoginRequiredMixin, ListView):
         context["query"] = self.request.GET.get("q", "").strip()
         context["total_resultados"] = self.object_list.count()
         return context
+
+    def get_export_columns(self):
+        return [
+            ("Nombre", lambda paciente: paciente.nombres),
+            ("CUIL", lambda paciente: paciente.cuil or ""),
+            ("DNI", lambda paciente: paciente.dni),
+            ("Email", lambda paciente: paciente.email),
+            ("Estado", lambda paciente: paciente.id_estado),
+        ]
 
 
 class PacienteDetailView(LoginRequiredMixin, DetailView):
@@ -671,7 +736,7 @@ class PsicologoFormView(LoginRequiredMixin, View):
 
 class PsicologoCreateView(PsicologoFormView):
     template_name = "psicologo/psicologo_form.html"
-    success_url = reverse_lazy("usuario:psicologo_pendiente_list")
+    success_url = reverse_lazy("usuario:psicologo_solicitud_enviada")
     success_action = "creado"
 
     def get(self, request, *args, **kwargs):
@@ -691,12 +756,23 @@ class PsicologoCreateView(PsicologoFormView):
             for field_name, value in datos_form.cleaned_data.items():
                 setattr(solicitud, field_name, value)
             solicitud.save()
-
-        messages.success(
-            request,
-            "Solicitud enviada correctamente. Quedara pendiente hasta que sea aprobada.",
+        send_profile_submission_email(
+            to_email=solicitud.email,
+            full_name=solicitud.nombres,
+            profile_type="psicólogo",
         )
+
+        request.session["psicologo_solicitud_email"] = solicitud.email
         return redirect(self.success_url)
+
+
+class PsicologoSolicitudEnviadaView(TemplateView):
+    template_name = "psicologo/psicologo_solicitud_enviada.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["email_solicitud"] = self.request.session.get("psicologo_solicitud_email", "")
+        return context
 
 
 class PsicologoUpdateView(PsicologoFormView):
@@ -764,6 +840,12 @@ class PsicologoPendienteApproveView(LoginRequiredMixin, View):
             solicitud.psicologo = psicologo
             solicitud.fch_resolucion = timezone.now()
             solicitud.save(update_fields=["estado", "psicologo", "fch_resolucion", "fch_actualizacion"])
+        send_profile_approved_email(
+            to_email=psicologo.email,
+            full_name=psicologo.nombres,
+            profile_type="psicólogo",
+            login_url=request.build_absolute_uri(reverse_lazy("login")),
+        )
 
         messages.success(request, "Solicitud aprobada. El psicologo ya fue creado.")
         return redirect(self.success_url)
@@ -793,16 +875,292 @@ class PsicologoPendienteApproveView(LoginRequiredMixin, View):
 class PsicologoPendienteRejectView(LoginRequiredMixin, View):
     success_url = reverse_lazy("usuario:psicologo_pendiente_list")
 
+    def get(self, request, pk, *args, **kwargs):
+        solicitud = get_object_or_404(PsicologoPendiente, pk=pk)
+        form = ObservacionRechazoForm(
+            initial={"observacion_rechazo": solicitud.observacion_rechazo}
+        )
+        return render(
+            request,
+            "usuario/solicitud_reject_form.html",
+            {
+                "form": form,
+                "solicitud": solicitud,
+                "tipo_solicitud": "psicologo",
+                "cancel_url": reverse_lazy("usuario:psicologo_pendiente_detail", kwargs={"pk": solicitud.pk}),
+            },
+        )
+
     def post(self, request, pk, *args, **kwargs):
         solicitud = get_object_or_404(PsicologoPendiente, pk=pk)
+        form = ObservacionRechazoForm(request.POST)
 
         if solicitud.estado != PsicologoPendiente.ESTADO_PENDIENTE:
             messages.warning(request, "Esta solicitud ya fue revisada.")
             return redirect(self.success_url)
 
+        if not form.is_valid():
+            return render(
+                request,
+                "usuario/solicitud_reject_form.html",
+                {
+                    "form": form,
+                    "solicitud": solicitud,
+                    "tipo_solicitud": "psicologo",
+                    "cancel_url": reverse_lazy("usuario:psicologo_pendiente_detail", kwargs={"pk": solicitud.pk}),
+                },
+            )
+
         solicitud.estado = PsicologoPendiente.ESTADO_RECHAZADO
+        solicitud.observacion_rechazo = form.cleaned_data["observacion_rechazo"]
         solicitud.fch_resolucion = timezone.now()
-        solicitud.save(update_fields=["estado", "fch_resolucion", "fch_actualizacion"])
+        solicitud.save(
+            update_fields=[
+                "estado",
+                "observacion_rechazo",
+                "fch_resolucion",
+                "fch_actualizacion",
+            ]
+        )
+
+        messages.success(request, "Solicitud rechazada correctamente.")
+        return redirect(self.success_url)
+
+
+class PacientePendienteListView(TableListSupportMixin, LoginRequiredMixin, ListView):
+    model = PacientePendiente
+    template_name = "paciente/paciente_pendiente.html"
+    context_object_name = "solicitudes"
+    paginate_by = 10
+    export_filename = "solicitudes_pacientes"
+    export_title = "Solicitudes de pacientes"
+
+    def get_queryset(self):
+        queryset = (
+            PacientePendiente.objects.select_related(
+                "paciente",
+                "id_ocupacion",
+                "id_ciclo_vida",
+                "id_grado_estudio",
+            )
+            .annotate(
+                dni_text=Cast("dni", output_field=CharField()),
+                cuil_text=Cast("cuil", output_field=CharField()),
+            )
+            .order_by("-fch_creacion")
+        )
+
+        query = self.request.GET.get("q", "").strip()
+        estado = self.request.GET.get("estado", "").strip().upper()
+
+        if estado in dict(PacientePendiente.ESTADOS):
+            queryset = queryset.filter(estado=estado)
+
+        if not query:
+            return queryset
+
+        filtros = (
+            Q(nombres__icontains=query)
+            | Q(email__icontains=query)
+            | Q(dni_text__icontains=query)
+            | Q(cuil_text__icontains=query)
+            | Q(id_ocupacion__dsc_ocupacion__icontains=query)
+            | Q(id_ciclo_vida__dsc_ciclo_vida__icontains=query)
+            | Q(id_grado_estudio__dsc_grado_estudio__icontains=query)
+            | Q(estado__icontains=query)
+        )
+        return queryset.filter(filtros)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["query"] = self.request.GET.get("q", "").strip()
+        context["estado_seleccionado"] = self.request.GET.get("estado", "").strip().upper()
+        context["estados"] = PacientePendiente.ESTADOS
+        context["total_resultados"] = self.object_list.count()
+        return context
+
+    def get_export_columns(self):
+        return [
+            ("Paciente", lambda solicitud: solicitud.nombres),
+            ("Email", lambda solicitud: solicitud.email),
+            ("DNI", lambda solicitud: solicitud.dni),
+            ("Telefono", lambda solicitud: solicitud.telefono),
+            (
+                "Perfil",
+                lambda solicitud: " - ".join(
+                    filter(
+                        None,
+                        [
+                            force_str(solicitud.id_ocupacion),
+                            force_str(solicitud.id_ciclo_vida),
+                            force_str(solicitud.id_grado_estudio),
+                        ],
+                    )
+                ),
+            ),
+            ("Estado", lambda solicitud: solicitud.get_estado_display()),
+        ]
+
+
+class PacientePendienteDetailView(LoginRequiredMixin, DetailView):
+    model = PacientePendiente
+    template_name = "paciente/paciente_pendiente_detail.html"
+    context_object_name = "solicitud"
+
+    def get_queryset(self):
+        return PacientePendiente.objects.select_related(
+            "paciente",
+            "id_ocupacion",
+            "id_ciclo_vida",
+            "id_grado_estudio",
+            "id_sexo",
+            "id_std_civil",
+            "id_pais",
+            "id_provincia",
+            "id_localidad",
+            "id_zona",
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mostrar_boton_observacion"] = bool(self.object.observacion_rechazo)
+        return context
+
+
+class PacientePendienteApproveView(LoginRequiredMixin, View):
+    success_url = reverse_lazy("usuario:paciente_pendiente_list")
+
+    def post(self, request, pk, *args, **kwargs):
+        solicitud = get_object_or_404(PacientePendiente, pk=pk)
+
+        if solicitud.estado != PacientePendiente.ESTADO_PENDIENTE:
+            messages.warning(request, "Esta solicitud ya fue revisada.")
+            return redirect(self.success_url)
+
+        estado_activo = PacienteForm.get_default_estado()
+        if estado_activo is None:
+            messages.error(request, "No hay un estado ACTIVO configurado para aprobar pacientes.")
+            return redirect(self.success_url)
+
+        if self.has_approval_conflicts(solicitud):
+            messages.error(
+                request,
+                "No se puede aprobar porque ya existe un paciente o usuario con el mismo DNI, CUIL o email.",
+            )
+            return redirect(self.success_url)
+
+        with transaction.atomic():
+            paciente = Paciente.objects.create(
+                nombres=solicitud.nombres,
+                email=solicitud.email,
+                dni=solicitud.dni,
+                cuil=solicitud.cuil,
+                fch_nacimiento=solicitud.fch_nacimiento,
+                foto=solicitud.foto,
+                sobre_mi=solicitud.sobre_mi,
+                id_estado=estado_activo,
+                id_ocupacion=solicitud.id_ocupacion,
+                id_ciclo_vida=solicitud.id_ciclo_vida,
+                id_grado_estudio=solicitud.id_grado_estudio,
+            )
+            DatosPersonales.objects.create(
+                paciente=paciente,
+                telefono=solicitud.telefono,
+                domicilio=solicitud.domicilio,
+                id_sexo=solicitud.id_sexo,
+                id_std_civil=solicitud.id_std_civil,
+                id_pais=solicitud.id_pais,
+                id_provincia=solicitud.id_provincia,
+                id_localidad=solicitud.id_localidad,
+                id_zona=solicitud.id_zona,
+            )
+            self.create_auth_user(solicitud, paciente)
+            solicitud.estado = PacientePendiente.ESTADO_APROBADO
+            solicitud.paciente = paciente
+            solicitud.fch_resolucion = timezone.now()
+            solicitud.save(update_fields=["estado", "paciente", "fch_resolucion", "fch_actualizacion"])
+        send_profile_approved_email(
+            to_email=paciente.email,
+            full_name=paciente.nombres,
+            profile_type="paciente",
+            login_url=request.build_absolute_uri(reverse_lazy("login")),
+        )
+
+        messages.success(request, "Solicitud aprobada. El paciente ya fue creado.")
+        return redirect(self.success_url)
+
+    @staticmethod
+    def has_approval_conflicts(solicitud):
+        pacientes = Paciente.objects.filter(
+            Q(dni=solicitud.dni) | Q(email__iexact=solicitud.email)
+        )
+        if solicitud.cuil:
+            pacientes = pacientes | Paciente.objects.filter(cuil=solicitud.cuil)
+
+        username_exists = get_user_model().objects.filter(username=str(solicitud.dni)).exists()
+        return pacientes.exists() or username_exists
+
+    @staticmethod
+    def create_auth_user(solicitud, paciente):
+        UserModel = get_user_model()
+        user = UserModel(username=str(paciente.dni), email=paciente.email)
+        if hasattr(user, "first_name"):
+            user.first_name = paciente.nombres[:150]
+        user.password = solicitud.password_hash
+        user.save()
+        return user
+
+
+class PacientePendienteRejectView(LoginRequiredMixin, View):
+    success_url = reverse_lazy("usuario:paciente_pendiente_list")
+
+    def get(self, request, pk, *args, **kwargs):
+        solicitud = get_object_or_404(PacientePendiente, pk=pk)
+        form = ObservacionRechazoForm(
+            initial={"observacion_rechazo": solicitud.observacion_rechazo}
+        )
+        return render(
+            request,
+            "usuario/solicitud_reject_form.html",
+            {
+                "form": form,
+                "solicitud": solicitud,
+                "tipo_solicitud": "paciente",
+                "cancel_url": reverse_lazy("usuario:paciente_pendiente_detail", kwargs={"pk": solicitud.pk}),
+            },
+        )
+
+    def post(self, request, pk, *args, **kwargs):
+        solicitud = get_object_or_404(PacientePendiente, pk=pk)
+        form = ObservacionRechazoForm(request.POST)
+
+        if solicitud.estado != PacientePendiente.ESTADO_PENDIENTE:
+            messages.warning(request, "Esta solicitud ya fue revisada.")
+            return redirect(self.success_url)
+
+        if not form.is_valid():
+            return render(
+                request,
+                "usuario/solicitud_reject_form.html",
+                {
+                    "form": form,
+                    "solicitud": solicitud,
+                    "tipo_solicitud": "paciente",
+                    "cancel_url": reverse_lazy("usuario:paciente_pendiente_detail", kwargs={"pk": solicitud.pk}),
+                },
+            )
+
+        solicitud.estado = PacientePendiente.ESTADO_RECHAZADO
+        solicitud.observacion_rechazo = form.cleaned_data["observacion_rechazo"]
+        solicitud.fch_resolucion = timezone.now()
+        solicitud.save(
+            update_fields=[
+                "estado",
+                "observacion_rechazo",
+                "fch_resolucion",
+                "fch_actualizacion",
+            ]
+        )
 
         messages.success(request, "Solicitud rechazada correctamente.")
         return redirect(self.success_url)
@@ -888,12 +1246,13 @@ class PacienteFormView(LoginRequiredMixin, View):
                 "slug": "perfil",
                 "title": "Ficha del paciente",
                 "description": (
-                    "Completa ocupacion y grado de estudio. El ciclo de vida se calcula automaticamente "
-                    "segun la fecha de nacimiento."
+                    "Completa ocupacion, grado de estudio y una breve presentacion personal. "
+                    "El ciclo de vida se calcula automaticamente segun la fecha de nacimiento."
                 ),
                 "fields": [
                     form["id_ocupacion"],
                     form["id_grado_estudio"],
+                    form["sobre_mi"],
                     form["foto"],
                 ],
             },
@@ -938,18 +1297,56 @@ class PacienteFormView(LoginRequiredMixin, View):
 
 
 class PacienteCreateView(PacienteFormView):
+    success_url = reverse_lazy("usuario:paciente_solicitud_enviada")
     success_action = "creado"
+
+    def get(self, request, *args, **kwargs):
+        form = PacientePendienteForm()
+        datos_form = DatosPersonalesSolicitudForm()
+        return render(request, self.template_name, self.get_context(form, datos_form, None))
+
+    def post(self, request, *args, **kwargs):
+        form = PacientePendienteForm(request.POST, request.FILES)
+        datos_form = DatosPersonalesSolicitudForm(request.POST)
+
+        if not (form.is_valid() and datos_form.is_valid()):
+            return render(request, self.template_name, self.get_context(form, datos_form, None))
+
+        with transaction.atomic():
+            solicitud = form.save(commit=False)
+            for field_name, value in datos_form.cleaned_data.items():
+                setattr(solicitud, field_name, value)
+            solicitud.save()
+        send_profile_submission_email(
+            to_email=solicitud.email,
+            full_name=solicitud.nombres,
+            profile_type="paciente",
+        )
+
+        request.session["paciente_solicitud_email"] = solicitud.email
+        return redirect(self.success_url)
+
+
+class PacienteSolicitudEnviadaView(TemplateView):
+    template_name = "paciente/paciente_solicitud_enviada.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["email_solicitud"] = self.request.session.get("paciente_solicitud_email", "")
+        return context
 
 
 class PacienteUpdateView(PacienteFormView):
     success_action = "actualizado"
 
 
-class PsicologoOficinaListView(PsicologoOwnerOrStaffMixin, ListView):
+class PsicologoOficinaListView(TableListSupportMixin, PsicologoOwnerOrStaffMixin, ListView):
     model = PsicologoOficina
     template_name = "psicologo/oficina_list.html"
     context_object_name = "oficinas"
     paginate_by = 10
+    export_filename = "consultorios"
+    export_title = "Listado de consultorios"
 
     def get_queryset(self):
         queryset = PsicologoOficina.objects.select_related(
@@ -981,6 +1378,32 @@ class PsicologoOficinaListView(PsicologoOwnerOrStaffMixin, ListView):
         context["total_resultados"] = self.object_list.count()
         context["mostrar_columna_psicologo"] = self.user_is_staff()
         return context
+
+    def get_export_columns(self):
+        columns = []
+        if self.user_is_staff():
+            columns.append(("Psicologo", lambda oficina: oficina.id_psicologo.nombres))
+        columns.extend(
+            [
+                ("Consultorio", lambda oficina: oficina.domicilio),
+                ("Telefono", lambda oficina: oficina.telefono or ""),
+                (
+                    "Ubicacion",
+                    lambda oficina: " - ".join(
+                        filter(
+                            None,
+                            [
+                                force_str(oficina.id_localidad),
+                                force_str(oficina.id_provincia),
+                                force_str(oficina.id_zona),
+                            ],
+                        )
+                    ),
+                ),
+                ("Estado", lambda oficina: oficina.id_estado),
+            ]
+        )
+        return columns
 
 
 class PsicologoOficinaCreateView(PsicologoOwnerOrStaffMixin, CreateView):
@@ -1070,11 +1493,13 @@ class PsicologoOficinaDeleteView(EstadoToggleMixin, PsicologoOwnerOrStaffMixin, 
         kwargs.pop("psicologo", None)
         return kwargs
 
-class PsicologoMetodoPagoListView(PsicologoOwnerOrStaffMixin, ListView):
+class PsicologoMetodoPagoListView(TableListSupportMixin, PsicologoOwnerOrStaffMixin, ListView):
     model = PsicologoMetodoPago
     template_name = "psicologo/metodo_pago_list.html"
     context_object_name = "metodos_pago"
     paginate_by = 10
+    export_filename = "metodos_pago"
+    export_title = "Listado de metodos de pago"
 
     def get_queryset(self):
         queryset = PsicologoMetodoPago.objects.select_related(
@@ -1098,6 +1523,18 @@ class PsicologoMetodoPagoListView(PsicologoOwnerOrStaffMixin, ListView):
         context["total_resultados"] = self.object_list.count()
         context["mostrar_columna_psicologo"] = self.user_is_staff()
         return context
+
+    def get_export_columns(self):
+        columns = []
+        if self.user_is_staff():
+            columns.append(("Psicologo", lambda metodo: metodo.id_psicologo.nombres))
+        columns.extend(
+            [
+                ("Metodo", lambda metodo: metodo.id_metodo_pago),
+                ("Estado", lambda metodo: metodo.id_estado),
+            ]
+        )
+        return columns
 
 
 class PsicologoMetodoPagoCreateView(PsicologoOwnerOrStaffMixin, CreateView):
@@ -1145,11 +1582,13 @@ class PsicologoMetodoPagoDeleteView(EstadoToggleMixin, PsicologoOwnerOrStaffMixi
         return kwargs
 
 
-class PsicologoRamaListView(PsicologoOwnerOrStaffMixin, ListView):
+class PsicologoRamaListView(TableListSupportMixin, PsicologoOwnerOrStaffMixin, ListView):
     model = PsicologoRama
     template_name = "psicologo/rama_list.html"
     context_object_name = "ramas"
     paginate_by = 10
+    export_filename = "psicologo_ramas"
+    export_title = "Listado de ramas profesionales"
 
     def get_queryset(self):
         queryset = PsicologoRama.objects.select_related(
@@ -1173,6 +1612,19 @@ class PsicologoRamaListView(PsicologoOwnerOrStaffMixin, ListView):
         context["total_resultados"] = self.object_list.count()
         context["mostrar_columna_psicologo"] = self.user_is_staff()
         return context
+
+    def get_export_columns(self):
+        columns = []
+        if self.user_is_staff():
+            columns.append(("Psicologo", lambda rama: rama.id_psicologo.nombres))
+        columns.extend(
+            [
+                ("Rama", lambda rama: rama.id_rama),
+                ("Valor sesion", lambda rama: rama.valor_sesion),
+                ("Estado", lambda rama: rama.id_estado),
+            ]
+        )
+        return columns
 
 
 class PsicologoRamaCreateView(PsicologoOwnerOrStaffMixin, CreateView):
@@ -1249,11 +1701,13 @@ class PacienteDeleteView(EstadoToggleMixin, LoginRequiredMixin, DeleteView):
 
 
 
-class PsicologoIdiomaListView(PsicologoOwnerOrStaffMixin, ListView):
+class PsicologoIdiomaListView(TableListSupportMixin, PsicologoOwnerOrStaffMixin, ListView):
     model = PsicologoIdioma
     template_name = "psicologo/idioma_list.html"
     context_object_name = "idiomas"
     paginate_by = 10
+    export_filename = "idiomas_psicologos"
+    export_title = "Listado de idiomas"
 
     def get_queryset(self):
         queryset = PsicologoIdioma.objects.select_related(
@@ -1280,6 +1734,18 @@ class PsicologoIdiomaListView(PsicologoOwnerOrStaffMixin, ListView):
         context["total_resultados"] = self.object_list.count()
         context["mostrar_columna_psicologo"] = self.user_is_staff()
         return context
+
+    def get_export_columns(self):
+        columns = []
+        if self.user_is_staff():
+            columns.append(("Psicologo", lambda idioma: idioma.id_psicologo.nombres))
+        columns.extend(
+            [
+                ("Idioma", lambda idioma: idioma.id_idioma),
+                ("Estado", lambda idioma: idioma.id_estado),
+            ]
+        )
+        return columns
 
 
 class PsicologoIdiomaCreateView(PsicologoOwnerOrStaffMixin, CreateView):

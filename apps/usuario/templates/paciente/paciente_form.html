@@ -1131,7 +1131,7 @@ Crea tu perfil de paciente en una experiencia simple, clara y pensada para acomp
 
                     <div class="form-grid">
                         {% for field in step.fields %}
-                            <div class="field-group{% if field.name == 'domicilio' or field.name == 'foto' %} field-group-full{% endif %}{% if field.errors %} has-error{% endif %}">
+                            <div class="field-group{% if field.name == 'domicilio' or field.name == 'foto' or field.name == 'sobre_mi' %} field-group-full{% endif %}{% if field.errors %} has-error{% endif %}">
                                 <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                                 <div class="field-surface">
                                     {% if field.name == 'password1' or field.name == 'password2' %}

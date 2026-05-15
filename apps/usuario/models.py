@@ -366,6 +366,7 @@ class PsicologoPendiente(models.Model):
         choices=ESTADOS,
         default=ESTADO_PENDIENTE,
     )
+    observacion_rechazo = models.TextField(blank=True, default="")
     psicologo = models.OneToOneField(
         Psicologo,
         on_delete=models.SET_NULL,
@@ -550,6 +551,151 @@ class Paciente(UsuarioBase):
 
     def assign_ciclo_vida_from_birth_date(self):
         descripcion = self.get_ciclo_vida_descripcion_by_age(self.edad)
+        if not descripcion:
+            return None
+
+        ciclo_vida = (
+            CicloVida.objects.filter(dsc_ciclo_vida__iexact=descripcion, flg_activo=True)
+            .order_by("id_ciclo_vida")
+            .first()
+        )
+        if ciclo_vida is None:
+            raise ValidationError(
+                {
+                    "fch_nacimiento": (
+                        f"No existe un ciclo de vida activo configurado para '{descripcion}'."
+                    )
+                }
+            )
+
+        self.id_ciclo_vida = ciclo_vida
+        return ciclo_vida
+
+    def clean(self):
+        super().clean()
+        if self.fch_nacimiento:
+            self.assign_ciclo_vida_from_birth_date()
+
+    def save(self, *args, **kwargs):
+        if self.fch_nacimiento:
+            self.assign_ciclo_vida_from_birth_date()
+        super().save(*args, **kwargs)
+
+
+class PacientePendiente(models.Model):
+    ESTADO_PENDIENTE = "PENDIENTE"
+    ESTADO_APROBADO = "APROBADO"
+    ESTADO_RECHAZADO = "RECHAZADO"
+    ESTADOS = (
+        (ESTADO_PENDIENTE, "Pendiente"),
+        (ESTADO_APROBADO, "Aprobado"),
+        (ESTADO_RECHAZADO, "Rechazado"),
+    )
+
+    nombres = models.CharField(max_length=100)
+    email = models.EmailField(max_length=50)
+    dni = models.PositiveBigIntegerField(
+        validators=[MinValueValidator(1_000_000), MaxValueValidator(99_999_999)]
+    )
+    cuil = models.PositiveBigIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(10_000_000_000), MaxValueValidator(99_999_999_999)],
+    )
+    fch_nacimiento = models.DateField(verbose_name="Fecha de nacimiento")
+    foto = models.FileField(
+        upload_to="personas/fotos/",
+        null=True,
+        blank=True,
+        validators=[
+            FileExtensionValidator(["jpg", "jpeg", "png", "webp"]),
+            validate_photo_size,
+        ],
+    )
+    sobre_mi = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Sobre mí",
+        help_text="Descripción sobre la persona.",
+    )
+    id_ocupacion = models.ForeignKey(
+        Ocupacion,
+        on_delete=models.RESTRICT,
+        related_name="pacientes_pendientes",
+        verbose_name="Ocupacion",
+    )
+    id_ciclo_vida = models.ForeignKey(
+        CicloVida,
+        on_delete=models.RESTRICT,
+        related_name="pacientes_pendientes",
+        verbose_name="Ciclo de vida",
+        null=True,
+        blank=True,
+    )
+    id_grado_estudio = models.ForeignKey(
+        GradoEstudio,
+        on_delete=models.RESTRICT,
+        related_name="pacientes_pendientes",
+        verbose_name="Grado de estudio",
+    )
+    telefono = models.CharField(max_length=25)
+    domicilio = models.CharField(max_length=200)
+    id_sexo = models.ForeignKey(Sexo, on_delete=models.RESTRICT, verbose_name="Sexo")
+    id_std_civil = models.ForeignKey(
+        TipoCivil,
+        on_delete=models.RESTRICT,
+        verbose_name="Estado civil",
+    )
+    id_pais = models.ForeignKey(Pais, on_delete=models.RESTRICT, verbose_name="Pais")
+    id_provincia = models.ForeignKey(
+        Provincia,
+        on_delete=models.RESTRICT,
+        verbose_name="Provincia",
+    )
+    id_localidad = models.ForeignKey(
+        Localidad,
+        on_delete=models.RESTRICT,
+        verbose_name="Localidad",
+    )
+    id_zona = models.ForeignKey(Zona, on_delete=models.RESTRICT, verbose_name="Zona")
+    password_hash = models.CharField(max_length=128)
+    estado = models.CharField(
+        max_length=12,
+        choices=ESTADOS,
+        default=ESTADO_PENDIENTE,
+    )
+    observacion_rechazo = models.TextField(blank=True, default="")
+    paciente = models.OneToOneField(
+        Paciente,
+        on_delete=models.SET_NULL,
+        related_name="solicitud_origen",
+        null=True,
+        blank=True,
+    )
+    fch_creacion = models.DateTimeField(auto_now_add=True)
+    fch_actualizacion = models.DateTimeField(auto_now=True)
+    fch_resolucion = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("-fch_creacion",)
+        verbose_name = "Paciente pendiente"
+        verbose_name_plural = "Pacientes pendientes"
+
+    def __str__(self):
+        return f"{self.nombres} - DNI {self.dni} ({self.get_estado_display()})"
+
+    @property
+    def edad(self):
+        return calculate_age_from_birth_date(self.fch_nacimiento)
+
+    @property
+    def foto_url(self):
+        if self.foto:
+            return self.foto.url
+        return static("images/foto_usuario_default.png")
+
+    def assign_ciclo_vida_from_birth_date(self):
+        descripcion = Paciente.get_ciclo_vida_descripcion_by_age(self.edad)
         if not descripcion:
             return None
 

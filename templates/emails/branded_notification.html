@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ heading }}</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f0fb;font-family:Arial,sans-serif;color:#24164a;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f0fb;padding:28px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;background:#ffffff;border-radius:28px;overflow:hidden;border:1px solid #e9dcff;box-shadow:0 18px 42px rgba(67,35,120,.10);">
+          <tr>
+            <td style="padding:28px 32px;background:linear-gradient(135deg,#ffffff 0%,#faf5ff 100%);border-bottom:1px solid #efe6ff;">
+              <table role="presentation" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="vertical-align:middle;padding-right:14px;">
+                    <img src="cid:{{ logo_cid }}" alt="MenteClara" width="58" style="display:block;width:58px;height:auto;">
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <div style="font-size:26px;line-height:1.1;font-weight:700;color:#5d31d3;">MenteClara</div>
+                    <div style="font-size:13px;line-height:1.4;color:#6e638d;">Acompañamiento emocional con una experiencia clara y humana.</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:34px 32px 18px;">
+              <div style="display:inline-block;padding:8px 14px;border-radius:999px;background:#f1e8ff;color:#5d31d3;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Notificación de perfil</div>
+              <h1 style="margin:18px 0 12px;font-size:34px;line-height:1.05;font-weight:700;color:#24164a;">{{ heading }}</h1>
+              <p style="margin:0 0 18px;font-size:16px;line-height:1.8;color:#5f557d;">{{ intro }}</p>
+              {% for line in body_lines %}
+                <p style="margin:0 0 14px;font-size:15px;line-height:1.8;color:#5f557d;">{{ line }}</p>
+              {% endfor %}
+              {% if cta_url and cta_label %}
+                <div style="padding:18px 0 8px;">
+                  <a href="{{ cta_url }}" style="display:inline-block;padding:14px 22px;border-radius:16px;background:linear-gradient(135deg,#6d3df0,#4f24c7);color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;">{{ cta_label }}</a>
+                </div>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 32px 32px;">
+              <div style="padding:18px 20px;border-radius:20px;background:#f9f5ff;border:1px solid #eee2ff;font-size:14px;line-height:1.8;color:#6a5f88;">
+                {{ footer_note }}
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

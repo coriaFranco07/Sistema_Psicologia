@@ -9,6 +9,11 @@ app_name = "usuario"
 urlpatterns = [
     path("psicologos/", views.PsicologoListView.as_view(), name="psicologo_list"),
     path("psicologos/nuevo/", views.PsicologoCreateView.as_view(), name="psicologo_create"),
+    path(
+        "psicologos/solicitud-enviada/",
+        views.PsicologoSolicitudEnviadaView.as_view(),
+        name="psicologo_solicitud_enviada",
+    ),
     path("psicologos/mi-perfil/", views.PsicologoMiPerfilView.as_view(), name="psicologo_mi_perfil"),
     path("psicologos/<int:pk>/", views.PsicologoDetailView.as_view(), name="psicologo_detail"),
     path(
@@ -123,6 +128,31 @@ urlpatterns = [
     ),
     path("pacientes/", views.PacienteListView.as_view(), name="paciente_list"),
     path("pacientes/nuevo/", views.PacienteCreateView.as_view(), name="paciente_create"),
+    path(
+        "pacientes/solicitud-enviada/",
+        views.PacienteSolicitudEnviadaView.as_view(),
+        name="paciente_solicitud_enviada",
+    ),
+    path(
+        "pacientes/pendientes/",
+        views.PacientePendienteListView.as_view(),
+        name="paciente_pendiente_list",
+    ),
+    path(
+        "pacientes/pendientes/<int:pk>/",
+        views.PacientePendienteDetailView.as_view(),
+        name="paciente_pendiente_detail",
+    ),
+    path(
+        "pacientes/pendientes/<int:pk>/confirmar/",
+        views.PacientePendienteApproveView.as_view(),
+        name="paciente_pendiente_confirmar",
+    ),
+    path(
+        "pacientes/pendientes/<int:pk>/rechazar/",
+        views.PacientePendienteRejectView.as_view(),
+        name="paciente_pendiente_rechazar",
+    ),
     path("pacientes/mi-perfil/", views.PacienteMiPerfilView.as_view(), name="paciente_mi_perfil"),
     path(
         "pacientes/mis-psicologos/",

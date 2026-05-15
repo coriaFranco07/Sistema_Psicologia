@@ -1,0 +1,104 @@
+{% extends "usuario/base.html" %}
+
+{% block title %}Ficha de Solicitud{% endblock %}
+{% block main_class %}detail-main{% endblock %}
+
+{% block extra_styles %}
+main.detail-main{max-width:1200px;margin:0 auto;padding:32px 20px 48px}.detail-page{display:grid;gap:18px}.detail-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:22px 0 10px}.detail-kicker{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:#e0f2fe;color:#0369a1;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.detail-hero h1{margin:12px 0 6px;color:#0f172a;font-size:2rem;line-height:1.1}.detail-hero p{margin:0;color:#64748b;line-height:1.55}.detail-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border:1px solid #dbe3ef;border-radius:8px;background:#fff;box-shadow:0 14px 32px rgba(15,23,42,.06)}.detail-actions{display:flex;gap:8px;flex-wrap:wrap}.detail-layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px}.detail-card{border:1px solid #dbe3ef;border-radius:8px;background:#fff;box-shadow:0 18px 44px rgba(15,23,42,.07)}.profile-card{padding:24px}.profile-photo{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:16px;background:#f1f5f9}.profile-name{margin:18px 0 6px;color:#0f172a;font-size:1.4rem}.profile-meta{margin:0;color:#64748b;line-height:1.6}.status-pill{display:inline-flex;align-items:center;min-height:30px;margin-top:14px;padding:0 10px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:.84rem;font-weight:800}.status-pill.is-aprobado{background:#dcfce7;color:#166534}.status-pill.is-rechazado{background:#fee2e2;color:#991b1b}.profile-note{margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0;color:#475569;line-height:1.55}.sections-card{padding:24px}.section-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.info-block{padding:18px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc}.info-block h2{margin:0 0 14px;color:#0f172a;font-size:1rem}.info-list{display:grid;gap:12px}.info-item span{display:block}.info-label{color:#64748b;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em}.info-value{margin-top:4px;color:#0f172a;font-weight:700;line-height:1.45}.btn-modern{min-height:38px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 14px;border-radius:13px;border:1px solid transparent;font-size:.84rem;font-weight:950;letter-spacing:.01em;text-decoration:none;white-space:nowrap;cursor:pointer;box-shadow:0 10px 22px rgba(15,23,42,.08);transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}.btn-modern:hover{transform:translateY(-2px);box-shadow:0 16px 30px rgba(15,23,42,.14);filter:saturate(1.08)}.btn-modern-primary{border-color:#bbf7d0;background:#ecfdf5;color:#166534}.btn-modern-danger{border-color:#fee2e2;background:#fef2f2;color:#b91c1c}.btn-modern-secondary{border-color:#cbd5e1;background:#fff;color:#334155}@media(max-width:920px){main.detail-main{padding:20px 14px 34px}.detail-hero,.detail-topbar,.detail-actions{flex-direction:column;align-items:stretch}.detail-layout,.section-grid{grid-template-columns:1fr}.btn-modern{width:100%}}
+{% endblock %}
+
+{% block content %}
+<section class="detail-page">
+  <div class="detail-hero">
+    <div>
+      <span class="detail-kicker">Ficha de paciente</span>
+      <h1>Solicitud de {{ solicitud.nombres }}</h1>
+      <p>Vista completa de la ficha enviada por el paciente antes de aprobar o rechazar la solicitud.</p>
+    </div>
+  </div>
+
+  <div class="detail-topbar">
+    <a class="btn-modern btn-modern-secondary" href="{% url 'usuario:paciente_pendiente_list' %}">Volver a solicitudes</a>
+    <div class="detail-actions">
+      {% if mostrar_boton_observacion %}
+        <a class="btn-modern btn-modern-secondary" href="#observacion-rechazo">Ver observacion</a>
+      {% endif %}
+      {% if solicitud.estado == "PENDIENTE" %}
+        <form method="post" action="{% url 'usuario:paciente_pendiente_confirmar' solicitud.pk %}">
+          {% csrf_token %}
+          <button class="btn-modern btn-modern-primary" type="submit">Aprobar solicitud</button>
+        </form>
+        <a class="btn-modern btn-modern-danger" href="{% url 'usuario:paciente_pendiente_rechazar' solicitud.pk %}">Rechazar solicitud</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="detail-layout">
+    <aside class="detail-card profile-card">
+      <img class="profile-photo" src="{{ solicitud.foto_url }}" alt="Foto de {{ solicitud.nombres }}">
+      <h2 class="profile-name">{{ solicitud.nombres }}</h2>
+      <p class="profile-meta">DNI {{ solicitud.dni }}</p>
+      <p class="profile-meta">{{ solicitud.email }}</p>
+      {% if solicitud.cuil %}
+        <p class="profile-meta">CUIL {{ solicitud.cuil }}</p>
+      {% endif %}
+      <span class="status-pill{% if solicitud.estado == 'APROBADO' %} is-aprobado{% elif solicitud.estado == 'RECHAZADO' %} is-rechazado{% endif %}">
+        {{ solicitud.get_estado_display }}
+      </span>
+      <p class="profile-note">Solicitud creada el {{ solicitud.fch_creacion|date:"d/m/Y H:i" }}.</p>
+    </aside>
+
+    <section class="detail-card sections-card">
+      <div class="section-grid">
+        <article class="info-block">
+          <h2>Datos básicos</h2>
+          <div class="info-list">
+            <div class="info-item"><span class="info-label">Nombre completo</span><span class="info-value">{{ solicitud.nombres }}</span></div>
+            <div class="info-item"><span class="info-label">Fecha de nacimiento</span><span class="info-value">{{ solicitud.fch_nacimiento|date:"d/m/Y" }}</span></div>
+            <div class="info-item"><span class="info-label">Edad</span><span class="info-value">{{ solicitud.edad }} años</span></div>
+            <div class="info-item"><span class="info-label">Sexo</span><span class="info-value">{{ solicitud.id_sexo }}</span></div>
+            <div class="info-item"><span class="info-label">Estado civil</span><span class="info-value">{{ solicitud.id_std_civil }}</span></div>
+          </div>
+        </article>
+
+        <article class="info-block">
+          <h2>Contacto</h2>
+          <div class="info-list">
+            <div class="info-item"><span class="info-label">Correo</span><span class="info-value">{{ solicitud.email }}</span></div>
+            <div class="info-item"><span class="info-label">Teléfono</span><span class="info-value">{{ solicitud.telefono }}</span></div>
+            <div class="info-item"><span class="info-label">Domicilio</span><span class="info-value">{{ solicitud.domicilio }}</span></div>
+          </div>
+        </article>
+
+        <article class="info-block">
+          <h2>Ubicación</h2>
+          <div class="info-list">
+            <div class="info-item"><span class="info-label">País</span><span class="info-value">{{ solicitud.id_pais }}</span></div>
+            <div class="info-item"><span class="info-label">Provincia</span><span class="info-value">{{ solicitud.id_provincia }}</span></div>
+            <div class="info-item"><span class="info-label">Localidad</span><span class="info-value">{{ solicitud.id_localidad }}</span></div>
+            <div class="info-item"><span class="info-label">Zona</span><span class="info-value">{{ solicitud.id_zona }}</span></div>
+          </div>
+        </article>
+
+        <article class="info-block">
+          <h2>Ficha del paciente</h2>
+          <div class="info-list">
+            <div class="info-item"><span class="info-label">Ocupación</span><span class="info-value">{{ solicitud.id_ocupacion }}</span></div>
+            <div class="info-item"><span class="info-label">Ciclo de vida</span><span class="info-value">{{ solicitud.id_ciclo_vida }}</span></div>
+            <div class="info-item"><span class="info-label">Grado de estudio</span><span class="info-value">{{ solicitud.id_grado_estudio }}</span></div>
+            <div class="info-item"><span class="info-label">Sobre mí</span><span class="info-value">{% if solicitud.sobre_mi %}{{ solicitud.sobre_mi }}{% else %}Sin descripción cargada.{% endif %}</span></div>
+          </div>
+        </article>
+        {% if solicitud.observacion_rechazo %}
+        <article class="info-block" id="observacion-rechazo">
+          <h2>Observacion de rechazo</h2>
+          <div class="info-list">
+            <div class="info-item"><span class="info-label">Motivo</span><span class="info-value">{{ solicitud.observacion_rechazo }}</span></div>
+          </div>
+        </article>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+</section>
+{% endblock %}

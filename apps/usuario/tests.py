@@ -1,5 +1,6 @@
 from datetime import date
 from django.contrib.auth import authenticate, get_user_model
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -24,6 +25,7 @@ from apps.parametro.models import (
 from .forms import PacienteForm, PsicologoForm
 from .models import (
     Paciente,
+    PacientePendiente,
     Psicologo,
     PsicologoIdioma,
     PsicologoMetodoPago,
@@ -108,6 +110,7 @@ class UsuarioFormWizardTests(TestCase):
         self.assertContains(response, "Siguiente")
         self.assertContains(response, "La foto es opcional: podes dejarla vacia.")
         self.assertContains(response, "calcula automaticamente el ciclo de vida")
+        self.assertContains(response, 'name="sobre_mi"', html=False)
 
     def test_psicologo_create_uses_multistep_layout_with_admin_panel(self):
         self.assert_wizard_response("usuario:psicologo_create", "psicologo/psicologo_form.html")
@@ -340,6 +343,10 @@ class PacienteAutoCicloVidaTests(TestCase):
                 self.assertEqual(paciente.id_ciclo_vida.dsc_ciclo_vida, descripcion)
 
 
+@override_settings(
+    EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    CORREO_OFICIAL="notificaciones@menteclara.test",
+)
 class PacienteCreateViewTests(TestCase):
     @staticmethod
     def birth_date_for_age(age):
@@ -402,28 +409,32 @@ class PacienteCreateViewTests(TestCase):
         )
         return paciente
 
-    def test_create_paciente_assigns_ciclo_vida_from_birth_date(self):
+    def paciente_payload(self, age=17):
+        return {
+            "nombres": "Pedro Paciente",
+            "email": "pedro@example.com",
+            "dni": "32111222",
+            "cuil": "20321112221",
+            "fch_nacimiento": self.birth_date_for_age(age).isoformat(),
+            "id_ocupacion": self.ocupacion.pk,
+            "id_grado_estudio": self.grado_estudio.pk,
+            "sobre_mi": "Me gustaria empezar terapia para trabajar ansiedad y autoestima.",
+            "telefono": "3515551234",
+            "domicilio": "San Martin 123",
+            "id_sexo": self.sexo.pk,
+            "id_std_civil": self.estado_civil.pk,
+            "id_pais": self.pais.pk,
+            "id_provincia": self.provincia.pk,
+            "id_localidad": self.localidad.pk,
+            "id_zona": self.zona.pk,
+            "password1": "ClaveSegura123",
+            "password2": "ClaveSegura123",
+        }
+
+    def create_solicitud(self, age=17):
         response = self.client.post(
             reverse("usuario:paciente_create"),
-            data={
-                "nombres": "Pedro Paciente",
-                "email": "pedro@example.com",
-                "dni": "32111222",
-                "cuil": "20321112221",
-                "fch_nacimiento": self.birth_date_for_age(17).isoformat(),
-                "id_ocupacion": self.ocupacion.pk,
-                "id_grado_estudio": self.grado_estudio.pk,
-                "telefono": "3515551234",
-                "domicilio": "San Martin 123",
-                "id_sexo": self.sexo.pk,
-                "id_std_civil": self.estado_civil.pk,
-                "id_pais": self.pais.pk,
-                "id_provincia": self.provincia.pk,
-                "id_localidad": self.localidad.pk,
-                "id_zona": self.zona.pk,
-                "password1": "ClaveSegura123",
-                "password2": "ClaveSegura123",
-            },
+            data=self.paciente_payload(age=age),
         )
 
         if response.status_code != 302:
@@ -431,12 +442,95 @@ class PacienteCreateViewTests(TestCase):
                 f"Form errors: {response.context['form'].errors}; "
                 f"datos_form errors: {response.context['datos_form'].errors}"
             )
-        self.assertRedirects(response, reverse("usuario:paciente_list"))
+        return response
 
+    def test_create_paciente_request_shows_success_page(self):
+        response = self.create_solicitud(age=17)
+
+        self.assertRedirects(response, reverse("usuario:paciente_solicitud_enviada"))
+
+        success_response = self.client.get(reverse("usuario:paciente_solicitud_enviada"))
+        self.assertContains(success_response, "Solicitud enviada exitosamente")
+        self.assertContains(success_response, "En menos de 24 hs se te aprobará el perfil")
+        self.assertContains(success_response, "pedro@example.com")
+
+        solicitud = PacientePendiente.objects.get(dni=32111222)
+        self.assertEqual(solicitud.estado, PacientePendiente.ESTADO_PENDIENTE)
+        self.assertEqual(solicitud.id_ciclo_vida.dsc_ciclo_vida, "ADOLESCENCIA")
+        self.assertEqual(
+            solicitud.sobre_mi,
+            "Me gustaria empezar terapia para trabajar ansiedad y autoestima.",
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["pedro@example.com"])
+        self.assertIn("tu solicitud está siendo analizada".lower(), mail.outbox[0].alternatives[0][0].lower())
+        self.assertFalse(Paciente.objects.filter(dni=32111222).exists())
+        self.assertFalse(get_user_model().objects.filter(username="32111222").exists())
+
+    def test_confirm_pending_paciente_creates_real_paciente(self):
+        self.create_solicitud(age=17)
+        solicitud = PacientePendiente.objects.get(dni=32111222)
+
+        response = self.client.post(
+            reverse("usuario:paciente_pendiente_confirmar", args=[solicitud.pk])
+        )
+
+        self.assertRedirects(response, reverse("usuario:paciente_pendiente_list"))
+
+        solicitud.refresh_from_db()
         paciente = Paciente.objects.get(dni=32111222)
+        self.assertEqual(solicitud.estado, PacientePendiente.ESTADO_APROBADO)
+        self.assertEqual(solicitud.paciente, paciente)
         self.assertEqual(paciente.id_estado, self.estado_activo)
         self.assertEqual(paciente.id_ciclo_vida.dsc_ciclo_vida, "ADOLESCENCIA")
+        self.assertEqual(
+            paciente.sobre_mi,
+            "Me gustaria empezar terapia para trabajar ansiedad y autoestima.",
+        )
         self.assertTrue(DatosPersonales.objects.filter(paciente=paciente).exists())
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[-1].to, ["pedro@example.com"])
+        self.assertIn("tu perfil ya fue aprobado".lower(), mail.outbox[-1].alternatives[0][0].lower())
+
+        user = get_user_model().objects.get(username="32111222")
+        self.assertEqual(user.email, "pedro@example.com")
+        self.assertTrue(user.check_password("ClaveSegura123"))
+        self.assertEqual(authenticate(username="32111222", password="ClaveSegura123"), user)
+
+    def test_reject_pending_paciente_does_not_create_real_paciente(self):
+        self.create_solicitud(age=17)
+        solicitud = PacientePendiente.objects.get(dni=32111222)
+
+        form_response = self.client.get(
+            reverse("usuario:paciente_pendiente_rechazar", args=[solicitud.pk])
+        )
+
+        self.assertEqual(form_response.status_code, 200)
+        self.assertContains(form_response, "Motivo del rechazo")
+
+        response = self.client.post(
+            reverse("usuario:paciente_pendiente_rechazar", args=[solicitud.pk]),
+            {"observacion_rechazo": "No cumple con los datos requeridos para aprobar la solicitud."},
+        )
+
+        self.assertRedirects(response, reverse("usuario:paciente_pendiente_list"))
+        solicitud.refresh_from_db()
+        self.assertEqual(solicitud.estado, PacientePendiente.ESTADO_RECHAZADO)
+        self.assertEqual(
+            solicitud.observacion_rechazo,
+            "No cumple con los datos requeridos para aprobar la solicitud.",
+        )
+        self.assertFalse(Paciente.objects.filter(dni=32111222).exists())
+        self.assertFalse(get_user_model().objects.filter(username="32111222").exists())
+
+        detail_response = self.client.get(
+            reverse("usuario:paciente_pendiente_detail", args=[solicitud.pk])
+        )
+        self.assertContains(detail_response, "Ver observacion")
+        self.assertContains(
+            detail_response,
+            "No cumple con los datos requeridos para aprobar la solicitud.",
+        )
 
     def test_paciente_list_shows_view_profile_action(self):
         paciente = self.create_patient_with_profile()
@@ -704,6 +798,10 @@ class PacientePsychologistSectionsTests(TestCase):
 
 
 @override_settings(STORAGES=TEST_STORAGES)
+@override_settings(
+    EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    CORREO_OFICIAL="notificaciones@menteclara.test",
+)
 class PsicologoCreateViewTests(TestCase):
     def setUp(self):
         self.staff_user = create_staff_user()
@@ -786,9 +884,18 @@ class PsicologoCreateViewTests(TestCase):
             "password2": "",
         }
 
-    def test_create_psicologo_request_goes_to_pending_table(self):
+    def test_create_psicologo_request_shows_success_page(self):
         response = self.create_solicitud()
-        self.assertRedirects(response, reverse("usuario:psicologo_pendiente_list"))
+        self.assertRedirects(response, reverse("usuario:psicologo_solicitud_enviada"))
+
+        success_response = self.client.get(reverse("usuario:psicologo_solicitud_enviada"))
+        self.assertContains(success_response, "Solicitud enviada exitosamente")
+        self.assertContains(success_response, "En menos de 24 hs se te aprobará el perfil")
+        self.assertContains(success_response, "laura@example.com")
+        self.assertContains(success_response, reverse("home"))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["laura@example.com"])
+        self.assertIn("tu solicitud está siendo analizada".lower(), mail.outbox[0].alternatives[0][0].lower())
 
         solicitud = PsicologoPendiente.objects.get(dni=31111222)
         self.assertEqual(solicitud.estado, PsicologoPendiente.ESTADO_PENDIENTE)
@@ -828,6 +935,9 @@ class PsicologoCreateViewTests(TestCase):
         self.assertEqual(psicologo.ramas.count(), 2)
         self.assertTrue(psicologo.ramas.filter(id_rama=self.rama).exists())
         self.assertTrue(psicologo.ramas.filter(id_rama=self.rama_secundaria).exists())
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[-1].to, ["laura@example.com"])
+        self.assertIn("tu perfil ya fue aprobado".lower(), mail.outbox[-1].alternatives[0][0].lower())
 
         user = get_user_model().objects.get(username="31111222")
         self.assertEqual(user.email, "laura@example.com")
@@ -838,15 +948,36 @@ class PsicologoCreateViewTests(TestCase):
         self.create_solicitud()
         solicitud = PsicologoPendiente.objects.get(dni=31111222)
 
-        response = self.client.post(
+        form_response = self.client.get(
             reverse("usuario:psicologo_pendiente_rechazar", args=[solicitud.pk])
+        )
+
+        self.assertEqual(form_response.status_code, 200)
+        self.assertContains(form_response, "Motivo del rechazo")
+
+        response = self.client.post(
+            reverse("usuario:psicologo_pendiente_rechazar", args=[solicitud.pk]),
+            {"observacion_rechazo": "La documentacion enviada no es suficiente para validar el alta."},
         )
 
         self.assertRedirects(response, reverse("usuario:psicologo_pendiente_list"))
         solicitud.refresh_from_db()
         self.assertEqual(solicitud.estado, PsicologoPendiente.ESTADO_RECHAZADO)
+        self.assertEqual(
+            solicitud.observacion_rechazo,
+            "La documentacion enviada no es suficiente para validar el alta.",
+        )
         self.assertFalse(Psicologo.objects.filter(dni=31111222).exists())
         self.assertFalse(get_user_model().objects.filter(username="31111222").exists())
+
+        detail_response = self.client.get(
+            reverse("usuario:psicologo_pendiente_detail", args=[solicitud.pk])
+        )
+        self.assertContains(detail_response, "Ver observacion")
+        self.assertContains(
+            detail_response,
+            "La documentacion enviada no es suficiente para validar el alta.",
+        )
 
     def test_create_psicologo_without_titulo_does_not_submit(self):
         response = self.client.post(
@@ -1443,6 +1574,31 @@ class UsuarioListPaginationTests(TestCase):
         self.assertEqual(len(response_page_2.context[context_name]), second_page_count)
         self.assertContains(response_page_2, "Pagina 2 de 2")
 
+    def assert_page_size_options(self, url, context_name, total_count):
+        response_five = self.client.get(url, {"per_page": 5})
+        self.assertEqual(response_five.status_code, 200)
+        self.assertEqual(response_five.context["paginator"].per_page, 5)
+        self.assertEqual(len(response_five.context[context_name]), 5)
+        self.assertContains(response_five, "Excel")
+        self.assertContains(response_five, "PDF")
+
+        response_all = self.client.get(url, {"per_page": "all"})
+        self.assertEqual(response_all.status_code, 200)
+        self.assertFalse(response_all.context["is_paginated"])
+        self.assertEqual(len(response_all.context[context_name]), total_count)
+
+    def assert_export_responses(self, url, expected_value):
+        response_excel = self.client.get(url, {"export": "excel"})
+        self.assertEqual(response_excel.status_code, 200)
+        self.assertEqual(response_excel["Content-Type"], "application/vnd.ms-excel; charset=utf-8")
+        self.assertContains(response_excel, expected_value)
+        self.assertNotContains(response_excel, "Acciones")
+
+        response_pdf = self.client.get(url, {"export": "pdf"})
+        self.assertEqual(response_pdf.status_code, 200)
+        self.assertEqual(response_pdf["Content-Type"], "application/pdf")
+        self.assertIn(b"%PDF-1.4", response_pdf.content)
+
     def create_psicologos(self, total):
         for index in range(total):
             dni = 32000000 + index
@@ -1492,6 +1648,30 @@ class UsuarioListPaginationTests(TestCase):
                 id_localidad=self.localidad,
                 id_zona=self.zona,
                 password_hash="hash-prueba",
+            )
+
+    def create_pacientes_pendientes(self, total):
+        for index in range(total):
+            dni = 35000000 + index
+            PacientePendiente.objects.create(
+                nombres=f"Paciente pendiente {index:02d}",
+                email=f"pacientependiente{index}@example.com",
+                dni=dni,
+                cuil=self.build_cuil(dni, index % 10),
+                fch_nacimiento=date(1994, 1, 1),
+                telefono="3515557890",
+                domicilio=f"Pasaje {index}",
+                id_sexo=self.sexo,
+                id_std_civil=self.estado_civil,
+                id_pais=self.pais,
+                id_provincia=self.provincia,
+                id_localidad=self.localidad,
+                id_zona=self.zona,
+                password_hash="hash-paciente",
+                id_ocupacion=self.ocupacion,
+                id_ciclo_vida=self.ciclo_vida,
+                id_grado_estudio=self.grado_estudio,
+                sobre_mi="Texto de prueba",
             )
 
     def create_oficinas(self, total):
@@ -1548,10 +1728,12 @@ class UsuarioListPaginationTests(TestCase):
         self.create_psicologos(12)
         self.create_pacientes(12)
         self.create_solicitudes(12)
+        self.create_pacientes_pendientes(12)
 
         self.assert_paginated(reverse("usuario:psicologo_list"), "psicologos", second_page_count=3)
         self.assert_paginated(reverse("usuario:paciente_list"), "pacientes")
         self.assert_paginated(reverse("usuario:psicologo_pendiente_list"), "solicitudes")
+        self.assert_paginated(reverse("usuario:paciente_pendiente_list"), "solicitudes")
 
     def test_psicologo_related_lists_paginate_by_ten(self):
         self.create_oficinas(12)
@@ -1563,3 +1745,41 @@ class UsuarioListPaginationTests(TestCase):
         self.assert_paginated(reverse("usuario:psicologo_metodo_pago_list"), "metodos_pago")
         self.assert_paginated(reverse("usuario:psicologo_rama_list"), "ramas", second_page_count=3)
         self.assert_paginated(reverse("usuario:psicologo_idioma_list"), "idiomas")
+
+    def test_tables_support_page_size_selector(self):
+        self.create_psicologos(12)
+        self.create_pacientes(12)
+        self.create_solicitudes(12)
+        self.create_pacientes_pendientes(12)
+        self.create_oficinas(12)
+        self.create_metodos_pago(12)
+        self.create_ramas_profesionales(12)
+        self.create_idiomas(12)
+
+        self.assert_page_size_options(reverse("usuario:psicologo_list"), "psicologos", 13)
+        self.assert_page_size_options(reverse("usuario:paciente_list"), "pacientes", 12)
+        self.assert_page_size_options(reverse("usuario:psicologo_pendiente_list"), "solicitudes", 12)
+        self.assert_page_size_options(reverse("usuario:paciente_pendiente_list"), "solicitudes", 12)
+        self.assert_page_size_options(reverse("usuario:psicologo_oficina_list"), "oficinas", 12)
+        self.assert_page_size_options(reverse("usuario:psicologo_metodo_pago_list"), "metodos_pago", 12)
+        self.assert_page_size_options(reverse("usuario:psicologo_rama_list"), "ramas", 25)
+        self.assert_page_size_options(reverse("usuario:psicologo_idioma_list"), "idiomas", 12)
+
+    def test_tables_support_excel_and_pdf_exports(self):
+        self.create_psicologos(2)
+        self.create_pacientes(2)
+        self.create_solicitudes(2)
+        self.create_pacientes_pendientes(2)
+        self.create_oficinas(2)
+        self.create_metodos_pago(2)
+        self.create_ramas_profesionales(2)
+        self.create_idiomas(2)
+
+        self.assert_export_responses(reverse("usuario:psicologo_list"), "Psicologo 00")
+        self.assert_export_responses(reverse("usuario:paciente_list"), "Paciente 00")
+        self.assert_export_responses(reverse("usuario:psicologo_pendiente_list"), "Solicitud 00")
+        self.assert_export_responses(reverse("usuario:paciente_pendiente_list"), "Paciente pendiente 00")
+        self.assert_export_responses(reverse("usuario:psicologo_oficina_list"), "Consultorio 00")
+        self.assert_export_responses(reverse("usuario:psicologo_metodo_pago_list"), "METODO 00")
+        self.assert_export_responses(reverse("usuario:psicologo_rama_list"), "RAMA 00")
+        self.assert_export_responses(reverse("usuario:psicologo_idioma_list"), "IDIOMA 00")

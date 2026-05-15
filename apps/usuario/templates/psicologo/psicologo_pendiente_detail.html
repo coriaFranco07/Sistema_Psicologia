@@ -184,30 +184,40 @@ main.detail-main {
 }
 
 .btn-modern {
-    min-height: 40px;
+    min-height: 38px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 0 12px;
-    border-radius: 8px;
+    padding: 0 14px;
+    border-radius: 13px;
     border: 1px solid transparent;
-    font-weight: 800;
+    font-size: 0.84rem;
+    font-weight: 950;
+    letter-spacing: 0.01em;
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+}
+
+.btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.14);
+    filter: saturate(1.08);
 }
 
 .btn-modern-primary {
-    border-color: #16a34a;
-    background: #16a34a;
-    color: #ffffff;
+    border-color: #bbf7d0;
+    background: #ecfdf5;
+    color: #166534;
 }
 
 .btn-modern-danger {
-    border-color: #dc2626;
-    background: #dc2626;
-    color: #ffffff;
+    border-color: #fee2e2;
+    background: #fef2f2;
+    color: #b91c1c;
 }
 
 .btn-modern-secondary {
@@ -259,15 +269,15 @@ main.detail-main {
         <a class="btn-modern btn-modern-secondary" href="{% url 'usuario:psicologo_pendiente_list' %}">Volver a solicitudes</a>
         <div class="detail-actions">
             <a class="btn-modern btn-modern-info" href="{{ solicitud.titulo.url }}" target="_blank" rel="noopener">Ver titulo PDF</a>
+            {% if mostrar_boton_observacion %}
+                <a class="btn-modern btn-modern-secondary" href="#observacion-rechazo">Ver observacion</a>
+            {% endif %}
             {% if solicitud.estado == 'PENDIENTE' %}
                 <form method="post" action="{% url 'usuario:psicologo_pendiente_confirmar' solicitud.pk %}">
                     {% csrf_token %}
                     <button class="btn-modern btn-modern-primary" type="submit">Aprobar</button>
                 </form>
-                <form method="post" action="{% url 'usuario:psicologo_pendiente_rechazar' solicitud.pk %}">
-                    {% csrf_token %}
-                    <button class="btn-modern btn-modern-danger" type="submit">Rechazar</button>
-                </form>
+                <a class="btn-modern btn-modern-danger" href="{% url 'usuario:psicologo_pendiente_rechazar' solicitud.pk %}">Rechazar</a>
             {% endif %}
         </div>
     </div>
@@ -393,6 +403,17 @@ main.detail-main {
                         </div>
                     </div>
                 </section>
+                {% if solicitud.observacion_rechazo %}
+                    <section class="info-block" id="observacion-rechazo">
+                        <h2>Observacion de rechazo</h2>
+                        <div class="info-list">
+                            <div class="info-item">
+                                <span class="info-label">Motivo</span>
+                                <span class="info-value">{{ solicitud.observacion_rechazo }}</span>
+                            </div>
+                        </div>
+                    </section>
+                {% endif %}
             </div>
         </div>
     </div>

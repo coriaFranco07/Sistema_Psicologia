@@ -4,6 +4,7 @@ from apps.datos_personales.models import DatosPersonales
 
 from .models import (
     Paciente,
+    PacientePendiente,
     Psicologo,
     PsicologoIdioma,
     PsicologoMetodoPago,
@@ -95,6 +96,30 @@ class PacienteAdmin(admin.ModelAdmin):
     autocomplete_fields = ("id_estado", "id_ocupacion", "id_grado_estudio")
     readonly_fields = ("id_ciclo_vida",)
     inlines = [PacienteDatosPersonalesInline]
+
+
+@admin.register(PacientePendiente)
+class PacientePendienteAdmin(admin.ModelAdmin):
+    list_display = (
+        "nombres",
+        "dni",
+        "email",
+        "id_ocupacion",
+        "id_ciclo_vida",
+        "estado",
+        "fch_creacion",
+    )
+    search_fields = ("nombres", "dni", "email", "cuil")
+    list_filter = ("estado", "id_ocupacion", "id_ciclo_vida", "id_grado_estudio")
+    list_select_related = ("paciente", "id_ocupacion", "id_ciclo_vida", "id_grado_estudio")
+    readonly_fields = (
+        "password_hash",
+        "paciente",
+        "id_ciclo_vida",
+        "fch_creacion",
+        "fch_actualizacion",
+        "fch_resolucion",
+    )
 
 
 @admin.register(PsicologoMetodoPago)

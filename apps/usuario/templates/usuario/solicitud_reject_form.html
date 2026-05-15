@@ -1,0 +1,33 @@
+{% extends "usuario/base.html" %}
+{% block title %}Rechazar solicitud{% endblock %}
+
+{% block extra_styles %}
+.reject-page{max-width:920px;margin:0 auto;display:grid;gap:18px}.reject-card{border:1px solid #dbe3ef;border-radius:18px;background:#fff;box-shadow:0 18px 44px rgba(15,23,42,.07);padding:24px}.reject-kicker{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:#fee2e2;color:#b91c1c;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.reject-card h1{margin:14px 0 8px;color:#0f172a;font-size:2rem;line-height:1.1}.reject-card p{margin:0;color:#64748b;line-height:1.6}.reject-form{display:grid;gap:16px}.reject-form label{display:block;margin-bottom:8px;color:#0f172a;font-size:.92rem;font-weight:800}.reject-form textarea{width:100%;min-height:150px;padding:14px 16px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc;color:#0f172a;font:inherit;resize:vertical}.reject-form textarea:focus{outline:2px solid rgba(239,68,68,.12);border-color:#ef4444;background:#fff}.reject-error{padding:12px 14px;border:1px solid #fecaca;border-radius:14px;background:#fef2f2;color:#b91c1c;font-weight:700}.reject-actions{display:flex;gap:10px;flex-wrap:wrap}.reject-btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 14px;border-radius:13px;border:1px solid transparent;font-size:.84rem;font-weight:950;letter-spacing:.01em;text-decoration:none;white-space:nowrap;cursor:pointer;box-shadow:0 10px 22px rgba(15,23,42,.08);transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}.reject-btn:hover{transform:translateY(-2px);box-shadow:0 16px 30px rgba(15,23,42,.14);filter:saturate(1.08)}.reject-btn.primary{border-color:#fee2e2;background:#fef2f2;color:#b91c1c}.reject-btn.secondary{border-color:#cbd5e1;background:#fff;color:#334155}@media(max-width:720px){.reject-page{max-width:none}.reject-actions{display:grid}.reject-btn{width:100%}}
+{% endblock %}
+
+{% block content %}
+<section class="reject-page">
+  <div class="reject-card">
+    <span class="reject-kicker">Rechazo de solicitud</span>
+    <h1>Rechazar solicitud de {{ solicitud.nombres }}</h1>
+    <p>Ingresa el motivo del rechazo. Luego quedara disponible el boton <strong>Ver observacion</strong> para consultar este comentario.</p>
+  </div>
+
+  <div class="reject-card">
+    <form method="post" class="reject-form">
+      {% csrf_token %}
+      {% if form.observacion_rechazo.errors %}
+        <div class="reject-error">{{ form.observacion_rechazo.errors|striptags }}</div>
+      {% endif %}
+      <div>
+        <label for="{{ form.observacion_rechazo.id_for_label }}">Motivo del rechazo</label>
+        {{ form.observacion_rechazo }}
+      </div>
+      <div class="reject-actions">
+        <button class="reject-btn primary" type="submit">Guardar rechazo</button>
+        <a class="reject-btn secondary" href="{{ cancel_url }}">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
