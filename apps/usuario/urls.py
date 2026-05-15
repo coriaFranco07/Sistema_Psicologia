@@ -150,4 +150,9 @@ urlpatterns = [
         views.PsicologoSobreMiUpdateView.as_view(),
         name="psicologo_sobre_mi_update",
     ),
+    path(
+        "pacientes/<int:pk>/sobre-mi/",
+        views.PacienteSobreMiUpdateView.as_view(),
+        name="paciente_sobre_mi_update",
+    ),
 ]

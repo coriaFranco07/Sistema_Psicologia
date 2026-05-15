@@ -228,6 +228,9 @@ main.detail-main {
     </div>
 
     <div class="detail-topbar">
+        <a class="admin-btn primary" href="{% url 'usuario:paciente_sobre_mi_update' paciente.pk %}">
+          Sobre mí
+        </a>
         <div class="detail-actions">
             <a class="btn-modern btn-modern-primary" href="{% url 'usuario:paciente_update' paciente.pk %}">Editar ficha</a>
         </div>

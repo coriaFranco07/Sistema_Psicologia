@@ -18,6 +18,7 @@ from principal.auth_utils import get_panel_role_for_user
 from .forms import (
     DatosPersonalesSolicitudForm,
     PacienteForm,
+    PacienteSobreMiForm,
     PsicologoForm,
     PsicologoIdiomaForm,
     PsicologoMetodoPagoForm,
@@ -1324,6 +1325,20 @@ class PsicologoSobreMiUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("usuario:psicologo_detail", kwargs={"pk": self.object.pk})
+
+    def form_valid(self, form):
+        messages.success(self.request, "Sobre mí actualizado correctamente.")
+        return super().form_valid(form)
+    
+
+class PacienteSobreMiUpdateView(LoginRequiredMixin, UpdateView):
+    model = Paciente
+    form_class = PacienteSobreMiForm
+    template_name = "paciente/paciente_sobre_mi_form.html"
+    context_object_name = "paciente"
+
+    def get_success_url(self):
+        return reverse_lazy("usuario:paciente_detail", kwargs={"pk": self.object.pk})
 
     def form_valid(self, form):
         messages.success(self.request, "Sobre mí actualizado correctamente.")

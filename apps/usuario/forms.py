@@ -641,3 +641,24 @@ class PsicologoSobreMiForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["sobre_mi"].label = "Sobre mí"
         self.fields["sobre_mi"].required = False
+
+
+
+class PacienteSobreMiForm(forms.ModelForm):
+    class Meta:
+        model = Paciente
+        fields = ["sobre_mi"]
+        widgets = {
+            "sobre_mi": forms.Textarea(
+                attrs={
+                    "class": "about-input",
+                    "rows": 10,
+                    "placeholder": "Contá quién sos, tu experiencia, qué te llevó a buscar terapia, qué esperas de las sesiones y cualquier otra información que quieras compartir para que el psicólogo pueda conocerte mejor.",
+                }
+            )
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["sobre_mi"].label = "Sobre mí"
+        self.fields["sobre_mi"].required = False
