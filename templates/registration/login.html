@@ -14,7 +14,7 @@
     <main class="login-page">
         <section class="login-left">
             <a class="login-brand" href="{% url 'home' %}">
-                <img class="login-logo" src="{% static 'images/MenteClara_sinFondo.png' %}" alt="MenteClara">
+                
             </a>
 
             <div class="login-copy">
@@ -32,16 +32,14 @@
         <section class="login-right">
             <div class="login-card">
                 <img class="login-card-logo" src="{% static 'images/MenteClara_sinFondo.png' %}" alt="MenteClara">
-                <div class="login-symbol" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M24 34V14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M24 22c-6-8-14-7-16-4 1 8 8 11 16 10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 22c6-8 14-7 16-4-1 8-8 11-16 10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 14c-4-5-8-5-10-3 0 5 4 8 10 8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 14c4-5 8-5 10-3 0 5-4 8-10 8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                <div class="login-head"><h2>Bienvenido de nuevo</h2><p>Inicia sesión para continuar cuidando tu bienestar.</p></div>
+                
                 {% if form.non_field_errors %}<div class="login-alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
                 <form method="post" class="login-form" novalidate>{% csrf_token %}
                     <div class="login-field"><label for="{{ form.username.id_for_label }}" class="login-label">DNI</label><div class="input-shell"><span class="input-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>{{ form.username }}</div></div>
                     <div class="login-field"><label for="{{ form.password.id_for_label }}" class="login-label">Contraseña</label><div class="input-shell password-shell"><span class="input-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>{{ form.password }}<button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar u ocultar contraseña" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
                     {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
-                    <div class="login-meta"><label class="remember-row" for="{{ form.remember_me.id_for_label }}">{{ form.remember_me }}<span>Recuérdame</span></label><a href="/admin/password_reset/" class="forgot-link">¿Olvidaste tu contraseña?</a></div>
                     <button type="submit" class="login-submit">Entrar al sistema</button>
-                    <div class="register-choice"><p class="register-choice-title">¿Todavía no tienes cuenta?</p><div class="register-actions"><a href="{% url 'home' %}" class="register-link"><span aria-hidden="true">👤</span>Quiero ser paciente</a><a href="{% url 'home' %}" class="register-link"><span aria-hidden="true">🧠</span>Quiero ser psicólogo</a></div></div>
+                    <div class="register-choice"><p class="register-choice-title">¿Todavía no tienes cuenta?</p><div class="register-actions"><a href="{% url 'home' %}" class="register-link"><span aria-hidden="true"></span>Quiero ser paciente</a><a href="{% url 'home' %}" class="register-link"><span aria-hidden="true"></span>Quiero ser psicólogo</a></div></div>
                 </form>
             </div>
         </section>
