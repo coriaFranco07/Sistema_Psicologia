@@ -218,7 +218,7 @@ class PsicologoFormDefaultsTests(TestCase):
                 "dni": "30111222",
                 "cuil": "20301112229",
                 "fch_nacimiento": "1990-01-15",
-                "id_rama": rama.pk,
+                "ramas": [rama.pk],
                 "password1": "ClaveSegura123",
                 "password2": "ClaveSegura123",
             },
@@ -231,6 +231,7 @@ class PsicologoFormDefaultsTests(TestCase):
 
         self.assertEqual(psicologo.id_estado, estado_activo)
         self.assertTrue(psicologo.titulo)
+        self.assertTrue(psicologo.ramas.filter(id_rama=rama, id_estado=estado_activo).exists())
         self.assertTrue(get_user_model().objects.filter(username="30111222").exists())
 
     def test_psicologo_form_requires_titulo_pdf(self):
@@ -243,7 +244,7 @@ class PsicologoFormDefaultsTests(TestCase):
                 "dni": "30111222",
                 "cuil": "20301112229",
                 "fch_nacimiento": "1990-01-15",
-                "id_rama": Rama.objects.get(dsc_rama="CLINICA").pk,
+                "ramas": [Rama.objects.get(dsc_rama="CLINICA").pk],
                 "password1": "ClaveSegura123",
                 "password2": "ClaveSegura123",
             }
@@ -262,7 +263,7 @@ class PsicologoFormDefaultsTests(TestCase):
                 "dni": "30111222",
                 "cuil": "20301112229",
                 "fch_nacimiento": "1990-01-15",
-                "id_rama": rama.pk,
+                "ramas": [rama.pk],
                 "password1": "ClaveSegura123",
                 "password2": "ClaveSegura123",
             },
@@ -688,10 +689,10 @@ class PacientePsychologistSectionsTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Foto de perfil de Laura Psicologa")
-        self.assertContains(response, "Quiero que sea mi psicologo")
-        self.assertContains(response, "Sesiones virtuales y presenciales")
-        self.assertContains(response, "Especialidades en clinica, infantil.")
+        self.assertContains(response, "Foto de Laura Psicologa")
+        self.assertContains(response, "Quiero que sea mi psicólogo")
+        self.assertContains(response, "Online y presencial")
+        self.assertContains(response, "Especialista en clinica, infantil")
         self.assertContains(response, self.idioma_en.dsc_idioma)
         self.assertContains(
             response,
@@ -716,6 +717,7 @@ class PsicologoCreateViewTests(TestCase):
         self.localidad = Localidad.objects.create(dsc_localidad="CORDOBA", flg_activo=True)
         self.rama = Rama.objects.create(dsc_rama="CLINICA", flg_activo=True)
         self.rama_secundaria = Rama.objects.create(dsc_rama="INFANTIL", flg_activo=True)
+        self.rama_terciaria = Rama.objects.create(dsc_rama="PAREJA", flg_activo=True)
         self.zona = Zona.objects.create(dsc_zona="CENTRO", flg_activo=True)
 
     def psicologo_payload(self, include_titulo=True, include_foto=False):
@@ -755,6 +757,34 @@ class PsicologoCreateViewTests(TestCase):
                 f"datos_form errors: {response.context['datos_form'].errors}"
             )
         return response
+
+    def create_psicologo_aprobado(self):
+        self.create_solicitud()
+        solicitud = PsicologoPendiente.objects.get(dni=31111222)
+        self.client.post(reverse("usuario:psicologo_pendiente_confirmar", args=[solicitud.pk]))
+        return Psicologo.objects.get(dni=31111222)
+
+    def psicologo_update_payload(self, psicologo, ramas):
+        datos = psicologo.datos_personales_rel
+        return {
+            "nombres": psicologo.nombres,
+            "email": psicologo.email,
+            "dni": str(psicologo.dni),
+            "cuil": str(psicologo.cuil),
+            "fch_nacimiento": psicologo.fch_nacimiento.isoformat(),
+            "ramas": ramas,
+            "sobre_mi": psicologo.sobre_mi,
+            "telefono": datos.telefono,
+            "domicilio": datos.domicilio,
+            "id_sexo": datos.id_sexo_id,
+            "id_std_civil": datos.id_std_civil_id,
+            "id_pais": datos.id_pais_id,
+            "id_provincia": datos.id_provincia_id,
+            "id_localidad": datos.id_localidad_id,
+            "id_zona": datos.id_zona_id,
+            "password1": "",
+            "password2": "",
+        }
 
     def test_create_psicologo_request_goes_to_pending_table(self):
         response = self.create_solicitud()
@@ -838,6 +868,73 @@ class PsicologoCreateViewTests(TestCase):
         self.assertContains(response, self.rama_secundaria.dsc_rama)
         self.assertNotContains(response, 'name="valor_sesion"', html=False)
 
+    def test_update_form_uses_rama_checkboxes_and_hides_valor_sesion(self):
+        psicologo = self.create_psicologo_aprobado()
+
+        response = self.client.get(reverse("usuario:psicologo_update", args=[psicologo.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'type="checkbox"', html=False)
+        self.assertContains(response, self.rama.dsc_rama)
+        self.assertContains(response, self.rama_secundaria.dsc_rama)
+        self.assertNotContains(response, 'name="valor_sesion"', html=False)
+
+    def test_update_psicologo_creates_new_active_rama_when_selected(self):
+        psicologo = self.create_psicologo_aprobado()
+
+        response = self.client.post(
+            reverse("usuario:psicologo_update", args=[psicologo.pk]),
+            data=self.psicologo_update_payload(
+                psicologo,
+                [self.rama.pk, self.rama_secundaria.pk, self.rama_terciaria.pk],
+            ),
+        )
+
+        self.assertRedirects(response, reverse("usuario:psicologo_list"))
+        psicologo.refresh_from_db()
+        self.assertTrue(psicologo.ramas.filter(id_rama=self.rama_terciaria).exists())
+        self.assertEqual(
+            psicologo.ramas.get(id_rama=self.rama_terciaria).id_estado,
+            self.estado_activo,
+        )
+
+    def test_update_psicologo_inactivates_unchecked_rama(self):
+        psicologo = self.create_psicologo_aprobado()
+
+        response = self.client.post(
+            reverse("usuario:psicologo_update", args=[psicologo.pk]),
+            data=self.psicologo_update_payload(psicologo, [self.rama.pk]),
+        )
+
+        self.assertRedirects(response, reverse("usuario:psicologo_list"))
+        psicologo.refresh_from_db()
+        self.assertEqual(
+            psicologo.ramas.get(id_rama=self.rama_secundaria).id_estado,
+            self.estado_inactivo,
+        )
+
+    def test_update_psicologo_reactivates_existing_inactive_rama_without_duplicate(self):
+        psicologo = self.create_psicologo_aprobado()
+        rama_relacion = psicologo.ramas.get(id_rama=self.rama_secundaria)
+        rama_relacion.id_estado = self.estado_inactivo
+        rama_relacion.save(update_fields=["id_estado"])
+
+        response = self.client.post(
+            reverse("usuario:psicologo_update", args=[psicologo.pk]),
+            data=self.psicologo_update_payload(
+                psicologo,
+                [self.rama.pk, self.rama_secundaria.pk],
+            ),
+        )
+
+        self.assertRedirects(response, reverse("usuario:psicologo_list"))
+        psicologo.refresh_from_db()
+        self.assertEqual(psicologo.ramas.filter(id_rama=self.rama_secundaria).count(), 1)
+        self.assertEqual(
+            psicologo.ramas.get(id_rama=self.rama_secundaria).id_estado,
+            self.estado_activo,
+        )
+
     def test_pending_psicologo_list_uses_review_template(self):
         response = self.client.get(reverse("usuario:psicologo_pendiente_list"))
 
@@ -871,7 +968,8 @@ class PsicologoCreateViewTests(TestCase):
         self.assertContains(response, "laura@example.com")
         self.assertContains(response, "3515551234")
         self.assertContains(response, "San Martin 123")
-        self.assertContains(response, "CLINICA, INFANTIL")
+        self.assertContains(response, "CLINICA")
+        self.assertContains(response, "INFANTIL")
         self.assertContains(response, "Abrir PDF adjunto")
     def test_psicologo_list_shows_complete_data_and_view_profile_action(self):
         self.create_solicitud(include_foto=True)
@@ -897,13 +995,14 @@ class PsicologoCreateViewTests(TestCase):
         response = self.client.get(reverse("usuario:psicologo_detail", args=[psicologo.pk]))
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "psicologo/psicologo_detail.html")
-        self.assertContains(response, "Psicologo Laura Psicologa")
-        self.assertContains(response, "Foto de perfil de Laura Psicologa")
+        self.assertTemplateUsed(response, "psicologo/psicologo_detail_admin.html")
+        self.assertContains(response, "Psicólogo Laura Psicologa")
+        self.assertContains(response, "Foto de Laura Psicologa")
         self.assertContains(response, "laura@example.com")
         self.assertContains(response, "3515551234")
         self.assertContains(response, "San Martin 123")
-        self.assertContains(response, "CLINICA, INFANTIL")
+        self.assertContains(response, "CLINICA")
+        self.assertContains(response, "INFANTIL")
         self.assertContains(response, "Abrir PDF adjunto")
 
     def test_psicologo_confirm_delete_uses_inactivation_copy(self):

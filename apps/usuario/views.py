@@ -341,10 +341,20 @@ class PsicologoDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         ramas_activas = self.object.get_ramas_activas()
+        oficinas_activas = getattr(self.object, "oficinas_activas", [])
+        idiomas_activos = getattr(self.object, "idiomas_activos", [])
         context["ramas_activas"] = ramas_activas
         context["ramas_activas_texto"] = ", ".join(
             rama.id_rama.dsc_rama for rama in ramas_activas
         ) or "Sin ramas asignadas"
+        context["idiomas_activos_texto"] = ", ".join(
+            idioma.id_idioma.dsc_idioma for idioma in idiomas_activos
+        ) or "No especificados"
+        context["ubicaciones_presenciales"] = [
+            f"{oficina.id_provincia}, {oficina.id_localidad}"
+            for oficina in oficinas_activas
+            if oficina.id_provincia and oficina.id_localidad
+        ]
         context["datos_personales"] = self.object.datos_personales_rel
         return context
 

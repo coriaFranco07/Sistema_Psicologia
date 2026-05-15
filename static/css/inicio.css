@@ -17,7 +17,7 @@
   --radius-lg: 24px;
   --radius-md: 18px;
   --radius-sm: 14px;
-  --content: 1380px;
+  --content: 1500px;
 }
 
 *,
@@ -137,9 +137,9 @@ input {
 }
 
 .landing {
-  width: min(var(--content), calc(100% - 24px));
+  width: min(var(--content), calc(100% - 16px));
   margin: 0 auto;
-  padding: 30px 0 0;
+  padding: 34px 0 0;
 }
 
 .hero-layout,
@@ -156,7 +156,7 @@ input {
   align-items: start;
 }
 
-.hero-panel,
+.hero-layout,
 .card,
 .feature-strip,
 .psych-card,
@@ -168,23 +168,24 @@ input {
   box-shadow: var(--shadow);
 }
 
-.hero-panel {
+.hero-layout {
   position: relative;
   border-radius: var(--radius-xl);
   overflow: hidden;
   display: grid;
-  grid-template-columns: minmax(0, 0.96fr) minmax(360px, 0.94fr);
-  min-height: 640px;
+  grid-template-columns: minmax(0, 1fr) minmax(460px, 1.04fr);
+  min-height: 700px;
+  margin-bottom: 26px;
   background:
-    radial-gradient(circle at 22% 18%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.82) 38%, rgba(255, 255, 255, 0) 66%),
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.8) 40%, rgba(255, 255, 255, 0) 68%),
     linear-gradient(90deg, #fff 0%, #fbf8ff 46%, #f3ebff 100%);
 }
 
-.hero-panel::before {
+.hero-layout::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 30% 54%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 40%);
+  background: radial-gradient(circle at 28% 54%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 42%);
   pointer-events: none;
   z-index: 1;
 }
@@ -192,13 +193,11 @@ input {
 .hero-copy {
   position: relative;
   z-index: 2;
-  padding: 44px 48px 36px;
+  padding: 58px 56px 52px 60px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background:
-    radial-gradient(circle at top left, rgba(129, 90, 255, 0.12), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(255, 255, 255, 0.92));
+  background: transparent;
 }
 
 .eyebrow {
@@ -242,9 +241,9 @@ input {
 
 .hero-copy p {
   margin: 0;
-  max-width: 500px;
+  max-width: 560px;
   color: var(--ink-soft);
-  font-size: 1.02rem;
+  font-size: 1.06rem;
   line-height: 1.82;
 }
 
@@ -295,7 +294,7 @@ input {
 
 .hero-media {
   position: relative;
-  min-height: 640px;
+  min-height: 700px;
   overflow: hidden;
 }
 
@@ -321,10 +320,14 @@ input {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 66% center;
-  transform: scale(1.04);
+  object-position: 68% center;
+  transform: scale(1.03);
   transform-origin: center;
   filter: saturate(0.96) brightness(1.02);
+}
+
+.hero-side {
+  margin-top: 6px;
 }
 
 .card {
@@ -913,7 +916,7 @@ input {
 }
 
 @media (max-width: 1100px) {
-  .hero-panel,
+  .hero-layout,
   .pro-card,
   .content-grid--bottom {
     grid-template-columns: 1fr;
@@ -945,7 +948,7 @@ input {
     padding: 34px 24px;
   }
 
-  .hero-panel,
+  .hero-layout,
   .card,
   .feature-strip,
   .site-footer,

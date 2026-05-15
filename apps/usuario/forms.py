@@ -41,6 +41,10 @@ def get_estado_activo():
     return Estado.objects.filter(dsc_estado__iexact="ACTIVO", flg_activo=True).first()
 
 
+def get_estado_inactivo():
+    return Estado.objects.filter(dsc_estado__iexact="INACTIVO", flg_activo=True).first()
+
+
 class DatosPersonalesSolicitudForm(forms.Form):
     telefono = forms.CharField(max_length=25, widget=forms.TextInput(attrs={"class": "app-input", "placeholder": "Telefono o celular"}))
     domicilio = forms.CharField(max_length=200, widget=forms.TextInput(attrs={"class": "app-input", "placeholder": "Domicilio"}))
@@ -208,9 +212,16 @@ class UsuarioBaseForm(forms.ModelForm):
 
 
 class PsicologoForm(UsuarioBaseForm):
+    ramas = forms.ModelMultipleChoiceField(
+        queryset=Rama.objects.none(),
+        label="Ramas",
+        widget=forms.CheckboxSelectMultiple,
+        help_text="Marca todas las ramas activas que quieras mostrar en tu perfil profesional.",
+    )
+
     class Meta(UsuarioBaseForm.Meta):
         model = Psicologo
-        fields = USUARIO_BASE_FIELDS + ["titulo", "sobre_mi"]
+        fields = USUARIO_BASE_FIELDS + ["titulo"]
         widgets = {
             "sobre_mi": forms.Textarea(
                 attrs={
@@ -227,10 +238,67 @@ class PsicologoForm(UsuarioBaseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["ramas"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
+        if self.instance and self.instance.pk:
+            self.fields["ramas"].initial = [
+                rama.id_rama_id for rama in self.instance.get_ramas_activas()
+            ]
         self.fields["titulo"].label = "Titulo"
         self.fields["titulo"].help_text = (
             "Adjunta el titulo profesional en formato PDF."
         )
+        self.fields["sobre_mi"].label = "Sobre mí"
+
+    def sync_ramas(self, psicologo):
+        if not psicologo.pk:
+            return
+
+        estado_activo = get_estado_activo()
+        estado_inactivo = get_estado_inactivo()
+        ramas_seleccionadas = {
+            rama.pk for rama in self.cleaned_data.get("ramas", [])
+        }
+        ramas_existentes = {
+            rama.id_rama_id: rama
+            for rama in psicologo.ramas.select_related("id_estado").all()
+        }
+
+        for rama_id in ramas_seleccionadas:
+            rama_relacion = ramas_existentes.get(rama_id)
+            if rama_relacion is None:
+                if estado_activo is None:
+                    continue
+                PsicologoRama.objects.create(
+                    id_psicologo=psicologo,
+                    id_rama_id=rama_id,
+                    valor_sesion=0,
+                    id_estado=estado_activo,
+                )
+                continue
+
+            if estado_activo and rama_relacion.id_estado_id != estado_activo.pk:
+                rama_relacion.id_estado = estado_activo
+                rama_relacion.save(update_fields=["id_estado"])
+
+        if estado_inactivo:
+            for rama_id, rama_relacion in ramas_existentes.items():
+                if rama_id in ramas_seleccionadas:
+                    continue
+                if rama_relacion.id_estado_id == estado_inactivo.pk:
+                    continue
+                rama_relacion.id_estado = estado_inactivo
+                rama_relacion.save(update_fields=["id_estado"])
+
+        if hasattr(psicologo, "ramas_activas"):
+            delattr(psicologo, "ramas_activas")
+
+    def save(self, commit=True):
+        psicologo = super().save(commit=False)
+        if commit:
+            psicologo.save()
+            self.sync_ramas(psicologo)
+            self.save_m2m()
+        return psicologo
 
         
 class PsicologoPendienteForm(UsuarioBaseForm):

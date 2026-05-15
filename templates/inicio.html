@@ -31,35 +31,34 @@
 
   <main class="landing">
     <section class="hero-layout">
-      <div class="hero-panel">
-        <div class="hero-copy">
-          <span class="eyebrow">
-            <span class="eyebrow__dot"></span>
-            +2.400 personas ya empezaron su proceso
-          </span>
+      <div class="hero-copy">
+        <span class="eyebrow">
+          <span class="eyebrow__dot"></span>
+          +2.400 personas ya empezaron su proceso
+        </span>
 
-          <h1>
-            Encontr&aacute; tu psic&oacute;logo.
-            <em>Empez&aacute; esta semana.</em>
-          </h1>
+        <h1>
+          Encontr&aacute; tu psic&oacute;logo.
+          <em>Empez&aacute; esta semana.</em>
+        </h1>
 
-          <p>
-            Sin listas de espera interminables. Sin papeleo confuso. Solo vos, tu psicologo
-            ideal y un espacio seguro para trabajar en lo que necesitas.
-          </p>
+        <p>
+          Sin listas de espera interminables. Sin papeleo confuso. Solo vos, tu psicologo
+          ideal y un espacio seguro para trabajar en lo que necesitas.
+        </p>
 
-          <div class="hero-actions">
-            <a class="btn btn--primary" href="{% url 'usuario:paciente_create' %}">Buscar psicologo</a>
-            <a class="btn btn--ghost" href="{% url 'usuario:psicologo_create' %}">&iquest;Sos psicologo/a?</a>
-          </div>
-        </div>
-
-        <div class="hero-media">
-          <img src="{% static 'images/fotos_inicio/foto3.jpg' %}" alt="Paciente conversando con una profesional">
+        <div class="hero-actions">
+          <a class="btn btn--primary" href="{% url 'usuario:paciente_create' %}">Buscar psicologo</a>
+          <a class="btn btn--ghost" href="{% url 'usuario:psicologo_create' %}">&iquest;Sos psicologo/a?</a>
         </div>
       </div>
 
-      <div class="hero-side">
+      <div class="hero-media">
+        <img src="{% static 'images/fotos_inicio/foto3.jpg' %}" alt="Paciente conversando con una profesional">
+      </div>
+    </section>
+
+    <section class="hero-side">
         <section id="como-funciona" class="card how-card">
           <div class="section-head section-head--center">
             <h2>&iquest;Como funciona?</h2>
@@ -135,7 +134,6 @@
             <img src="{% static 'images/fotos_inicio/foto2.jpg' %}" alt="Profesional trabajando online">
           </div>
         </section>
-      </div>
     </section>
 
     <section class="feature-strip">
@@ -343,28 +341,7 @@
 
       </div>
 
-      <aside class="newsletter-block">
-        <div class="newsletter-copy">
-          <h2>Recibi contenido que te hace bien</h2>
-          <p>Suscribite y recibi recursos, consejos y novedades en tu correo.</p>
-        </div>
-
-        <form class="newsletter-form">
-          <label class="sr-only" for="newsletter-email">Tu correo electr&oacute;nico</label>
-          <input id="newsletter-email" type="email" placeholder="Tu correo electronico">
-          <button type="button" aria-label="Enviar suscripcion">→</button>
-        </form>
-
-        <p class="newsletter-note">No compartimos tu informacion. Podes darte de baja cuando quieras.</p>
-
-        <div class="newsletter-envelope" aria-hidden="true">
-          <div class="newsletter-envelope__paper"></div>
-          <div class="newsletter-envelope__flap"></div>
-          <div class="newsletter-envelope__body">
-            <span>&#9829;</span>
-          </div>
-        </div>
-      </aside>
+    
     </section>
   </main>
 
