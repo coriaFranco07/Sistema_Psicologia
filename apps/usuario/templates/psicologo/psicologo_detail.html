@@ -16,11 +16,16 @@
       <span class="psy-role">Psicólogo</span>
       <p class="psy-subtitle">Especialista en {{ ramas_activas_texto|lower }}</p>
       <div class="psy-meta">
-        <span>{% if datos_personales and datos_personales.id_provincia %}{{ datos_personales.id_provincia }}{% else %}Perfil verificado{% endif %}</span>
+        <span class="psy-meta-item">{% if psicologo.oficinas_activas %}Online y presencial{% else %}Online{% endif %}</span>
+        <span>
+          {% if datos_personales and datos_personales.id_provincia and datos_personales and datos_personales.id_localidad %}
+            {{ datos_personales.id_provincia }}, {{ datos_personales.id_localidad }}
+          {% else %}
+            Perfil verificado
+          {% endif %}
+        </span>
         <span class="psy-rating">★ 4.8</span>
         <span>(96 opiniones)</span>
-        <span class="psy-meta-item">{% if psicologo.oficinas_activas %}Palermo, CABA{% elif datos_personales and datos_personales.id_localidad %}{{ datos_personales.id_localidad }}{% else %}Ubicación a confirmar{% endif %}</span>
-        <span class="psy-meta-item">{% if psicologo.oficinas_activas %}Online y presencial{% else %}Online{% endif %}</span>
       </div>
       {% if panel_role != "paciente" %}
       <div class="psy-admin-actions">

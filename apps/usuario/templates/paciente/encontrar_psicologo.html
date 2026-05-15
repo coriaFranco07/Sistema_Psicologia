@@ -880,14 +880,32 @@
               <div class="fp-card-body">
                 <div class="fp-card-top">
                   <h3 class="fp-card-name">{{ psicologo.nombres }}</h3>
-                  <p class="fp-card-meta">Psicologia {{ psicologo.id_rama.dsc_rama|lower }}</p>
+<p class="fp-card-meta">
+  Psicologia
+  {% for rama in psicologo.ramas_activas %}
+    {{ rama.id_rama.dsc_rama|lower }}{% if not forloop.last %}, {% endif %}
+  {% empty %}
+    sin especialidad cargada
+  {% endfor %}
+</p>
                 </div>
 
-                <p class="fp-card-summary">
-                  Enfoque en {{ psicologo.id_rama.dsc_rama|lower }} con una atencion cercana, profesional y adaptada al ritmo de cada paciente.
-                </p>
+<p class="fp-card-summary">
+  Enfoque en
+  {% for rama in psicologo.ramas_activas %}
+    {{ rama.id_rama.dsc_rama|lower }}{% if not forloop.last %}, {% endif %}
+  {% empty %}
+    distintas areas de atencion
+  {% endfor %}
+  con una atencion cercana, profesional y adaptada al ritmo de cada paciente.
+</p>
 
                 <div class="fp-card-tags">
+                  {% for rama in psicologo.ramas_activas %}
+  <span class="fp-tag">{{ rama.id_rama.dsc_rama }}</span>
+{% empty %}
+  <span class="fp-tag">Sin especialidades cargadas</span>
+{% endfor %}
                   <span class="fp-tag">
                     {% if psicologo.oficinas_activas %}
                       Sesiones virtuales y presenciales
