@@ -82,6 +82,26 @@ urlpatterns = [
         name="psicologo_metodo_pago_delete",
     ),
     path(
+        "psicologos/ramas/",
+        views.PsicologoRamaListView.as_view(),
+        name="psicologo_rama_list",
+    ),
+    path(
+        "psicologos/ramas/nueva/",
+        views.PsicologoRamaCreateView.as_view(),
+        name="psicologo_rama_create",
+    ),
+    path(
+        "psicologos/ramas/<int:pk>/editar/",
+        views.PsicologoRamaUpdateView.as_view(),
+        name="psicologo_rama_update",
+    ),
+    path(
+        "psicologos/ramas/<int:pk>/eliminar/",
+        views.PsicologoRamaDeleteView.as_view(),
+        name="psicologo_rama_delete",
+    ),
+    path(
         "psicologos/idiomas/",
         views.PsicologoIdiomaListView.as_view(),
         name="psicologo_idioma_list",

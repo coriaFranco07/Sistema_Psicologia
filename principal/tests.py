@@ -91,7 +91,7 @@ class PanelPacientePageTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Panel paciente")
         self.assertContains(response, "Mi espacio personal")
-        self.assertContains(response, "Tu espacio personal, simple y claro.")
+        self.assertContains(response, "Bienvenida de vuelta")
         self.assertContains(response, reverse("usuario:paciente_mi_perfil"))
         self.assertContains(response, reverse("usuario:paciente_mis_psicologos"))
         self.assertContains(response, reverse("usuario:paciente_encontrar_psicologo"))

@@ -95,6 +95,7 @@
                     <div id="admin-nav-psicologos" class="admin-nav-items">
                         <a class="admin-nav-link" data-admin-nav-link href="{% url 'usuario:psicologo_list' %}"><span>Ver psicologos</span></a>
                         <a class="admin-nav-link" data-admin-nav-link href="{% url 'usuario:psicologo_pendiente_list' %}"><span>Psicologos pendientes</span></a>
+                        <a class="admin-nav-link" data-admin-nav-link href="{% url 'usuario:psicologo_rama_list' %}"><span>Psicologo-Rama</span></a>
                         <a class="admin-nav-link" data-admin-nav-link href="{% url 'usuario:psicologo_oficina_list' %}"><span>Oficinas</span></a>
                         <a class="admin-nav-link" data-admin-nav-link href="{% url 'usuario:psicologo_metodo_pago_list' %}"><span>Metodos de pago</span></a>
                         <a class="admin-nav-link" data-admin-nav-link href="{% url 'usuario:psicologo_idioma_list' %}"><span>Idiomas</span></a>
@@ -145,6 +146,17 @@
                     </button>
                     <div id="psy-nav-perfil" class="admin-nav-items">
                         <a class="admin-nav-link" data-admin-nav-link href="{% url 'usuario:psicologo_mi_perfil' %}"><span>Mi perfil</span></a>
+                    </div>
+                </section>
+
+                <section class="admin-nav-group" data-admin-nav-group>
+                    <button type="button" class="admin-nav-trigger" data-admin-section-toggle aria-expanded="false" aria-controls="psy-nav-ramas">
+                        <span class="admin-nav-bullet"></span>
+                        <span class="admin-nav-copy"><span class="admin-nav-label">Mis ramas</span></span>
+                        <span class="admin-nav-caret"></span>
+                    </button>
+                    <div id="psy-nav-ramas" class="admin-nav-items">
+                        <a class="admin-nav-link" data-admin-nav-link href="{% url 'usuario:psicologo_rama_list' %}"><span>Ver ramas</span></a>
                     </div>
                 </section>
 

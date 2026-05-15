@@ -1,0 +1,44 @@
+{% extends "usuario/base.html" %}
+{% block title %}Psicologo-Rama{% endblock %}
+
+{% block extra_styles %}
+.rama-form-page{display:grid;gap:22px}.rama-form-hero{position:relative;overflow:hidden;display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:30px;border-radius:32px;background:radial-gradient(circle at 12% 12%,rgba(20,184,166,.28),transparent 26%),linear-gradient(135deg,#0f172a,#115e59);color:#fff;box-shadow:0 28px 70px rgba(15,23,42,.16)}.rama-form-hero:after{content:"";position:absolute;right:-80px;bottom:-120px;width:280px;height:280px;border-radius:999px;background:rgba(255,255,255,.1)}.rama-form-hero>*{position:relative;z-index:1}.rama-form-hero h1{margin:10px 0 8px;font-size:clamp(2rem,4vw,3.5rem);line-height:.95;letter-spacing:-.06em}.rama-form-hero p{margin:0;max-width:680px;color:rgba(226,232,240,.9);line-height:1.6}.rama-kicker{display:inline-flex;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.rama-back{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 15px;border-radius:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;text-decoration:none;font-weight:900}.rama-form-shell{width:min(920px,100%);margin:0 auto}.rama-form-card{padding:26px;border-radius:30px;background:#fff;border:1px solid #e2e8f0;box-shadow:0 18px 44px rgba(15,23,42,.06)}.rama-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.rama-field{display:grid;gap:8px}.rama-field label{font-weight:900;color:#0f172a}.rama-field input,.rama-field select{width:100%;min-height:50px;border:1px solid #dbe4ee;border-radius:15px;background:#f8fafc;padding:0 14px;color:#0f172a;font-weight:700;outline:none;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}.rama-field input:focus,.rama-field select:focus{border-color:#14b8a6;background:#fff;box-shadow:0 0 0 4px rgba(20,184,166,.12)}.rama-field small{color:#64748b}.rama-error{margin:0;color:#be123c;font-weight:800;font-size:.86rem}.rama-form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:20px;border-top:1px solid #e2e8f0}.rama-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 16px;border-radius:14px;text-decoration:none;font-weight:900;border:0}.rama-btn.light{background:#f1f5f9;color:#334155}.rama-btn.primary{background:#0f766e;color:#fff;box-shadow:0 14px 28px rgba(15,118,110,.2)}@media(max-width:900px){.rama-form-hero{display:grid}.rama-form-shell{width:100%}}@media(max-width:620px){.rama-form-card{padding:20px}.rama-form-grid{grid-template-columns:1fr}.rama-form-actions{display:grid}.rama-btn{width:100%}}
+{% endblock %}
+
+{% block content %}
+<div class="rama-form-page">
+  <section class="rama-form-hero">
+    <div>
+      <span class="rama-kicker">Perfil profesional</span>
+      <h1>{% if form.instance.pk %}Editar rama profesional{% else %}Nueva rama profesional{% endif %}</h1>
+      <p>Relaciona al psicologo con una rama profesional concreta y define el valor por sesion para ese enfoque.</p>
+    </div>
+    <a class="rama-back" href="{% url 'usuario:psicologo_rama_list' %}">Volver</a>
+  </section>
+
+  <div class="rama-form-shell">
+    <form method="post" class="rama-form-card">
+      {% csrf_token %}
+      <div class="rama-form-grid">
+        {% for field in form %}
+          {% if field.is_hidden %}
+            {{ field }}
+          {% else %}
+            <div class="rama-field">
+              <label>{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+              {% for error in field.errors %}<p class="rama-error">{{ error }}</p>{% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="rama-form-actions">
+        <a class="rama-btn light" href="{% url 'usuario:psicologo_rama_list' %}">Cancelar</a>
+        <button class="rama-btn primary" type="submit">Guardar rama</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

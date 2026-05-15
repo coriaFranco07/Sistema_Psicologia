@@ -1,112 +1,1038 @@
 {% extends "usuario/base.html" %}
+{% load static querystring %}
 
-{% block title %}Encontrar mi Psicólogo{% endblock %}
+{% block title %}Encontrar mi Psicologo{% endblock %}
 {% block main_class %}fp-main{% endblock %}
 
 {% block extra_styles %}
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; }
 
 .fp-main {
-  --teal-50: #f0fdfa;
-  --teal-100: #ccfbf1;
-  --teal-200: #99f6e4;
-  --teal-500: #14b8a6;
-  --teal-600: #0d9488;
-  --teal-700: #0f766e;
-  --teal-800: #115e59;
-  --teal-900: #134e4a;
-  --navy-50: #f8fafc;
-  --navy-100: #f1f5f9;
-  --navy-200: #e2e8f0;
-  --navy-300: #cbd5e1;
-  --navy-400: #94a3b8;
-  --navy-500: #64748b;
-  --navy-700: #334155;
-  --navy-800: #1e293b;
-  --navy-900: #0f172a;
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
-  font-family: var(--font-body);
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px 64px;
-  background: transparent;
+  --fp-bg: #f6f8fc;
+  --fp-surface: #ffffff;
+  --fp-surface-soft: #f9fbff;
+  --fp-border: #dfe7f2;
+  --fp-border-strong: #cfd9e9;
+  --fp-ink: #17304f;
+  --fp-copy: #4f6580;
+  --fp-muted: #7b8da6;
+  --fp-primary: #6e4ff6;
+  --fp-primary-soft: #efeafe;
+  --fp-primary-deep: #5637df;
+  --fp-accent: #1f9bb8;
+  --fp-success: #17a768;
+  --fp-shadow: 0 24px 64px rgba(30, 55, 90, 0.09);
+  --fp-display: "Cormorant Garamond", Georgia, serif;
+  --fp-body: "Manrope", system-ui, sans-serif;
+
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 28px 72px;
+  background:
+    radial-gradient(circle at top left, rgba(110, 79, 246, 0.08), transparent 24%),
+    linear-gradient(180deg, #fbfcff 0%, #f4f7fb 100%);
+  color: var(--fp-ink);
+  font-family: var(--fp-body);
 }
-.fp-hero{position:relative;overflow:hidden;padding:56px 52px 52px;margin-bottom:12px;border-radius:28px;background:var(--navy-900);color:#fff}.fp-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 85% -10%, rgba(20,184,166,.28) 0%, transparent 55%),radial-gradient(ellipse 40% 60% at -5% 110%, rgba(20,184,166,.15) 0%, transparent 50%);pointer-events:none}.fp-hero-inner{position:relative;z-index:1}.fp-kicker{display:inline-flex;align-items:center;gap:7px;padding:5px 14px 5px 10px;border-radius:999px;border:1px solid rgba(20,184,166,.35);background:rgba(20,184,166,.12);color:var(--teal-200);font-family:var(--font-body);font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:22px}.fp-kicker::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal-500);box-shadow:0 0 0 3px rgba(20,184,166,.25)}.fp-hero h1{font-family:var(--font-display);font-size:clamp(2rem,3.8vw,3rem);font-weight:500;line-height:1.08;letter-spacing:-.01em;color:#fff;margin:0 0 16px;max-width:640px}.fp-hero p{color:rgba(255,255,255,.58);font-size:1rem;font-weight:300;line-height:1.75;max-width:600px;margin:0 0 32px}.fp-meta{display:flex;flex-wrap:wrap;gap:10px}.fp-pill{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:.82rem;font-weight:500}.fp-pill.accent{background:rgba(20,184,166,.18);border-color:rgba(20,184,166,.35);color:var(--teal-200)}.fp-pill.accent::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal-400,#2dd4bf)}
-.fp-toolbar{display:grid;grid-template-columns:minmax(240px,1fr) minmax(180px,240px) minmax(160px,220px) auto auto;align-items:end;gap:12px;padding:18px 20px;border-radius:20px;background:#fff;border:1px solid var(--navy-200);box-shadow:0 2px 12px rgba(15,23,42,.05);margin-bottom:12px}.fp-filter-field{display:grid;gap:7px}.fp-filter-label{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--navy-400)}.fp-search-wrap{position:relative;display:flex;align-items:center}.fp-search-icon{position:absolute;left:14px;color:var(--navy-400);width:18px;height:18px;pointer-events:none}.fp-search,.fp-select{width:100%;height:46px;border:1px solid var(--navy-200);border-radius:12px;background:var(--navy-50);color:var(--navy-900);font-family:var(--font-body);font-size:.93rem;transition:border-color .18s,box-shadow .18s}.fp-search{padding:0 14px 0 42px}.fp-select{padding:0 14px}.fp-search::placeholder{color:var(--navy-400)}.fp-search:focus,.fp-select:focus{outline:none;border-color:var(--teal-500);box-shadow:0 0 0 3px rgba(20,184,166,.12)}.fp-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:46px;padding:0 22px;border-radius:12px;border:none;background:var(--navy-900);color:#fff;font-family:var(--font-body);font-size:.9rem;font-weight:600;cursor:pointer;text-decoration:none;transition:background .18s,transform .1s;white-space:nowrap}.fp-btn:hover{background:var(--navy-800)}.fp-btn:active{transform:scale(.98)}.fp-btn.ghost{background:transparent;color:var(--navy-500);border:1px solid var(--navy-200)}.fp-btn.ghost:hover{background:var(--navy-50)}
-.fp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.fp-card{display:flex;flex-direction:column;gap:0;border-radius:24px;background:#fff;border:1px solid var(--navy-200);box-shadow:0 4px 24px rgba(15,23,42,.05);overflow:hidden;transition:box-shadow .22s,transform .22s}.fp-card:hover{box-shadow:0 12px 40px rgba(15,23,42,.1);transform:translateY(-2px)}.fp-card-header{padding:22px 22px 18px;display:flex;gap:16px;align-items:flex-start}.fp-photo-wrap{position:relative;flex:0 0 auto}.fp-photo{width:72px;height:72px;border-radius:18px;object-fit:cover;background:var(--navy-100);display:block}.fp-status-dot{position:absolute;bottom:4px;right:4px;width:12px;height:12px;border-radius:50%;background:#22c55e;border:2px solid #fff}.fp-card-identity{min-width:0}.fp-card-identity h2{font-family:var(--font-display);font-size:1.05rem;font-weight:500;color:var(--navy-900);margin:0 0 4px;line-height:1.2}.fp-card-rama{font-size:.82rem;color:var(--teal-700);font-weight:500;margin:0 0 10px}.fp-badges{display:flex;flex-wrap:wrap;gap:6px}.fp-badge{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;font-size:.72rem;font-weight:600}.fp-badge.blue{background:#eff6ff;color:#1d4ed8}.fp-badge.teal{background:var(--teal-50);color:var(--teal-700)}.fp-divider{height:1px;background:var(--navy-100);margin:0 22px}.fp-info{padding:16px 22px;display:grid;gap:10px}.fp-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.fp-row-label{font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy-400);white-space:nowrap;padding-top:1px}.fp-row-value{font-size:.88rem;font-weight:500;color:var(--navy-800);text-align:right;line-height:1.4}.fp-lang-list{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}.fp-lang-tag{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;background:var(--navy-100);color:var(--navy-700);font-size:.72rem;font-weight:600}.fp-card-cta{padding:14px 22px 22px;margin-top:auto}.fp-cta-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:44px;border-radius:12px;background:var(--teal-700);color:#fff;font-family:var(--font-body);font-size:.88rem;font-weight:600;text-decoration:none;transition:background .18s,transform .1s}.fp-cta-btn:hover{background:var(--teal-800)}.fp-cta-btn:active{transform:scale(.98)}.fp-cta-btn svg{width:15px;height:15px;opacity:.8}.fp-empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:64px 24px;border-radius:24px;background:#fff;border:1px dashed var(--navy-200)}.fp-empty-icon{width:56px;height:56px;border-radius:16px;background:var(--navy-100);display:flex;align-items:center;justify-content:center;margin-bottom:20px;color:var(--navy-400)}.fp-empty h2{font-family:var(--font-display);font-size:1.3rem;font-weight:500;color:var(--navy-900);margin:0 0 10px}.fp-empty p{color:var(--navy-500);font-size:.92rem;line-height:1.65;max-width:440px;margin:0}.fp-page{display:flex;flex-direction:column;gap:12px}
-@media(max-width:1040px){.fp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.fp-toolbar{grid-template-columns:1fr 1fr}.fp-filter-field.search{grid-column:1/-1}.fp-btn,.fp-btn.ghost{width:100%}}
-@media(max-width:720px){.fp-main{padding:0 0 40px}.fp-hero{padding:36px 28px 36px;border-radius:20px}.fp-toolbar{grid-template-columns:1fr;border-radius:16px}.fp-grid{grid-template-columns:1fr}.fp-card{border-radius:18px}.fp-row{flex-direction:column;gap:4px}.fp-row-value,.fp-lang-list{text-align:left;justify-content:flex-start}}
+
+.fp-page {
+  display: grid;
+  gap: 24px;
+}
+
+.fp-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 420px);
+  gap: 28px;
+  align-items: stretch;
+  padding: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 30px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 248, 255, 0.94)),
+    linear-gradient(135deg, rgba(110, 79, 246, 0.08), rgba(31, 155, 184, 0.04));
+  box-shadow: var(--fp-shadow);
+  overflow: hidden;
+}
+
+.fp-hero::after {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -60px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(110, 79, 246, 0.16), transparent 70%);
+  pointer-events: none;
+}
+
+.fp-hero-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.fp-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(110, 79, 246, 0.12);
+  color: var(--fp-primary-deep);
+  font-size: 0.77rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.fp-hero h1 {
+  margin: 0;
+  color: #1b2d4c;
+  font-family: var(--fp-display);
+  font-size: clamp(2.5rem, 4vw, 3.7rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.fp-hero p {
+  margin: 0;
+  max-width: 660px;
+  color: var(--fp-copy);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.fp-hero-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.fp-highlight {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(23, 48, 79, 0.08);
+  color: var(--fp-ink);
+  font-size: 0.83rem;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(55, 78, 111, 0.08);
+}
+
+.fp-highlight-dot {
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--fp-success);
+  box-shadow: 0 0 0 6px rgba(23, 167, 104, 0.12);
+}
+
+.fp-hero-visual {
+  position: relative;
+  min-height: 250px;
+  border-radius: 24px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0)),
+    #ebe5dd;
+}
+
+.fp-hero-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.fp-toolbar {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) repeat(3, minmax(0, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+  margin-top: -52px;
+  padding: 18px;
+  border: 1px solid rgba(218, 227, 240, 0.95);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 20px 40px rgba(24, 47, 78, 0.1);
+  backdrop-filter: blur(14px);
+}
+
+.fp-field {
+  display: grid;
+  gap: 7px;
+}
+
+.fp-field-label {
+  padding-left: 2px;
+  color: var(--fp-muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fp-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.fp-search-icon {
+  position: absolute;
+  left: 14px;
+  width: 16px;
+  height: 16px;
+  color: #92a2b8;
+  pointer-events: none;
+}
+
+.fp-search,
+.fp-select {
+  width: 100%;
+  height: 48px;
+  border: 1px solid var(--fp-border);
+  border-radius: 14px;
+  background: var(--fp-surface-soft);
+  color: var(--fp-ink);
+  font-family: var(--fp-body);
+  font-size: 0.92rem;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.fp-search {
+  padding: 0 14px 0 40px;
+}
+
+.fp-select {
+  padding: 0 14px;
+}
+
+.fp-search::placeholder {
+  color: #98a8bc;
+}
+
+.fp-search:focus,
+.fp-select:focus {
+  outline: none;
+  border-color: rgba(110, 79, 246, 0.45);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(110, 79, 246, 0.1);
+}
+
+.fp-toolbar-actions {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+}
+
+.fp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 118px;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 14px;
+  border: 0;
+  background: linear-gradient(135deg, var(--fp-primary), var(--fp-primary-deep));
+  color: #ffffff;
+  font-family: var(--fp-body);
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 16px 32px rgba(110, 79, 246, 0.22);
+  transition: transform .14s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+.fp-btn:hover {
+  filter: brightness(1.02);
+  transform: translateY(-1px);
+  box-shadow: 0 18px 34px rgba(110, 79, 246, 0.26);
+}
+
+.fp-btn.ghost {
+  min-width: auto;
+  background: #ffffff;
+  color: var(--fp-copy);
+  border: 1px solid var(--fp-border);
+  box-shadow: none;
+}
+
+.fp-body {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.fp-sidebar {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 16px;
+}
+
+.fp-panel {
+  padding: 20px;
+  border: 1px solid var(--fp-border);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 14px 34px rgba(33, 55, 86, 0.06);
+}
+
+.fp-panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 16px;
+  color: var(--fp-ink);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.fp-panel-link {
+  color: var(--fp-primary);
+  font-size: 0.77rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.fp-panel-list {
+  display: grid;
+  gap: 10px;
+}
+
+.fp-checkline,
+.fp-chipline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--fp-copy);
+  font-size: 0.83rem;
+}
+
+.fp-checkbox {
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--fp-border-strong);
+  border-radius: 4px;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+.fp-checkbox.active {
+  background: var(--fp-primary-soft);
+  border-color: rgba(110, 79, 246, 0.32);
+  box-shadow: inset 0 0 0 4px var(--fp-primary);
+}
+
+.fp-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fp-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #f7f9fd;
+  border: 1px solid var(--fp-border);
+  color: var(--fp-copy);
+  font-size: 0.77rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.fp-chip.active {
+  background: var(--fp-primary-soft);
+  border-color: rgba(110, 79, 246, 0.26);
+  color: var(--fp-primary-deep);
+}
+
+.fp-results {
+  display: grid;
+  gap: 18px;
+}
+
+.fp-results-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 4px;
+}
+
+.fp-results-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.fp-results-copy h2 {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.fp-results-copy p {
+  margin: 0;
+  color: var(--fp-muted);
+  font-size: 0.83rem;
+}
+
+.fp-results-order {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--fp-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.fp-order-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid var(--fp-border);
+  color: var(--fp-ink);
+}
+
+.fp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.fp-card {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--fp-border);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+  box-shadow: 0 18px 34px rgba(34, 58, 89, 0.07);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.fp-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(31, 155, 184, 0.26);
+  box-shadow: 0 24px 42px rgba(34, 58, 89, 0.11);
+}
+
+.fp-card-media {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fp-photo-wrap {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #efeafe, #e7f4f6);
+}
+
+.fp-photo {
+  display: block;
+  width: 100%;
+  height: 124px;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.fp-card-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(23, 167, 104, 0.1);
+  color: #117349;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.fp-card-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fp-card-top {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.fp-card-name {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.fp-card-meta {
+  margin: 0;
+  color: var(--fp-accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.fp-card-summary {
+  margin: 0 0 12px;
+  color: var(--fp-copy);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.fp-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.fp-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f4f7fc;
+  border: 1px solid var(--fp-border);
+  color: var(--fp-copy);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.fp-card-stats {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.fp-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fp-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.fp-stat-row svg {
+  width: 14px;
+  height: 14px;
+  color: #8da1be;
+  flex-shrink: 0;
+}
+
+.fp-card-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 40px;
+  margin-top: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(110, 79, 246, 0.22);
+  background: linear-gradient(180deg, #ffffff 0%, #f7f3ff 100%);
+  color: var(--fp-primary-deep);
+  font-size: 0.83rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.fp-card-cta:hover {
+  background: linear-gradient(180deg, #f6f0ff 0%, #efe8ff 100%);
+}
+
+.fp-trust-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.fp-trust-card {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 16px 18px;
+  border: 1px solid var(--fp-border);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 28px rgba(33, 55, 86, 0.05);
+}
+
+.fp-trust-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--fp-primary-soft);
+  color: var(--fp-primary-deep);
+}
+
+.fp-trust-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.fp-trust-card strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--fp-ink);
+  font-size: 0.83rem;
+}
+
+.fp-trust-card span {
+  color: var(--fp-copy);
+  font-size: 0.77rem;
+  line-height: 1.55;
+}
+
+.fp-empty {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 64px 24px;
+  border: 1px dashed var(--fp-border-strong);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.86);
+  text-align: center;
+}
+
+.fp-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
+  background: var(--fp-primary-soft);
+  color: var(--fp-primary-deep);
+}
+
+.fp-empty h2 {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 1.15rem;
+}
+
+.fp-empty p {
+  margin: 0;
+  max-width: 520px;
+  color: var(--fp-copy);
+  line-height: 1.7;
+}
+
+@media (max-width: 1360px) {
+  .fp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fp-trust-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 1120px) {
+  .fp-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 0;
+  }
+
+  .fp-toolbar-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+
+  .fp-body {
+    grid-template-columns: 1fr;
+  }
+
+  .fp-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 860px) {
+  .fp-main { padding: 0 16px 48px; }
+
+  .fp-hero {
+    grid-template-columns: 1fr;
+    padding: 24px;
+  }
+
+  .fp-hero-visual {
+    min-height: 220px;
+  }
+
+  .fp-grid,
+  .fp-trust-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .fp-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .fp-toolbar-actions {
+    justify-content: stretch;
+  }
+
+  .fp-btn,
+  .fp-btn.ghost {
+    width: 100%;
+  }
+
+  .fp-results-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fp-card {
+    grid-template-columns: 1fr;
+  }
+
+  .fp-photo {
+    height: 220px;
+  }
+}
 {% endblock %}
 
 {% block content %}
 <div class="fp-page">
   <section class="fp-hero">
-    <div class="fp-hero-inner">
-      <span class="fp-kicker">Directorio de profesionales</span>
-      <h1>Encontrá al psicólogo que encaje con vos.</h1>
-      <p>Explorá perfiles verificados de profesionales activos. Filtrá por nombre, especialidad, sexo o ubicación para encontrar a alguien en quien confiar.</p>
-      <div class="fp-meta">
-        <span class="fp-pill accent">{{ total_resultados }} psicólogos activos</span>
-        <span class="fp-pill">Listado visible para pacientes</span>
+    <div class="fp-hero-copy">
+      <span class="fp-hero-badge">Perfiles verificados y activos</span>
+      <h1>Elegi tu psicologo ideal</h1>
+      <p>Encuentra un profesional activo que encaje contigo. Explora perfiles verificados, especialidades y modalidades para dar con alguien que te haga sentir en confianza.</p>
+      <div class="fp-hero-highlights">
+        <span class="fp-highlight"><span class="fp-highlight-dot"></span>{{ total_resultados }} psicologos activos</span>
+        <span class="fp-highlight">Sesiones 100% online disponibles</span>
+        <span class="fp-highlight">Con opcion presencial segun oficina</span>
       </div>
+    </div>
+
+    <div class="fp-hero-visual" aria-hidden="true">
+      <img src="{% static 'images/fotos_inicio/foto2.jpg' %}" alt="">
     </div>
   </section>
 
-  <form id="search-form" class="fp-toolbar" method="get">
-    <div class="fp-filter-field search">
-      <label class="fp-filter-label" for="fp-search">Buscar</label>
+  <form class="fp-toolbar" method="get">
+    <div class="fp-field">
+      <label class="fp-field-label" for="fp-search">Buscar</label>
       <div class="fp-search-wrap">
-        <svg class="fp-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input id="fp-search" class="fp-search" type="search" name="q" value="{{ query }}" placeholder="Buscá por nombre o ubicación…" aria-label="Buscar psicólogo">
+        <svg class="fp-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input
+          id="fp-search"
+          class="fp-search"
+          type="search"
+          name="q"
+          value="{{ query }}"
+          placeholder="Buscar por nombre, especialidad o enfoque..."
+          aria-label="Buscar psicologo">
       </div>
     </div>
-    <div class="fp-filter-field">
-      <label class="fp-filter-label" for="fp-rama">Rama</label>
+
+    <div class="fp-field">
+      <label class="fp-field-label" for="fp-rama">Especialidad</label>
       <select id="fp-rama" class="fp-select" name="rama">
-        <option value="">Todas las ramas</option>
+        <option value="">Todas</option>
         {% for rama in ramas %}
           <option value="{{ rama.pk }}" {% if rama_seleccionada == rama.pk|stringformat:'s' %}selected{% endif %}>{{ rama.dsc_rama }}</option>
         {% endfor %}
       </select>
     </div>
-    <div class="fp-filter-field">
-      <label class="fp-filter-label" for="fp-sexo">Sexo</label>
-      <select id="fp-sexo" class="fp-select" name="sexo">
-        <option value="">Todos</option>
-        {% for sexo in sexos %}
-          <option value="{{ sexo.pk }}" {% if sexo_seleccionado == sexo.pk|stringformat:'s' %}selected{% endif %}>{{ sexo.dsc_tipo }}</option>
+
+    <div class="fp-field">
+      <label class="fp-field-label" for="fp-modalidad">Modalidad</label>
+      <select id="fp-modalidad" class="fp-select" name="modalidad">
+        <option value="">Todas</option>
+        <option value="virtual" {% if modalidad_seleccionada == "virtual" %}selected{% endif %}>Online</option>
+        <option value="presencial" {% if modalidad_seleccionada == "presencial" %}selected{% endif %}>Presencial</option>
+      </select>
+    </div>
+
+    <div class="fp-field">
+      <label class="fp-field-label" for="fp-provincia">Ubicacion</label>
+      <select id="fp-provincia" class="fp-select" name="provincia">
+        <option value="">Todas</option>
+        {% for provincia in provincias %}
+          <option value="{{ provincia.pk }}" {% if provincia_seleccionada == provincia.pk|stringformat:'s' %}selected{% endif %}>{{ provincia.dsc_provincia }}</option>
         {% endfor %}
       </select>
     </div>
-    <button class="fp-btn" type="submit">Buscar</button>
-    {% if query or rama_seleccionada or sexo_seleccionado %}<a class="fp-btn ghost" href="{% url 'usuario:paciente_encontrar_psicologo' %}">Limpiar</a>{% endif %}
+
+    <div class="fp-toolbar-actions">
+      <button class="fp-btn" type="submit">Buscar perfiles</button>
+      {% if query or rama_seleccionada or modalidad_seleccionada or provincia_seleccionada %}
+        <a class="fp-btn ghost" href="{% url 'usuario:paciente_encontrar_psicologo' %}">Limpiar</a>
+      {% endif %}
+    </div>
   </form>
 
-  {% if psicologos %}
-    <section class="fp-grid" aria-label="Listado de psicólogos activos">
-      {% for psicologo in psicologos %}
-        <article class="fp-card">
-          <div class="fp-card-header">
-            <div class="fp-photo-wrap"><img class="fp-photo" src="{{ psicologo.foto_url }}" alt="Foto de {{ psicologo.nombres }}"><span class="fp-status-dot" aria-label="Activo"></span></div>
-            <div class="fp-card-identity"><h2>{{ psicologo.nombres }}</h2><p class="fp-card-rama">{{ psicologo.id_rama.dsc_rama }}</p><div class="fp-badges"><span class="fp-badge teal">Activo</span><span class="fp-badge blue">{% if psicologo.oficinas_activas %}Virtual &amp; Presencial{% else %}Solo virtual{% endif %}</span></div></div>
+  <div class="fp-body">
+    <aside class="fp-sidebar">
+      <section class="fp-panel">
+        <h2 class="fp-panel-title">
+          Filtrar por
+          <a class="fp-panel-link" href="{% url 'usuario:paciente_encontrar_psicologo' %}">Limpiar todo</a>
+        </h2>
+
+        <div class="fp-panel-list">
+          <div class="fp-checkline">
+            <span class="fp-checkbox {% if not rama_seleccionada %}active{% endif %}"></span>
+            <span>Todas las especialidades</span>
           </div>
-          <div class="fp-divider"></div>
-          <div class="fp-info">
-            <div class="fp-row"><span class="fp-row-label">Especialidad</span><span class="fp-row-value">{{ psicologo.id_rama.dsc_rama }}</span></div>
-            <div class="fp-row"><span class="fp-row-label">Sexo</span><span class="fp-row-value">{% if psicologo.datos_personales_rel and psicologo.datos_personales_rel.id_sexo %}{{ psicologo.datos_personales_rel.id_sexo.dsc_tipo }}{% else %}A confirmar{% endif %}</span></div>
-            <div class="fp-row"><span class="fp-row-label">Ubicación</span><span class="fp-row-value">{% if psicologo.datos_personales_rel and psicologo.datos_personales_rel.id_provincia %}{{ psicologo.datos_personales_rel.id_provincia.dsc_provincia }}, {{ psicologo.datos_personales_rel.id_localidad.dsc_localidad }}{% else %}A confirmar{% endif %}</span></div>
-            <div class="fp-row"><span class="fp-row-label">Idiomas</span>{% if psicologo.idiomas_activos %}<div class="fp-lang-list">{% for idioma in psicologo.idiomas_activos %}<span class="fp-lang-tag">{{ idioma.id_idioma.dsc_idioma }}</span>{% endfor %}</div>{% else %}<span class="fp-row-value">No especificados</span>{% endif %}</div>
+          <div class="fp-checkline">
+            <span class="fp-checkbox {% if modalidad_seleccionada == 'virtual' %}active{% endif %}"></span>
+            <span>Online</span>
           </div>
-          <div class="fp-card-cta"><a class="fp-cta-btn" href="{% url 'usuario:psicologo_detail' psicologo.pk %}">Quiero que sea mi psicólogo<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
-        </article>
-      {% endfor %}
-    </section>
-    {% include "includes/pagination.html" %}
-  {% else %}
-    <section class="fp-empty"><div class="fp-empty-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6M11 8v6"/></svg></div><h2>Sin resultados para esa búsqueda.</h2><p>Probá con otro nombre, una rama distinta, otro sexo o una ubicación más general para volver a explorar el listado.</p></section>
-  {% endif %}
+          <div class="fp-checkline">
+            <span class="fp-checkbox {% if modalidad_seleccionada == 'presencial' %}active{% endif %}"></span>
+            <span>Presencial</span>
+          </div>
+          <div class="fp-checkline">
+            <span class="fp-checkbox {% if provincia_seleccionada %}active{% endif %}"></span>
+            <span>Con ubicacion definida</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="fp-panel">
+        <h2 class="fp-panel-title">Especialidades</h2>
+        <div class="fp-chip-grid">
+          {% for rama in ramas|slice:":8" %}
+            <a class="fp-chip {% if rama_seleccionada == rama.pk|stringformat:'s' %}active{% endif %}" href="{% querystring rama=rama.pk page='' %}">{{ rama.dsc_rama }}</a>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="fp-panel">
+        <h2 class="fp-panel-title">Tu busqueda</h2>
+        <div class="fp-panel-list">
+          <div class="fp-chipline">
+            <strong>Resultados:</strong>
+            <span>{{ total_resultados }} perfiles</span>
+          </div>
+          <div class="fp-chipline">
+            <strong>Busqueda:</strong>
+            <span>{% if query %}{{ query }}{% else %}Sin texto{% endif %}</span>
+          </div>
+          <div class="fp-chipline">
+            <strong>Modalidad:</strong>
+            <span>
+              {% if modalidad_seleccionada == "presencial" %}
+                Presencial
+              {% elif modalidad_seleccionada == "virtual" %}
+                Online
+              {% else %}
+                Todas
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <div class="fp-results">
+      <div class="fp-results-head">
+        <div class="fp-results-copy">
+          <h2>Mostrando perfiles recomendados</h2>
+          <p>Profesionales activos listos para acompanarte en tu proceso.</p>
+        </div>
+        <div class="fp-results-order">
+          <span>Ordenar por:</span>
+          <span class="fp-order-pill">Recomendados</span>
+        </div>
+      </div>
+
+      {% if psicologos %}
+        <section class="fp-grid" aria-label="Listado de psicologos activos">
+          {% for psicologo in psicologos %}
+            <article class="fp-card">
+              <div class="fp-card-media">
+                <div class="fp-photo-wrap">
+                  <img class="fp-photo" src="{{ psicologo.foto_url }}" alt="Foto de {{ psicologo.nombres }}" loading="lazy">
+                </div>
+                <span class="fp-card-badge">Disponible</span>
+              </div>
+
+              <div class="fp-card-body">
+                <div class="fp-card-top">
+                  <h3 class="fp-card-name">{{ psicologo.nombres }}</h3>
+                  <p class="fp-card-meta">Psicologia {{ psicologo.id_rama.dsc_rama|lower }}</p>
+                </div>
+
+                <p class="fp-card-summary">
+                  Enfoque en {{ psicologo.id_rama.dsc_rama|lower }} con una atencion cercana, profesional y adaptada al ritmo de cada paciente.
+                </p>
+
+                <div class="fp-card-tags">
+                  <span class="fp-tag">
+                    {% if psicologo.oficinas_activas %}
+                      Sesiones virtuales y presenciales
+                    {% else %}
+                      Sesiones virtuales
+                    {% endif %}
+                  </span>
+                  <span class="fp-tag">Perfil activo</span>
+                </div>
+
+                <div class="fp-card-stats">
+                  <div class="fp-stat-row">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"></path>
+                    </svg>
+                    <span>Perfil verificado y visible para pacientes</span>
+                  </div>
+
+                  <div class="fp-stat-row">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span>
+                      {% if psicologo.oficinas_activas %}
+                        {{ psicologo.oficinas_activas.0.id_provincia.dsc_provincia }}{% if psicologo.oficinas_activas.0.id_localidad %}, {{ psicologo.oficinas_activas.0.id_localidad.dsc_localidad }}{% endif %}
+                      {% elif psicologo.datos_personales_rel and psicologo.datos_personales_rel.id_provincia %}
+                        {{ psicologo.datos_personales_rel.id_provincia.dsc_provincia }}{% if psicologo.datos_personales_rel.id_localidad %}, {{ psicologo.datos_personales_rel.id_localidad.dsc_localidad }}{% endif %}
+                      {% else %}
+                        Ubicacion a confirmar
+                      {% endif %}
+                    </span>
+                  </div>
+
+                  <div class="fp-stat-row">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>
+                      {% if psicologo.idiomas_activos %}
+                        {% for idioma in psicologo.idiomas_activos %}
+                          {{ idioma.id_idioma.dsc_idioma }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                      {% else %}
+                        Idiomas no especificados
+                      {% endif %}
+                    </span>
+                  </div>
+                </div>
+
+                <a class="fp-card-cta" href="{% url 'usuario:psicologo_detail' psicologo.pk %}">Ver perfil</a>
+              </div>
+            </article>
+          {% endfor %}
+        </section>
+
+        {% include "includes/pagination.html" %}
+
+        <section class="fp-trust-strip">
+          <article class="fp-trust-card">
+            <div class="fp-trust-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 2l7 4v6c0 5-3.5 9.74-7 10-3.5-.26-7-5-7-10V6l7-4z"></path>
+                <path d="m9 12 2 2 4-4"></path>
+              </svg>
+            </div>
+            <div>
+              <strong>Profesionales verificados</strong>
+              <span>Todos los perfiles visibles pasaron por una revision previa.</span>
+            </div>
+          </article>
+
+          <article class="fp-trust-card">
+            <div class="fp-trust-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <div>
+              <strong>Confidencial y seguro</strong>
+              <span>Tu informacion y tu proceso se cuidan desde el primer paso.</span>
+            </div>
+          </article>
+
+          <article class="fp-trust-card">
+            <div class="fp-trust-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div>
+              <strong>Elegi con mas claridad</strong>
+              <span>Compara perfiles, modalidades e idiomas antes de decidir.</span>
+            </div>
+          </article>
+
+          <article class="fp-trust-card">
+            <div class="fp-trust-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                <path d="M16 2v4M8 2v4M3 10h18"></path>
+              </svg>
+            </div>
+            <div>
+              <strong>Agenda mas facil</strong>
+              <span>Cuando elijas a tu profesional, el siguiente paso sera simple.</span>
+            </div>
+          </article>
+        </section>
+      {% else %}
+        <section class="fp-empty">
+          <div class="fp-empty-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+          </div>
+          <h2>Sin resultados para esa busqueda.</h2>
+          <p>Prueba con otra especialidad, una provincia diferente o un termino mas general para explorar el directorio completo.</p>
+        </section>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

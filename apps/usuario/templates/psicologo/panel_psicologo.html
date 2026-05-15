@@ -16,6 +16,7 @@
       <p>Gestiona tu perfil profesional, pacientes, consultorios, metodos de pago y agenda desde un solo lugar claro y moderno.</p>
       <div class="psy-actions">
         <a class="psy-btn primary" href="{% url 'usuario:psicologo_list' %}">Ver mi perfil</a>
+        <a class="psy-btn secondary" href="{% url 'usuario:psicologo_rama_list' %}">Mis ramas</a>
         <a class="psy-btn secondary" href="{% url 'usuario:psicologo_oficina_list' %}">Mis consultorios</a>
         <a class="psy-btn secondary" href="{% url 'usuario:psicologo_metodo_pago_list' %}">Mis pagos</a>
       </div>
@@ -31,6 +32,8 @@
   </section>
 
   <section class="quick-grid">
+    <a class="quick-card" href="{% url 'usuario:psicologo_rama_list' %}"><div class="psy-icon">RA</div><strong>Mis ramas</strong><small>Gestionar enfoques profesionales y valor por sesion.</small></a>
+    <a class="quick-card" href="{% url 'usuario:psicologo_rama_create' %}"><div class="psy-icon">+</div><strong>Nueva rama</strong><small>Agregar otra rama profesional a tu perfil.</small></a>
     <a class="quick-card" href="{% url 'usuario:psicologo_oficina_list' %}"><div class="psy-icon">CO</div><strong>Mis consultorios</strong><small>Ver, editar o eliminar espacios de atencion.</small></a>
     <a class="quick-card" href="{% url 'usuario:psicologo_oficina_create' %}"><div class="psy-icon">+</div><strong>Nuevo consultorio</strong><small>Cargar una oficina o lugar de atencion presencial.</small></a>
     <a class="quick-card" href="{% url 'usuario:psicologo_metodo_pago_list' %}"><div class="psy-icon">$</div><strong>Mis metodos de pago</strong><small>Administrar medios de cobro habilitados.</small></a>
@@ -55,6 +58,7 @@
     </div>
 
     <aside class="stack">
+      <section class="psy-mini" id="ramas"><h3>Mis ramas</h3><div class="office-list"><div class="office-item"><div class="copy"><strong>Gestion de ramas</strong><span>Define enfoques profesionales y valor por sesion.</span></div><span class="psy-chip">Nuevo</span></div></div><div class="mini-actions"><a class="mini-link" href="{% url 'usuario:psicologo_rama_list' %}">Ver todas</a><a class="mini-link" href="{% url 'usuario:psicologo_rama_create' %}">Agregar</a></div></section>
       <section class="psy-mini" id="consultorios"><h3>Mis consultorios</h3><div class="office-list"><div class="office-item"><div class="copy"><strong>Gestion de consultorios</strong><span>Administra domicilios, zonas y telefonos.</span></div><span class="psy-chip">Nuevo</span></div></div><div class="mini-actions"><a class="mini-link" href="{% url 'usuario:psicologo_oficina_list' %}">Ver todos</a><a class="mini-link" href="{% url 'usuario:psicologo_oficina_create' %}">Agregar</a></div></section>
       <section class="psy-mini" id="pagos"><h3>Mis metodos de pago</h3><div class="pay-list"><div class="pay-item"><div class="copy"><strong>Gestion de cobros</strong><span>Configura los medios de pago disponibles.</span></div><span class="pay-badge">Activo</span></div></div><div class="mini-actions"><a class="mini-link" href="{% url 'usuario:psicologo_metodo_pago_list' %}">Ver todos</a><a class="mini-link" href="{% url 'usuario:psicologo_metodo_pago_create' %}">Agregar</a></div></section>
     </aside>

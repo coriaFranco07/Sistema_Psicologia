@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
-from apps.parametro.models import Rama, Sexo
+from apps.parametro.models import Provincia, Rama
 from apps.core.views import get_estado_activo, get_estado_inactivo
 from apps.datos_personales.forms import DatosPersonalesForm
 from apps.datos_personales.models import DatosPersonales
@@ -23,9 +23,41 @@ from .forms import (
     PsicologoMetodoPagoForm,
     PsicologoOficinaForm,
     PsicologoPendienteForm,
+    PsicologoRamaForm,
 )
 
-from .models import Paciente, Psicologo, PsicologoIdioma, PsicologoMetodoPago, PsicologoOficina, PsicologoPendiente
+from .models import (
+    Paciente,
+    Psicologo,
+    PsicologoIdioma,
+    PsicologoMetodoPago,
+    PsicologoOficina,
+    PsicologoPendiente,
+    PsicologoPendienteRama,
+    PsicologoRama,
+)
+
+
+def get_psicologo_ramas_prefetch():
+    return Prefetch(
+        "ramas",
+        queryset=PsicologoRama.objects.select_related("id_rama", "id_estado").filter(
+            id_estado__dsc_estado__iexact="ACTIVO",
+            id_estado__flg_activo=True,
+        ).order_by("id_psico_rama"),
+        to_attr="ramas_activas",
+    )
+
+
+def get_psicologo_pendiente_ramas_prefetch():
+    return Prefetch(
+        "ramas_pendientes",
+        queryset=PsicologoPendienteRama.objects.select_related("id_rama").order_by(
+            "id_psico_pend_rama"
+        ),
+        to_attr="ramas_pendientes_prefetch",
+    )
+
 
 class PsicologoMiPerfilView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -127,7 +159,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         ).count()
         context["total_pacientes"] = Paciente.objects.count()
         context["ultimos_psicologos"] = Psicologo.objects.select_related(
-            "id_estado", "id_rama"
+            "id_estado"
+        ).prefetch_related(
+            get_psicologo_ramas_prefetch()
         ).order_by("-fch_creacion")[:5]
         context["ultimos_pacientes"] = Paciente.objects.select_related(
             "id_estado", "id_ocupacion", "id_ciclo_vida"
@@ -142,16 +176,19 @@ class PsicologoPendienteListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = PsicologoPendiente.objects.select_related(
-            "id_rama",
-            "id_sexo",
-            "id_std_civil",
-            "id_pais",
-            "id_provincia",
-            "id_localidad",
-            "id_zona",
-            "psicologo",
-        ).order_by("-fch_creacion")
+        queryset = (
+            PsicologoPendiente.objects.select_related(
+                "id_sexo",
+                "id_std_civil",
+                "id_pais",
+                "id_provincia",
+                "id_localidad",
+                "id_zona",
+                "psicologo",
+            )
+            .prefetch_related(get_psicologo_pendiente_ramas_prefetch())
+            .order_by("-fch_creacion")
+        )
 
         estado = self.request.GET.get("estado", "").strip().upper()
         if estado in dict(PsicologoPendiente.ESTADOS):
@@ -169,8 +206,8 @@ class PsicologoPendienteListView(LoginRequiredMixin, ListView):
             | Q(email__icontains=query)
             | Q(dni_text__icontains=query)
             | Q(cuil_text__icontains=query)
-            | Q(id_rama__dsc_rama__icontains=query)
-        )
+            | Q(ramas_pendientes__id_rama__dsc_rama__icontains=query)
+        ).distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -188,7 +225,6 @@ class PsicologoPendienteDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         return PsicologoPendiente.objects.select_related(
-            "id_rama",
             "id_sexo",
             "id_std_civil",
             "id_pais",
@@ -196,7 +232,7 @@ class PsicologoPendienteDetailView(LoginRequiredMixin, DetailView):
             "id_localidad",
             "id_zona",
             "psicologo",
-        )
+        ).prefetch_related(get_psicologo_pendiente_ramas_prefetch())
 
 
 class PsicologoListView(LoginRequiredMixin, ListView):
@@ -209,7 +245,6 @@ class PsicologoListView(LoginRequiredMixin, ListView):
         queryset = (
             Psicologo.objects.select_related(
                 "id_estado",
-                "id_rama",
                 "datos_personales",
                 "datos_personales__id_sexo",
                 "datos_personales__id_std_civil",
@@ -217,6 +252,8 @@ class PsicologoListView(LoginRequiredMixin, ListView):
                 "datos_personales__id_provincia",
                 "datos_personales__id_localidad",
                 "datos_personales__id_zona",
+            ).prefetch_related(
+                get_psicologo_ramas_prefetch()
             )
             .annotate(
                 dni_text=Cast("dni", output_field=CharField()),
@@ -237,7 +274,7 @@ class PsicologoListView(LoginRequiredMixin, ListView):
             | Q(datos_personales__telefono__icontains=query)
             | Q(datos_personales__domicilio__icontains=query)
             | Q(id_estado__dsc_estado__icontains=query)
-            | Q(id_rama__dsc_rama__icontains=query)
+            | Q(ramas__id_rama__dsc_rama__icontains=query)
             | Q(datos_personales__id_sexo__dsc_tipo__icontains=query)
             | Q(datos_personales__id_std_civil__dsc_std_civil__icontains=query)
             | Q(datos_personales__id_pais__dsc_pais__icontains=query)
@@ -245,7 +282,7 @@ class PsicologoListView(LoginRequiredMixin, ListView):
             | Q(datos_personales__id_localidad__dsc_localidad__icontains=query)
             | Q(datos_personales__id_zona__dsc_zona__icontains=query)
         )
-        return queryset.filter(filtros)
+        return queryset.filter(filtros).distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -262,7 +299,6 @@ class PsicologoDetailView(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         return Psicologo.objects.select_related(
             "id_estado",
-            "id_rama",
             "datos_personales",
             "datos_personales__id_sexo",
             "datos_personales__id_std_civil",
@@ -271,9 +307,14 @@ class PsicologoDetailView(LoginRequiredMixin, DetailView):
             "datos_personales__id_localidad",
             "datos_personales__id_zona",
         ).prefetch_related(
+            get_psicologo_ramas_prefetch(),
             Prefetch(
                 "oficinas",
-                queryset=PsicologoOficina.objects.select_related("id_estado").filter(
+                queryset=PsicologoOficina.objects.select_related(
+                    "id_estado",
+                    "id_provincia",
+                    "id_localidad",
+                ).filter(
                     id_estado__dsc_estado__iexact="ACTIVO",
                     id_estado__flg_activo=True,
                 ),
@@ -291,6 +332,11 @@ class PsicologoDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        ramas_activas = self.object.get_ramas_activas()
+        context["ramas_activas"] = ramas_activas
+        context["ramas_activas_texto"] = ", ".join(
+            rama.id_rama.dsc_rama for rama in ramas_activas
+        ) or "Sin ramas asignadas"
         context["datos_personales"] = self.object.datos_personales_rel
         return context
 
@@ -379,13 +425,13 @@ class PacienteEncontrarPsicologoListView(PacienteRequiredMixin, ListView):
         queryset = (
             Psicologo.objects.select_related(
                 "id_estado",
-                "id_rama",
                 "datos_personales",
                 "datos_personales__id_provincia",
                 "datos_personales__id_localidad",
                 "datos_personales__id_zona",
             )
             .prefetch_related(
+                get_psicologo_ramas_prefetch(),
                 Prefetch(
                     "oficinas",
                     queryset=PsicologoOficina.objects.select_related("id_estado").filter(
@@ -416,13 +462,32 @@ class PacienteEncontrarPsicologoListView(PacienteRequiredMixin, ListView):
         query = self.request.GET.get("q", "").strip()
 
         rama = self.request.GET.get("rama", "").strip()
-        sexo = self.request.GET.get("sexo", "").strip()
+        modalidad = self.request.GET.get("modalidad", "").strip()
+        provincia = self.request.GET.get("provincia", "").strip()
 
         if rama.isdigit():
-            queryset = queryset.filter(id_rama_id=int(rama))
+            queryset = queryset.filter(
+                ramas__id_rama_id=int(rama),
+                ramas__id_estado__dsc_estado__iexact="ACTIVO",
+                ramas__id_estado__flg_activo=True,
+            )
 
-        if sexo.isdigit():
-            queryset = queryset.filter(datos_personales__id_sexo_id=int(sexo))
+        if modalidad == "presencial":
+            queryset = queryset.filter(
+                oficinas__id_estado__dsc_estado__iexact="ACTIVO",
+                oficinas__id_estado__flg_activo=True,
+            )
+
+        if provincia.isdigit():
+            provincia_id = int(provincia)
+            queryset = queryset.filter(
+                Q(datos_personales__id_provincia_id=provincia_id)
+                | Q(
+                    oficinas__id_provincia_id=provincia_id,
+                    oficinas__id_estado__dsc_estado__iexact="ACTIVO",
+                    oficinas__id_estado__flg_activo=True,
+                )
+            )
 
         if not query:
             return queryset.distinct()
@@ -431,19 +496,22 @@ class PacienteEncontrarPsicologoListView(PacienteRequiredMixin, ListView):
             Q(nombres__icontains=query)
             | Q(email__icontains=query)
             | Q(dni_text__icontains=query)
-            | Q(id_rama__dsc_rama__icontains=query)
+            | Q(ramas__id_rama__dsc_rama__icontains=query)
             | Q(datos_personales__id_localidad__dsc_localidad__icontains=query)
             | Q(datos_personales__id_provincia__dsc_provincia__icontains=query)
             | Q(datos_personales__id_zona__dsc_zona__icontains=query)
+            | Q(oficinas__id_localidad__dsc_localidad__icontains=query)
+            | Q(oficinas__id_provincia__dsc_provincia__icontains=query)
         ).distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["query"] = self.request.GET.get("q", "").strip()
         context["rama_seleccionada"] = self.request.GET.get("rama", "").strip()
-        context["sexo_seleccionado"] = self.request.GET.get("sexo", "").strip()
+        context["modalidad_seleccionada"] = self.request.GET.get("modalidad", "").strip()
+        context["provincia_seleccionada"] = self.request.GET.get("provincia", "").strip()
         context["ramas"] = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
-        context["sexos"] = Sexo.objects.filter(flg_activo=True).order_by("dsc_tipo")
+        context["provincias"] = Provincia.objects.filter(flg_activo=True).order_by("dsc_provincia")
         context["total_resultados"] = self.object_list.count()
         return context
 
@@ -454,7 +522,9 @@ class PsicologoFormView(LoginRequiredMixin, View):
     success_action = "guardado"
 
     def get_psicologo_queryset(self):
-        return Psicologo.objects.select_related("id_estado", "id_rama")
+        return Psicologo.objects.select_related("id_estado").prefetch_related(
+            get_psicologo_ramas_prefetch()
+        )
 
     def get_psicologo(self):
         pk = self.kwargs.get("pk")
@@ -482,6 +552,22 @@ class PsicologoFormView(LoginRequiredMixin, View):
         }
 
     def build_form_steps(self, form, datos_form):
+        if "ramas" in form.fields:
+            perfil_description = "Selecciona una o mas ramas profesionales y adjunta tu titulo para enviar la solicitud."
+            perfil_fields = [
+                form["ramas"],
+                form["titulo"],
+                form["foto"],
+            ]
+        else:
+            perfil_description = "Selecciona la rama profesional, define el valor por sesion y agrega una foto si deseas."
+            perfil_fields = [
+                form["id_rama"],
+                form["valor_sesion"],
+                form["titulo"],
+                form["foto"],
+            ]
+
         steps = [
             {
                 "slug": "datos-basicos",
@@ -522,12 +608,8 @@ class PsicologoFormView(LoginRequiredMixin, View):
             {
                 "slug": "perfil",
                 "title": "Perfil profesional",
-                "description": "Selecciona la rama profesional y agrega una foto si deseas.",
-                "fields": [
-                    form["id_rama"],
-                    form["titulo"],
-                    form["foto"],
-                ],
+                "description": perfil_description,
+                "fields": perfil_fields,
             },
         ]
 
@@ -634,8 +716,18 @@ class PsicologoPendienteApproveView(LoginRequiredMixin, View):
                 fch_nacimiento=solicitud.fch_nacimiento,
                 foto=solicitud.foto,
                 id_estado=estado_activo,
-                id_rama=solicitud.id_rama,
                 titulo=solicitud.titulo,
+            )
+            PsicologoRama.objects.bulk_create(
+                [
+                    PsicologoRama(
+                        id_psicologo=psicologo,
+                        id_rama=rama,
+                        valor_sesion=0,
+                        id_estado=estado_activo,
+                    )
+                    for rama in solicitud.get_ramas_pendientes()
+                ]
             )
             DatosPersonales.objects.create(
                 psicologo=psicologo,
@@ -1032,6 +1124,82 @@ class PsicologoMetodoPagoDeleteView(EstadoToggleMixin, PsicologoOwnerOrStaffMixi
         kwargs.pop("user", None)
         kwargs.pop("psicologo", None)
         return kwargs
+
+
+class PsicologoRamaListView(PsicologoOwnerOrStaffMixin, ListView):
+    model = PsicologoRama
+    template_name = "psicologo/rama_list.html"
+    context_object_name = "ramas"
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = PsicologoRama.objects.select_related(
+            "id_psicologo",
+            "id_rama",
+            "id_estado",
+        ).order_by("id_psicologo__nombres", "id_rama__dsc_rama")
+        queryset = self.get_owner_filtered_queryset(queryset)
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(
+                Q(id_psicologo__nombres__icontains=query)
+                | Q(id_rama__dsc_rama__icontains=query)
+                | Q(id_estado__dsc_estado__icontains=query)
+            )
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["query"] = self.request.GET.get("q", "").strip()
+        context["total_resultados"] = self.object_list.count()
+        context["mostrar_columna_psicologo"] = self.user_is_staff()
+        return context
+
+
+class PsicologoRamaCreateView(PsicologoOwnerOrStaffMixin, CreateView):
+    model = PsicologoRama
+    form_class = PsicologoRamaForm
+    template_name = "psicologo/rama_form.html"
+    success_url = reverse_lazy("usuario:psicologo_rama_list")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Rama profesional creada correctamente.")
+        return super().form_valid(form)
+
+
+class PsicologoRamaUpdateView(PsicologoOwnerOrStaffMixin, UpdateView):
+    model = PsicologoRama
+    form_class = PsicologoRamaForm
+    template_name = "psicologo/rama_form.html"
+    success_url = reverse_lazy("usuario:psicologo_rama_list")
+
+    def get_queryset(self):
+        queryset = PsicologoRama.objects.select_related("id_psicologo")
+        return self.get_owner_filtered_queryset(queryset)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Rama profesional actualizada correctamente.")
+        return super().form_valid(form)
+
+
+class PsicologoRamaDeleteView(EstadoToggleMixin, PsicologoOwnerOrStaffMixin, DeleteView):
+    model = PsicologoRama
+    template_name = "psicologo/rama_confirm_delete.html"
+    context_object_name = "psicologo_rama"
+    success_url = reverse_lazy("usuario:psicologo_rama_list")
+    activate_success_message = "Rama profesional activada correctamente."
+    deactivate_success_message = "Rama profesional dada de baja correctamente."
+
+    def get_queryset(self):
+        queryset = PsicologoRama.objects.select_related("id_psicologo", "id_rama")
+        return self.get_owner_filtered_queryset(queryset)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.pop("user", None)
+        kwargs.pop("psicologo", None)
+        return kwargs
+
 
 class PsicologoDeleteView(EstadoToggleMixin, LoginRequiredMixin, DeleteView):
     model = Psicologo

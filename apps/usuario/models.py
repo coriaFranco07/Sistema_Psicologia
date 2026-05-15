@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.core.validators import (
@@ -125,8 +126,6 @@ class UsuarioBase(models.Model):
 
 
 class Psicologo(UsuarioBase):
-
-    id_rama = models.ForeignKey(Rama, on_delete=models.RESTRICT, related_name="psicologos", verbose_name="Rama")
     titulo = models.FileField(
         upload_to="psicologos/titulos/",
         default="",
@@ -137,6 +136,159 @@ class Psicologo(UsuarioBase):
     class Meta(UsuarioBase.Meta):
         verbose_name = "Psicologo"
         verbose_name_plural = "Psicologos"
+
+    def __init__(self, *args, **kwargs):
+        self._pending_id_rama = kwargs.pop("id_rama", None)
+        self._pending_valor_sesion = kwargs.pop("valor_sesion", None)
+        super().__init__(*args, **kwargs)
+
+    @staticmethod
+    def get_default_rama_estado():
+        return Estado.objects.filter(dsc_estado__iexact="ACTIVO", flg_activo=True).first()
+
+    def get_ramas_activas(self):
+        if not self.pk:
+            return []
+
+        ramas_prefetch = getattr(self, "ramas_activas", None)
+        if ramas_prefetch is not None:
+            return ramas_prefetch
+
+        return list(
+            self.ramas.select_related("id_rama", "id_estado")
+            .filter(id_estado__dsc_estado__iexact="ACTIVO", id_estado__flg_activo=True)
+            .order_by("id_psico_rama")
+        )
+
+    @property
+    def rama_principal_rel(self):
+        if not self.pk:
+            return None
+
+        ramas = self.get_ramas_activas()
+        if ramas:
+            return ramas[0]
+
+        return (
+            self.ramas.select_related("id_rama", "id_estado")
+            .order_by("id_psico_rama")
+            .first()
+        )
+
+    @property
+    def id_rama(self):
+        rama_principal = self.rama_principal_rel
+        return rama_principal.id_rama if rama_principal else None
+
+    @id_rama.setter
+    def id_rama(self, value):
+        self._pending_id_rama = value
+
+    @property
+    def valor_sesion(self):
+        rama_principal = self.rama_principal_rel
+        return rama_principal.valor_sesion if rama_principal else Decimal("0.00")
+
+    @valor_sesion.setter
+    def valor_sesion(self, value):
+        self._pending_valor_sesion = value
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self._pending_id_rama is None and self._pending_valor_sesion is None:
+            return
+
+        rama_relacion = self.ramas.order_by("id_psico_rama").first()
+
+        rama = self._pending_id_rama
+        if rama is None and rama_relacion is not None:
+            rama = rama_relacion.id_rama
+
+        if rama is None:
+            self._pending_valor_sesion = None
+            return
+
+        if isinstance(rama, int):
+            rama = Rama.objects.get(pk=rama)
+
+        valor_sesion = self._pending_valor_sesion
+        if valor_sesion in (None, ""):
+            valor_sesion = (
+                rama_relacion.valor_sesion if rama_relacion is not None else Decimal("0.00")
+            )
+
+        estado = (
+            rama_relacion.id_estado
+            if rama_relacion is not None
+            else self.get_default_rama_estado()
+        )
+
+        if rama_relacion is None and estado is None:
+            self._pending_id_rama = None
+            self._pending_valor_sesion = None
+            return
+
+        if rama_relacion is None:
+            PsicologoRama.objects.create(
+                id_psicologo=self,
+                id_rama=rama,
+                valor_sesion=valor_sesion,
+                id_estado=estado,
+            )
+        else:
+            rama_relacion.id_rama = rama
+            rama_relacion.valor_sesion = valor_sesion
+            rama_relacion.id_estado = estado
+            rama_relacion.save(update_fields=["id_rama", "valor_sesion", "id_estado"])
+
+        if hasattr(self, "ramas_activas"):
+            delattr(self, "ramas_activas")
+
+        self._pending_id_rama = None
+        self._pending_valor_sesion = None
+
+
+class PsicologoRama(models.Model):
+    id_psico_rama = models.AutoField(primary_key=True, db_column="id_psico_rama")
+    id_psicologo = models.ForeignKey(
+        Psicologo,
+        on_delete=models.CASCADE,
+        related_name="ramas",
+        verbose_name="Psicologo",
+    )
+    id_rama = models.ForeignKey(
+        Rama,
+        on_delete=models.RESTRICT,
+        related_name="psicologo_ramas",
+        verbose_name="Rama",
+    )
+    valor_sesion = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        validators=[MinValueValidator(0)],
+        verbose_name="Valor de sesion",
+    )
+    id_estado = models.ForeignKey(
+        Estado,
+        on_delete=models.RESTRICT,
+        related_name="psicologo_ramas",
+        verbose_name="Estado",
+    )
+
+    class Meta:
+        verbose_name = "Rama del psicologo"
+        verbose_name_plural = "Ramas de los psicologos"
+        constraints = [
+            models.UniqueConstraint(
+                fields=("id_psicologo", "id_rama"),
+                name="uniq_psicologo_rama",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.id_psicologo.nombres} - {self.id_rama.dsc_rama}"
 
 
 class PsicologoPendiente(models.Model):
@@ -168,12 +320,6 @@ class PsicologoPendiente(models.Model):
             FileExtensionValidator(["jpg", "jpeg", "png", "webp"]),
             validate_photo_size,
         ],
-    )
-    id_rama = models.ForeignKey(
-        Rama,
-        on_delete=models.RESTRICT,
-        related_name="psicologos_pendientes",
-        verbose_name="Rama",
     )
     titulo = models.FileField(
         upload_to="psicologos/titulos/",
@@ -222,6 +368,13 @@ class PsicologoPendiente(models.Model):
         verbose_name = "Psicologo pendiente"
         verbose_name_plural = "Psicologos pendientes"
 
+    def __init__(self, *args, **kwargs):
+        self._pending_ramas = kwargs.pop("ramas_seleccionadas", None)
+        rama_inicial = kwargs.pop("id_rama", None)
+        if rama_inicial is not None and self._pending_ramas is None:
+            self._pending_ramas = self.normalize_rama_ids([rama_inicial])
+        super().__init__(*args, **kwargs)
+
     def __str__(self):
         return f"{self.nombres} - DNI {self.dni} ({self.get_estado_display()})"
 
@@ -234,6 +387,117 @@ class PsicologoPendiente(models.Model):
         if self.foto:
             return self.foto.url
         return static("images/foto_usuario_default.png")
+
+    @staticmethod
+    def normalize_rama_ids(ramas):
+        if ramas is None:
+            return None
+
+        rama_ids = []
+        vistos = set()
+        for rama in ramas:
+            rama_id = rama.pk if isinstance(rama, Rama) else int(rama)
+            if rama_id in vistos:
+                continue
+            vistos.add(rama_id)
+            rama_ids.append(rama_id)
+        return rama_ids
+
+    def set_ramas_pendientes(self, ramas):
+        self._pending_ramas = self.normalize_rama_ids(ramas)
+
+    def get_ramas_pendientes(self):
+        if not self.pk:
+            if self._pending_ramas is None:
+                return []
+            ramas_map = Rama.objects.in_bulk(self._pending_ramas)
+            return [ramas_map[rama_id] for rama_id in self._pending_ramas if rama_id in ramas_map]
+
+        relaciones_prefetch = getattr(self, "ramas_pendientes_prefetch", None)
+        if relaciones_prefetch is not None:
+            return [relacion.id_rama for relacion in relaciones_prefetch]
+
+        return [
+            relacion.id_rama
+            for relacion in self.ramas_pendientes.select_related("id_rama").order_by(
+                "id_psico_pend_rama"
+            )
+        ]
+
+    @property
+    def id_rama(self):
+        ramas = self.get_ramas_pendientes()
+        return ramas[0] if ramas else None
+
+    @id_rama.setter
+    def id_rama(self, value):
+        self.set_ramas_pendientes([value] if value else [])
+
+    @property
+    def valor_sesion(self):
+        return Decimal("0.00")
+
+    @property
+    def ramas_descripcion(self):
+        ramas = self.get_ramas_pendientes()
+        if not ramas:
+            return "-"
+        return ", ".join(rama.dsc_rama for rama in ramas)
+
+    def sync_pending_ramas(self):
+        if self._pending_ramas is None or not self.pk:
+            return
+
+        self._pending_ramas = self.normalize_rama_ids(self._pending_ramas)
+        self.ramas_pendientes.all().delete()
+        if self._pending_ramas:
+            PsicologoPendienteRama.objects.bulk_create(
+                [
+                    PsicologoPendienteRama(
+                        id_psicologo_pendiente=self,
+                        id_rama_id=rama_id,
+                    )
+                    for rama_id in self._pending_ramas
+                ]
+            )
+
+        if hasattr(self, "ramas_pendientes_prefetch"):
+            delattr(self, "ramas_pendientes_prefetch")
+
+        self._pending_ramas = None
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.sync_pending_ramas()
+
+
+class PsicologoPendienteRama(models.Model):
+    id_psico_pend_rama = models.AutoField(primary_key=True, db_column="id_psico_pend_rama")
+    id_psicologo_pendiente = models.ForeignKey(
+        PsicologoPendiente,
+        on_delete=models.CASCADE,
+        related_name="ramas_pendientes",
+        verbose_name="Solicitud de psicologo",
+    )
+    id_rama = models.ForeignKey(
+        Rama,
+        on_delete=models.RESTRICT,
+        related_name="psicologo_pendiente_ramas",
+        verbose_name="Rama",
+    )
+
+    class Meta:
+        verbose_name = "Rama seleccionada en solicitud"
+        verbose_name_plural = "Ramas seleccionadas en solicitudes"
+        constraints = [
+            models.UniqueConstraint(
+                fields=("id_psicologo_pendiente", "id_rama"),
+                name="uniq_psicologo_pendiente_rama",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.id_psicologo_pendiente.nombres} - {self.id_rama.dsc_rama}"
 
 
 class Paciente(UsuarioBase):

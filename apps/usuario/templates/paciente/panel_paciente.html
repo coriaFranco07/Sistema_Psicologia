@@ -1,64 +1,776 @@
 {% extends "usuario/base.html" %}
 
 {% block title %}Panel del Paciente{% endblock %}
-{% block main_class %}patient-home-main{% endblock %}
+{% block main_class %}ph-main{% endblock %}
 {% block back_button %}{% endblock %}
 
 {% block extra_styles %}
-.patient-home-main{max-width:980px;margin:0 auto;padding:18px 16px 38px;background:#f7f0e7}.patient-home{display:grid;gap:14px;font-family:Inter,"Trebuchet MS",sans-serif;color:#241c17}.patient-top{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}.patient-hero,.patient-cta,.patient-card,.patient-module,.patient-status,.patient-quote{border:1px solid rgba(95,70,48,.13);box-shadow:0 16px 34px rgba(53,38,25,.07)}.patient-hero{min-height:235px;border-radius:24px;padding:26px;background:#1f140d;color:#fff;display:grid;align-content:space-between;overflow:hidden;position:relative}.patient-hero:before{content:"";position:absolute;inset:auto -30px -55px auto;width:190px;height:190px;border-radius:999px;background:rgba(255,255,255,.06)}.patient-kicker{width:max-content;display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#e9d7c1}.patient-kicker:before{content:"";width:7px;height:7px;border-radius:999px;background:#f8c98b}.patient-hero h1{position:relative;z-index:1;margin:18px 0 0;font-family:Georgia,"Times New Roman",serif;font-weight:700;font-size:clamp(2rem,4.4vw,3.15rem);line-height:.92;letter-spacing:-.05em}.patient-name{color:#f2c489;font-style:italic}.patient-stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}.patient-stat strong{display:block;font-size:1.1rem;color:#fff}.patient-stat span{display:block;margin-top:3px;color:rgba(255,255,255,.62);font-size:.67rem;line-height:1.2}.patient-cta{min-height:235px;border-radius:24px;padding:26px;background:#1f6b55;color:#fff;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}.patient-cta:after{content:"";position:absolute;right:-55px;top:-55px;width:180px;height:180px;border-radius:999px;background:rgba(255,255,255,.08)}.patient-cta h2{position:relative;z-index:1;margin:0;font-family:Georgia,"Times New Roman",serif;font-size:1.4rem;line-height:1.05}.patient-cta h2 em{color:#f2c489}.patient-cta p{position:relative;z-index:1;max-width:310px;margin:8px 0 0;color:rgba(255,255,255,.72);font-size:.82rem;line-height:1.55}.patient-cta-link{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;width:max-content;gap:8px;min-height:42px;padding:0 15px;border-radius:999px;background:#fff;color:#1f6b55;text-decoration:none;font-size:.8rem;font-weight:900}.patient-mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.patient-card{border-radius:16px;background:#fffaf3;padding:14px;min-height:108px}.patient-icon{width:30px;height:30px;border-radius:11px;display:grid;place-items:center;background:#edf7ef;color:#1f6b55;font-size:.85rem;font-weight:900;margin-bottom:13px}.patient-icon.warn{background:#fff4d8;color:#a36b13}.patient-icon.soft{background:#f4ede4;color:#6e5846}.patient-card strong{display:block;font-size:1rem;margin-bottom:3px}.patient-card span{display:block;color:#8b7b6c;font-size:.68rem;line-height:1.25}.patient-bottom{display:grid;grid-template-columns:1.35fr .9fr;gap:14px}.patient-module{border-radius:20px;background:#fffaf3;padding:18px}.patient-module-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.patient-module h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:1.1rem}.patient-view-all{color:#1f6b55;text-decoration:none;font-size:.75rem;font-weight:900}.patient-actions{display:grid;gap:10px}.patient-action{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:11px;padding:11px;border-radius:15px;background:#fff;border:1px solid rgba(95,70,48,.1);text-decoration:none;color:#241c17}.patient-action:hover{border-color:rgba(31,107,85,.28);box-shadow:0 10px 20px rgba(31,107,85,.08)}.patient-action-icon{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:#edf7ef;color:#1f6b55;font-weight:900}.patient-action-icon.gold{background:#fff4d8;color:#a36b13}.patient-action-icon.neutral{background:#f4ede4;color:#6e5846}.patient-action strong{display:block;font-size:.88rem}.patient-action span{display:block;margin-top:2px;color:#8b7b6c;font-size:.72rem}.patient-tag{display:inline-flex;align-items:center;min-height:24px;padding:0 9px;border-radius:999px;background:#edf7ef;color:#1f6b55;font-size:.65rem;font-weight:900}.patient-tag.gold{background:#fff4d8;color:#a36b13}.patient-side{display:grid;gap:14px}.patient-status{border-radius:20px;background:#fffaf3;padding:16px}.patient-status-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}.patient-status h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:1rem}.patient-status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:#edf7ef;color:#1f6b55;font-size:.65rem;font-weight:900}.patient-status-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid rgba(95,70,48,.08);color:#6d5c4e;font-size:.76rem}.patient-status-dot{width:8px;height:8px;border-radius:999px;background:#24b46b}.patient-quote{border-radius:20px;background:#1f140d;color:#fff;padding:20px;min-height:120px;display:grid;align-content:center}.patient-quote p{margin:0;font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:1rem;line-height:1.25}.patient-quote span{display:block;margin-top:10px;color:#f2c489;font-size:.72rem;font-weight:800}@media(max-width:820px){.patient-top,.patient-bottom{grid-template-columns:1fr}.patient-mini-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.patient-home-main{padding:12px}.patient-hero,.patient-cta{padding:20px;border-radius:20px}.patient-mini-grid{grid-template-columns:1fr}.patient-stats{grid-template-columns:1fr}.patient-action{grid-template-columns:36px 1fr}.patient-tag{grid-column:2}}
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Cabinet+Grotesk:wght@300;400;500;600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── BASE ─────────────────────────────────────── */
+.ph-main {
+  --ink:       #161512;
+  --ink-2:     #2a2520;
+  --ink-m:     #6b6560;
+  --ink-f:     #a09890;
+  --cream:     #faf7f2;
+  --cream-2:   #f3ede3;
+  --cream-3:   #ece4d6;
+  --sage:      #4a7c59;
+  --sage-2:    #3a6347;
+  --sage-pale: #e8f1eb;
+  --gold:      #b8842a;
+  --gold-pale: #f9f0de;
+  --border:    rgba(22,21,18,.09);
+  --border-2:  rgba(22,21,18,.13);
+  --shadow-s:  0 2px 8px rgba(22,21,18,.06);
+  --shadow-m:  0 8px 28px rgba(22,21,18,.09);
+  --shadow-l:  0 20px 52px rgba(22,21,18,.1);
+  --r-lg:      24px;
+  --r-md:      16px;
+  --r-sm:      10px;
+  --font-d:    'Cormorant Garamond', Georgia, serif;
+  --font-b:    'Cabinet Grotesk', system-ui, sans-serif;
+
+  font-family: var(--font-b);
+  color: var(--ink);
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 28px 72px;
+  background: transparent;
+}
+
+/* ── LAYOUT ───────────────────────────────────── */
+.ph-home { display: grid; gap: 16px; }
+
+.ph-top {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 16px;
+}
+
+.ph-bottom {
+  display: grid;
+  grid-template-columns: 1.45fr .88fr;
+  gap: 16px;
+}
+
+/* ── HERO ─────────────────────────────────────── */
+.ph-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  background: var(--ink);
+  color: #fff;
+  padding: 40px 40px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 290px;
+  border: 1px solid rgba(255,255,255,.04);
+  box-shadow: var(--shadow-l);
+}
+
+/* Texture arcs */
+.ph-hero-arc {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ph-hero-arc svg {
+  position: absolute;
+  bottom: -80px;
+  right: -80px;
+  width: 380px;
+  height: 380px;
+  opacity: .05;
+}
+
+/* Glow blobs */
+.ph-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -40px;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(74,124,89,.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+.ph-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; left: 30%;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184,132,42,.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ph-hero-top { position: relative; z-index: 1; }
+
+.ph-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 22px;
+}
+.ph-eyebrow-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--sage);
+  box-shadow: 0 0 0 3px rgba(74,124,89,.25);
+}
+.ph-eyebrow-text {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.45);
+}
+
+.ph-hero h1 {
+  font-family: var(--font-d);
+  font-size: clamp(2rem, 3.8vw, 3.2rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -.01em;
+  margin: 0;
+  color: #fff;
+}
+
+.ph-hero-name {
+  font-style: italic;
+  color: #d4c4a8;
+}
+
+.ph-hero-sub {
+  margin: 12px 0 0;
+  font-size: .9rem;
+  font-weight: 300;
+  color: rgba(255,255,255,.42);
+  line-height: 1.7;
+  max-width: 340px;
+}
+
+.ph-stats {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-top: 32px;
+}
+
+.ph-stat {
+  padding: 16px 18px;
+  background: rgba(255,255,255,.04);
+  backdrop-filter: blur(4px);
+}
+.ph-stat strong {
+  display: block;
+  font-family: var(--font-d);
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1;
+}
+.ph-stat span {
+  display: block;
+  margin-top: 5px;
+  font-size: .67rem;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.38);
+  line-height: 1.4;
+}
+
+/* ── CTA CARD ─────────────────────────────────── */
+.ph-cta {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  background: var(--sage-2);
+  color: #fff;
+  padding: 36px 36px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 290px;
+  border: 1px solid rgba(255,255,255,.06);
+  box-shadow: var(--shadow-l);
+}
+
+.ph-cta::before {
+  content: '';
+  position: absolute;
+  top: -50px; right: -50px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.07);
+  pointer-events: none;
+}
+.ph-cta::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: -20px;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.08);
+  pointer-events: none;
+}
+
+.ph-cta-body { position: relative; z-index: 1; }
+
+.ph-cta h2 {
+  font-family: var(--font-d);
+  font-size: 1.7rem;
+  font-weight: 500;
+  line-height: 1.08;
+  margin: 0 0 12px;
+}
+.ph-cta h2 em {
+  font-style: italic;
+  color: #d4e8c2;
+}
+
+.ph-cta p {
+  font-size: .88rem;
+  font-weight: 300;
+  line-height: 1.72;
+  color: rgba(255,255,255,.65);
+  margin: 0;
+  max-width: 280px;
+}
+
+.ph-cta-link {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 11px;
+  background: #fff;
+  color: var(--sage-2);
+  text-decoration: none;
+  font-size: .85rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  transition: box-shadow .2s, transform .12s, background .2s;
+  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+  width: fit-content;
+}
+.ph-cta-link:hover {
+  background: var(--cream);
+  box-shadow: 0 6px 24px rgba(0,0,0,.28);
+}
+.ph-cta-link:active { transform: scale(.98); }
+.ph-cta-link svg { width: 14px; height: 14px; transition: transform .2s; }
+.ph-cta-link:hover svg { transform: translateX(3px); }
+
+/* ── MINI GRID ────────────────────────────────── */
+.ph-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.ph-mini-card {
+  border-radius: var(--r-md);
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-s);
+  padding: 20px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow .2s, transform .2s, border-color .2s;
+}
+.ph-mini-card:hover {
+  box-shadow: var(--shadow-m);
+  border-color: var(--border-2);
+  transform: translateY(-2px);
+}
+
+.ph-mini-icon {
+  width: 38px; height: 38px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ph-mini-icon svg { width: 18px; height: 18px; }
+.ph-mini-icon.green  { background: var(--sage-pale); color: var(--sage); }
+.ph-mini-icon.gold   { background: var(--gold-pale); color: var(--gold); }
+.ph-mini-icon.neutral{ background: var(--cream-2);   color: var(--ink-m); }
+.ph-mini-icon.ink    { background: rgba(22,21,18,.06); color: var(--ink); }
+
+.ph-mini-card strong {
+  display: block;
+  font-family: var(--font-d);
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1;
+}
+.ph-mini-card span {
+  display: block;
+  font-size: .72rem;
+  font-weight: 500;
+  color: var(--ink-f);
+  line-height: 1.4;
+}
+
+/* ── MODULE (acciones) ────────────────────────── */
+.ph-module {
+  border-radius: var(--r-lg);
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-m);
+  padding: 26px 26px 22px;
+}
+
+.ph-module-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ph-module h2 {
+  font-family: var(--font-d);
+  font-size: 1.35rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--ink);
+  margin: 0;
+}
+
+.ph-view-all {
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--sage);
+  text-decoration: none;
+  transition: color .15s;
+}
+.ph-view-all:hover { color: var(--sage-2); }
+
+.ph-actions { display: grid; gap: 10px; }
+
+.ph-action {
+  display: grid;
+  grid-template-columns: 46px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--ink);
+  transition: background .18s, border-color .18s, box-shadow .18s, transform .12s;
+}
+.ph-action:hover {
+  background: #fff;
+  border-color: rgba(74,124,89,.22);
+  box-shadow: 0 6px 20px rgba(74,124,89,.1);
+  transform: translateX(2px);
+}
+
+.ph-action-icon {
+  width: 46px; height: 46px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ph-action-icon svg { width: 20px; height: 20px; }
+.ph-action-icon.green   { background: var(--sage-pale); color: var(--sage); }
+.ph-action-icon.gold    { background: var(--gold-pale); color: var(--gold); }
+.ph-action-icon.neutral { background: var(--cream-2);   color: var(--ink-m); }
+
+.ph-action-body strong {
+  display: block;
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.ph-action-body span {
+  display: block;
+  font-size: .76rem;
+  font-weight: 400;
+  color: var(--ink-m);
+  line-height: 1.4;
+}
+
+.ph-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.ph-tag.green  { background: var(--sage-pale); color: var(--sage); border-color: rgba(74,124,89,.18); }
+.ph-tag.gold   { background: var(--gold-pale); color: var(--gold); border-color: rgba(184,132,42,.18); }
+.ph-tag.neutral{ background: var(--cream-2); color: var(--ink-m); border-color: var(--border); }
+
+/* ── SIDE ─────────────────────────────────────── */
+.ph-side { display: grid; gap: 14px; }
+
+/* Status */
+.ph-status {
+  border-radius: var(--r-lg);
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-s);
+  padding: 22px 22px 16px;
+}
+
+.ph-status-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.ph-status h2 {
+  font-family: var(--font-d);
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--ink);
+  margin: 0;
+}
+
+.ph-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 7px;
+  background: var(--sage-pale);
+  color: var(--sage);
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  border: 1px solid rgba(74,124,89,.18);
+}
+.ph-status-pill::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--sage);
+}
+
+.ph-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  font-size: .8rem;
+  color: var(--ink-m);
+  font-weight: 500;
+}
+
+.ph-status-ok {
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  background: var(--sage-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ph-status-ok svg { width: 11px; height: 11px; color: var(--sage); }
+
+/* Quote */
+.ph-quote {
+  border-radius: var(--r-lg);
+  background: var(--ink);
+  color: #fff;
+  padding: 26px 26px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.ph-quote::before {
+  content: '\201C';
+  position: absolute;
+  top: -10px; left: 16px;
+  font-family: var(--font-d);
+  font-size: 7rem;
+  font-style: italic;
+  color: rgba(255,255,255,.05);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.ph-quote p {
+  font-family: var(--font-d);
+  font-style: italic;
+  font-size: 1.12rem;
+  line-height: 1.52;
+  color: rgba(255,255,255,.88);
+  margin: 0 0 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.ph-quote-author {
+  display: block;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  position: relative;
+  z-index: 1;
+}
+
+/* ── ANIMATIONS ───────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ph-hero       { animation: fadeUp .55s ease both; }
+.ph-cta        { animation: fadeUp .55s .08s ease both; }
+.ph-mini-grid  { animation: fadeUp .55s .16s ease both; }
+.ph-module     { animation: fadeUp .55s .22s ease both; }
+.ph-side       { animation: fadeUp .55s .28s ease both; }
+
+/* ── RESPONSIVE ───────────────────────────────── */
+@media (max-width: 940px) {
+  .ph-top, .ph-bottom { grid-template-columns: 1fr; }
+  .ph-mini-grid { grid-template-columns: repeat(2, 1fr); }
+  .ph-hero { min-height: auto; }
+  .ph-cta  { min-height: auto; }
+}
+
+@media (max-width: 540px) {
+  .ph-main { padding: 0 14px 48px; }
+  .ph-hero, .ph-cta { padding: 28px 22px; border-radius: 18px; }
+  .ph-mini-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ph-stats { grid-template-columns: 1fr; }
+  .ph-action { grid-template-columns: 42px 1fr; }
+  .ph-tag { display: none; }
+  .ph-module, .ph-status, .ph-quote { border-radius: 18px; }
+}
 {% endblock %}
 
 {% block content %}
-<div class="patient-home">
-  <section class="patient-top">
-    <article class="patient-hero">
-      <div>
-        <span class="patient-kicker">Bienvenida de vuelta</span>
-        <h1>Hola, <span class="patient-name">{{ request.user.first_name|default:request.user.username }}</span>.<br>¿Cómo estás hoy?</h1>
+<div class="ph-home">
+
+  <!-- TOP ROW -->
+  <section class="ph-top">
+
+    <!-- HERO -->
+    <article class="ph-hero">
+      <div class="ph-hero-arc">
+        <svg viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="380" cy="380" r="300" stroke="white" stroke-width="1"/>
+          <circle cx="380" cy="380" r="220" stroke="white" stroke-width="1"/>
+          <circle cx="380" cy="380" r="140" stroke="white" stroke-width="1"/>
+        </svg>
       </div>
-      <div class="patient-stats">
-        <div class="patient-stat"><strong>48</strong><span>Profesionales disponibles</span></div>
-        <div class="patient-stat"><strong>1</strong><span>Psicólogos vinculados</span></div>
-        <div class="patient-stat"><strong>100%</strong><span>Perfil disponible</span></div>
+
+      <div class="ph-hero-top">
+        <div class="ph-eyebrow">
+          <span class="ph-eyebrow-dot"></span>
+          <span class="ph-eyebrow-text">Bienvenida de vuelta</span>
+        </div>
+        <h1>Hola, <span class="ph-hero-name">{{ request.user.first_name|default:request.user.username }}</span>.<br>¿Cómo estás hoy?</h1>
+        <p class="ph-hero-sub">Tu espacio de cuidado personal está listo y disponible.</p>
+      </div>
+
+      <div class="ph-stats">
+        <div class="ph-stat">
+          <strong>48</strong>
+          <span>Profesionales disponibles</span>
+        </div>
+        <div class="ph-stat">
+          <strong>1</strong>
+          <span>Psicólogos vinculados</span>
+        </div>
+        <div class="ph-stat">
+          <strong>100%</strong>
+          <span>Perfil completo</span>
+        </div>
       </div>
     </article>
 
-    <article class="patient-cta">
-      <div>
-        <h2>Tu jornada está en el <em>presente</em>.</h2>
+    <!-- CTA -->
+    <article class="ph-cta">
+      <div class="ph-cta-body">
+        <h2>Tu jornada está en el <em>presente.</em></h2>
         <p>Tenés profesionales disponibles para acompañar tu proceso desde un espacio cómodo y seguro.</p>
       </div>
-      <a class="patient-cta-link" href="{% url 'usuario:paciente_encontrar_psicologo' %}">Explorar psicólogos →</a>
+      <a class="ph-cta-link" href="{% url 'usuario:paciente_encontrar_psicologo' %}">
+        Explorar psicólogos
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
     </article>
   </section>
 
-  <section class="patient-mini-grid">
-    <article class="patient-card"><div class="patient-icon">OK</div><strong>OK</strong><span>Tu perfil está disponible</span></article>
-    <article class="patient-card"><div class="patient-icon warn">!</div><strong>1</strong><span>Psicólogo en proceso</span></article>
-    <article class="patient-card"><div class="patient-icon soft">☰</div><strong>—</strong><span>Sesiones futuras</span></article>
-    <article class="patient-card"><div class="patient-icon soft">48</div><strong>48</strong><span>Disponibles ahora</span></article>
-  </section>
+  <!-- MINI GRID -->
+  <section class="ph-mini-grid" aria-label="Resumen rápido">
 
-  <section class="patient-bottom">
-    <article class="patient-module">
-      <div class="patient-module-head"><h2>Tu espacio</h2><a class="patient-view-all" href="{% url 'usuario:paciente_mi_perfil' %}">Ver todo</a></div>
-      <div class="patient-actions">
-        <a class="patient-action" href="{% url 'usuario:paciente_mi_perfil' %}"><span class="patient-action-icon">PF</span><span><strong>Mi ficha</strong><span>Datos personales, contacto y estado del perfil.</span></span><span class="patient-tag">Completo</span></a>
-        <a class="patient-action" href="{% url 'usuario:paciente_mis_psicologos' %}"><span class="patient-action-icon gold">MP</span><span><strong>Mis psicólogos</strong><span>Profesionales vinculados a tu cuenta.</span></span><span class="patient-tag">1 activo</span></a>
-        <a class="patient-action" href="{% url 'usuario:paciente_encontrar_psicologo' %}"><span class="patient-action-icon neutral">🔎</span><span><strong>Encontrar mi psicólogo</strong><span>Explorá perfiles de profesionales activos.</span></span><span class="patient-tag gold">48 disponibles</span></a>
+    <article class="ph-mini-card">
+      <div class="ph-mini-icon green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div>
+        <strong>OK</strong>
+        <span>Perfil disponible</span>
       </div>
     </article>
 
-    <aside class="patient-side">
-      <article class="patient-status">
-        <div class="patient-status-head"><h2>Estado del sistema</h2><span class="patient-status-pill">Todo en orden</span></div>
-        <div class="patient-status-row"><span>Datos personales</span><span class="patient-status-dot"></span></div>
-        <div class="patient-status-row"><span>Perfil activo</span><span class="patient-status-dot"></span></div>
-        <div class="patient-status-row"><span>Buscador</span><span class="patient-status-dot"></span></div>
-        <div class="patient-status-row"><span>Mis psicólogos</span><span class="patient-status-dot"></span></div>
+    <article class="ph-mini-card">
+      <div class="ph-mini-icon gold">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div>
+        <strong>1</strong>
+        <span>Psicólogo en proceso</span>
+      </div>
+    </article>
+
+    <article class="ph-mini-card">
+      <div class="ph-mini-icon neutral">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div>
+        <strong>—</strong>
+        <span>Sesiones futuras</span>
+      </div>
+    </article>
+
+    <article class="ph-mini-card">
+      <div class="ph-mini-icon ink">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </div>
+      <div>
+        <strong>48</strong>
+        <span>Disponibles ahora</span>
+      </div>
+    </article>
+  </section>
+
+  <!-- BOTTOM ROW -->
+  <section class="ph-bottom">
+
+    <!-- ACCIONES -->
+    <article class="ph-module">
+      <div class="ph-module-head">
+        <h2>Tu espacio</h2>
+        <a class="ph-view-all" href="{% url 'usuario:paciente_mi_perfil' %}">Ver todo</a>
+      </div>
+      <div class="ph-actions">
+
+        <a class="ph-action" href="{% url 'usuario:paciente_mi_perfil' %}">
+          <div class="ph-action-icon green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="ph-action-body">
+            <strong>Mi ficha</strong>
+            <span>Datos personales, contacto y estado del perfil.</span>
+          </div>
+          <span class="ph-tag green">Completo</span>
+        </a>
+
+        <a class="ph-action" href="{% url 'usuario:paciente_mis_psicologos' %}">
+          <div class="ph-action-icon gold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="ph-action-body">
+            <strong>Mis psicólogos</strong>
+            <span>Profesionales vinculados a tu cuenta.</span>
+          </div>
+          <span class="ph-tag gold">1 activo</span>
+        </a>
+
+        <a class="ph-action" href="{% url 'usuario:paciente_encontrar_psicologo' %}">
+          <div class="ph-action-icon neutral">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <div class="ph-action-body">
+            <strong>Encontrar mi psicólogo</strong>
+            <span>Explorá perfiles de profesionales activos.</span>
+          </div>
+          <span class="ph-tag neutral">48 disponibles</span>
+        </a>
+
+      </div>
+    </article>
+
+    <!-- SIDEBAR -->
+    <aside class="ph-side">
+
+      <!-- Estado del sistema -->
+      <article class="ph-status">
+        <div class="ph-status-head">
+          <h2>Estado del sistema</h2>
+          <span class="ph-status-pill">Todo en orden</span>
+        </div>
+        <div class="ph-status-row">
+          <span>Datos personales</span>
+          <span class="ph-status-ok">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        </div>
+        <div class="ph-status-row">
+          <span>Perfil activo</span>
+          <span class="ph-status-ok">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        </div>
+        <div class="ph-status-row">
+          <span>Buscador</span>
+          <span class="ph-status-ok">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        </div>
+        <div class="ph-status-row">
+          <span>Mis psicólogos</span>
+          <span class="ph-status-ok">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        </div>
       </article>
-      <article class="patient-quote"><p>“Todo queda en un solo lugar, para que puedas enfocarte en sentirte mejor.”</p><span>Sistema de apoyo</span></article>
+
+      <!-- Quote -->
+      <article class="ph-quote">
+        <p>"Todo queda en un solo lugar, para que puedas enfocarte en sentirte mejor."</p>
+        <span class="ph-quote-author">Sistema de apoyo</span>
+      </article>
+
     </aside>
   </section>
+
 </div>
 {% endblock %}

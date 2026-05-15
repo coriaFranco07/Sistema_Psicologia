@@ -9,6 +9,8 @@ from .models import (
     PsicologoMetodoPago,
     PsicologoOficina,
     PsicologoPendiente,
+    PsicologoPendienteRama,
+    PsicologoRama,
 )
 
 
@@ -26,6 +28,12 @@ class PacienteDatosPersonalesInline(admin.StackedInline):
     max_num = 1
 
 
+class PsicologoPendienteRamaInline(admin.TabularInline):
+    model = PsicologoPendienteRama
+    fk_name = "id_psicologo_pendiente"
+    extra = 0
+
+
 @admin.register(Psicologo)
 class PsicologoAdmin(admin.ModelAdmin):
     list_display = (
@@ -33,15 +41,20 @@ class PsicologoAdmin(admin.ModelAdmin):
         "dni",
         "email",
         "id_estado",
-        "id_rama",
+        "rama_principal",
         "tiene_titulo",
         "tiene_foto",
     )
-    search_fields = ("nombres", "dni", "email", "cuil", "id_rama__dsc_rama")
-    list_filter = ("id_estado", "id_rama")
-    list_select_related = ("id_estado", "id_rama")
-    autocomplete_fields = ("id_estado", "id_rama")
+    search_fields = ("nombres", "dni", "email", "cuil", "ramas__id_rama__dsc_rama")
+    list_filter = ("id_estado",)
+    list_select_related = ("id_estado",)
+    autocomplete_fields = ("id_estado",)
     inlines = [PsicologoDatosPersonalesInline]
+
+    @admin.display(description="Rama")
+    def rama_principal(self, obj):
+        rama = obj.id_rama
+        return rama.dsc_rama if rama else "-"
 
     @admin.display(boolean=True, description="Foto")
     def tiene_foto(self, obj):
@@ -54,11 +67,16 @@ class PsicologoAdmin(admin.ModelAdmin):
 
 @admin.register(PsicologoPendiente)
 class PsicologoPendienteAdmin(admin.ModelAdmin):
-    list_display = ("nombres", "dni", "email", "id_rama", "estado", "fch_creacion")
-    search_fields = ("nombres", "dni", "email", "cuil", "id_rama__dsc_rama")
-    list_filter = ("estado", "id_rama")
-    list_select_related = ("id_rama", "psicologo")
+    list_display = ("nombres", "dni", "email", "ramas", "estado", "fch_creacion")
+    search_fields = ("nombres", "dni", "email", "cuil", "ramas_pendientes__id_rama__dsc_rama")
+    list_filter = ("estado",)
+    list_select_related = ("psicologo",)
     readonly_fields = ("password_hash", "psicologo", "fch_creacion", "fch_actualizacion", "fch_resolucion")
+    inlines = [PsicologoPendienteRamaInline]
+
+    @admin.display(description="Ramas")
+    def ramas(self, obj):
+        return obj.ramas_descripcion
 
 
 @admin.register(Paciente)
@@ -101,3 +119,18 @@ class PsicologoIdiomaAdmin(admin.ModelAdmin):
     search_fields = ("id_psicologo__nombres", "id_idioma__dsc_idioma")
     list_filter = ("id_estado", "id_idioma")
     list_select_related = ("id_psicologo", "id_idioma", "id_estado")
+
+
+@admin.register(PsicologoRama)
+class PsicologoRamaAdmin(admin.ModelAdmin):
+    list_display = ("id_psicologo", "id_rama", "valor_sesion", "id_estado")
+    search_fields = ("id_psicologo__nombres", "id_rama__dsc_rama")
+    list_filter = ("id_estado", "id_rama")
+    list_select_related = ("id_psicologo", "id_rama", "id_estado")
+
+
+@admin.register(PsicologoPendienteRama)
+class PsicologoPendienteRamaAdmin(admin.ModelAdmin):
+    list_display = ("id_psicologo_pendiente", "id_rama")
+    search_fields = ("id_psicologo_pendiente__nombres", "id_rama__dsc_rama")
+    list_select_related = ("id_psicologo_pendiente", "id_rama")

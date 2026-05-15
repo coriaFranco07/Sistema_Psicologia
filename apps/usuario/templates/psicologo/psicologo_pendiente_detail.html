@@ -276,7 +276,7 @@ main.detail-main {
         <aside class="detail-card profile-card">
             <img class="profile-photo" src="{{ solicitud.foto_url }}" alt="Foto de perfil de {{ solicitud.nombres }}">
             <h2 class="profile-name">{{ solicitud.nombres }}</h2>
-            <p class="profile-meta">Rama {{ solicitud.id_rama }}</p>
+            <p class="profile-meta">Ramas {{ solicitud.ramas_descripcion }}</p>
             <p class="profile-meta">Correo {{ solicitud.email }}</p>
             <p class="profile-meta">DNI {{ solicitud.dni }}</p>
             {% if solicitud.cuil %}
@@ -364,8 +364,8 @@ main.detail-main {
                     <h2>Datos profesionales</h2>
                     <div class="info-list">
                         <div class="info-item">
-                            <span class="info-label">Rama</span>
-                            <span class="info-value">{{ solicitud.id_rama }}</span>
+                            <span class="info-label">Ramas</span>
+                            <span class="info-value">{{ solicitud.ramas_descripcion }}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Estado de solicitud</span>

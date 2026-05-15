@@ -281,7 +281,7 @@ main.pending-main {
                 <tr>
                     <th>Solicitante</th>
                     <th>Contacto</th>
-                    <th>Rama</th>
+                    <th>Ramas</th>
                     <th>Estado</th>
                     <th>Fecha</th>
                     <th>Acciones</th>
@@ -296,7 +296,7 @@ main.pending-main {
                         <td>
                             <span class="pending-name">{{ solicitud.email }}</span>
                         </td>
-                        <td>{{ solicitud.id_rama }}</td>
+                        <td>{{ solicitud.ramas_descripcion }}</td>
                         <td>
                             <span class="status-pill{% if solicitud.estado == 'APROBADO' %} is-aprobado{% elif solicitud.estado == 'RECHAZADO' %} is-rechazado{% endif %}">
                                 {{ solicitud.get_estado_display }}

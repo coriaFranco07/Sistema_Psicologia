@@ -4,49 +4,419 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MenteClara — Psicología online que funciona</title>
-  <meta name="description" content="Encontrá tu psicólogo ideal y comenzá hoy. Plataforma segura, humana y sin listas de espera.">
+  <title>MenteClara | Psicologia online</title>
+  <meta name="description" content="Encontra tu psicologo ideal y empeza tu proceso con una experiencia simple, humana y segura.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/inicio.css' %}">
-  <style>
-    main{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}.hero{position:relative;left:50%;right:50%;width:100vw;max-width:100vw;margin-left:-50vw;margin-right:-50vw;min-height:620px;display:flex;align-items:center;overflow:hidden;isolation:isolate;padding:112px 6vw 110px!important;background:#eef3f6}.hero-bg-slider{position:absolute;inset:0;z-index:-3;overflow:hidden}.hero-bg-slide{position:absolute;inset:0;opacity:0;background-position:95% center;background-size:82% auto;background-repeat:no-repeat;transform:none;filter:contrast(1.08) saturate(1.08);image-rendering:auto;transition:opacity .75s ease}.hero-bg-slide.is-active{opacity:1;transform:none}.hero::before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,rgba(246,249,250,.98) 0%,rgba(246,249,250,.92) 38%,rgba(246,249,250,.36) 62%,rgba(246,249,250,0) 100%)}.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:78px;z-index:-1;background:linear-gradient(180deg,rgba(246,249,250,0),#f7f5ef)}.hero-layout{width:100%!important;max-width:none!important;display:block!important}.hero-layout>div{max-width:760px}.hero-kicker{position:absolute!important;top:72px;left:6vw;background:rgba(255,255,255,.74)!important;border:1px solid rgba(20,57,76,.08)!important;color:#476170!important;box-shadow:0 12px 32px rgba(15,23,42,.08)}.hero-h1{font-family:"Plus Jakarta Sans",sans-serif!important;color:#173347!important;font-size:clamp(3.1rem,5.4vw,6.2rem)!important;line-height:.9!important;letter-spacing:-.078em!important;margin:0 0 18px!important;max-width:800px}.hero-h1 em{font-family:"Instrument Serif",serif!important;color:#173347!important;font-style:italic!important;font-weight:400!important}.hero-p{max-width:650px!important;color:#536b78!important;font-size:1.08rem!important;line-height:1.6!important;margin-bottom:26px!important}.hero-btns{display:flex;gap:12px;align-items:center}.btn-hero-main{background:#164e86!important;color:#fff!important;border-radius:4px!important;min-height:44px!important;padding:0 18px!important;box-shadow:0 16px 30px rgba(22,78,134,.2)!important}.btn-hero-sec{background:transparent!important;color:#173347!important;border:none!important;min-height:44px!important;padding:0 6px!important;box-shadow:none!important}.hero-right{display:none!important}.hero-benefits{position:absolute;left:6vw;right:6vw;bottom:26px;z-index:2;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:none;margin:0}.hero-benefit{display:flex;align-items:center;gap:10px;min-height:58px;padding:12px 14px;border-radius:6px;background:rgba(255,255,255,.92);border:1px solid rgba(15,23,42,.08);box-shadow:0 12px 30px rgba(15,23,42,.08);color:#173347;font-size:.82rem;font-weight:800}.hero-benefit svg{width:22px;height:22px;flex:0 0 auto;color:#164e86}@media(max-width:920px){.hero{min-height:660px}.hero-bg-slide{background-size:105% auto;background-position:82% center}.hero::before{background:linear-gradient(90deg,rgba(246,249,250,.96),rgba(246,249,250,.58))}.hero-benefits{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-layout>div{max-width:680px}}@media(max-width:640px){.hero{padding:110px 22px 190px!important}.hero-bg-slider{opacity:.28}.hero-bg-slide{background-size:cover;background-position:center}.hero-kicker{left:22px;right:22px}.hero-benefits{left:22px;right:22px;grid-template-columns:1fr}.hero-h1{font-size:3.25rem!important}.hero-p{max-width:100%!important}}
-  </style>
 </head>
 <body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="{% url 'home' %}" aria-label="Ir al inicio de MenteClara">
+        <img class="brand__logo" src="{% static 'images/MenteClara_sinFondo.png' %}" alt="MenteClara">
+      </a>
 
-<header class="hdr">
-  <div class="hdr-in">
-    <a href="/" class="brand"><img class="brand-logo" src="{% static 'images/MenteClara_sinFondo.png' %}" alt="MenteClara"></a>
-    <nav class="hdr-nav"><a href="#como-funciona" class="hdr-link">¿Cómo funciona?</a><a href="#psicologos" class="hdr-link">Psicólogos</a><a href="#para-profesionales" class="hdr-link">Para profesionales</a><a href="{% url 'login' %}" class="hdr-cta">Ingresar →</a></nav>
-  </div>
-</header>
+      <nav class="site-nav" aria-label="Navegacion principal">
+        <a href="#como-funciona">&iquest;Como funciona?</a>
+        <a href="#psicologos">Psicologos</a>
+        <a href="#profesionales">Para profesionales</a>
+        <a href="#recursos">Recursos</a>
+      </nav>
 
-<main>
-  <section class="hero" data-hero-bg-slider>
-    <div class="hero-bg-slider" aria-hidden="true"><div class="hero-bg-slide is-active" style="background-image:url('{% static 'images/fotos_inicio/foto1.jpg' %}');"></div><div class="hero-bg-slide" style="background-image:url('{% static 'images/fotos_inicio/foto2.jpg' %}');"></div><div class="hero-bg-slide" style="background-image:url('{% static 'images/fotos_inicio/foto3.jpg' %}');"></div><div class="hero-bg-slide" style="background-image:url('{% static 'images/fotos_inicio/foto4.jpg' %}');"></div></div>
-    <div class="hero-kicker"><span class="kicker-dot"></span>+2.400 personas ya empezaron su proceso</div>
-    <div class="hero-layout"><div><h1 class="hero-h1">Encontrá tu psicólogo.<br><em>Empezá esta semana.</em></h1><p class="hero-p">Sin listas de espera interminables. Sin papeleo confuso. Solo vos, tu psicólogo ideal y un espacio seguro para trabajar en lo que necesitás.</p><div class="hero-btns"><a href="#psicologos" class="btn-hero-main">Buscar psicólogo →</a><a href="#para-profesionales" class="btn-hero-sec">¿Sos psicólogo/a?</a></div></div></div>
-    
-  </section>
-</main>
+      <a class="site-header__login" href="{% url 'login' %}">Ingresar</a>
+    </div>
+  </header>
 
-<div class="proof-band"><div class="proof-scroll"><span class="proof-item"><span>+2.400</span> pacientes activos</span><span class="proof-dot"></span><span class="proof-item"><span>180</span> psicólogos verificados</span><span class="proof-dot"></span><span class="proof-item"><span>4.9 ★</span> valoración promedio</span><span class="proof-dot"></span></span><span class="proof-item">Turnos disponibles <span>esta semana</span></span><span class="proof-dot"></span><span class="proof-item"><span>100%</span> online y seguro</span><span class="proof-dot"></span><span class="proof-item"><span>+2.400</span> pacientes activos</span><span class="proof-dot"></span><span class="proof-item"><span>180</span> psicólogos verificados</span><span class="proof-dot"></span><span class="proof-item"><span>4.9 ★</span> valoración promedio</span><span class="proof-dot"></span><span class="proof-item">Primera consulta <span>sin costo</span></span><span class="proof-dot"></span><span class="proof-item">Turnos disponibles <span>esta semana</span></span><span class="proof-dot"></span><span class="proof-item"><span>100%</span> online y seguro</span><span class="proof-dot"></span></div></div>
+  <main class="landing">
+    <section class="hero-layout">
+      <div class="hero-panel">
+        <div class="hero-copy">
+          <span class="eyebrow">
+            <span class="eyebrow__dot"></span>
+            +2.400 personas ya empezaron su proceso
+          </span>
 
-<section id="para-profesionales"><div class="dual"><div class="dual-label">Para todos</div><h2 class="dual-title">MenteClara está diseñada<br>para vos, sea quien seas.</h2><div class="dual-grid"><div class="audience-card ac-patient"><span class="ac-eyebrow">Para pacientes</span><h2 class="ac-h">Encontrá al psicólogo que te entiende. Hoy.</h2><p class="ac-p">Sabemos que pedir ayuda no es fácil. Por eso lo hicimos lo más simple posible: buscás, elegís y reservás en minutos. Sin esperas, sin complicaciones.</p><ul class="ac-perks"><li><span class="perk-check"><svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Turnos online desde cualquier dispositivo</li><li><span class="perk-check"><svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Tu historial, notas y seguimiento en un solo lugar</li><li><span class="perk-check"><svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Podés cambiar de profesional cuando quieras</li></ul><a href="{% url 'usuario:paciente_create' %}" class="ac-btn">Buscar mi psicólogo →</a><div class="ac-deco deco-a"></div><div class="ac-deco deco-b"></div></div><div class="audience-card ac-psych"><span class="ac-eyebrow">Para psicólogos</span><h2 class="ac-h">Más pacientes. Menos administración.</h2><p class="ac-p">Enfocate en lo que sabés hacer. Nosotros nos ocupamos de la gestión de turnos, el historial clínico y la comunicación con pacientes.</p><ul class="ac-perks"><li><span class="perk-check"><svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Tu perfil visible para miles que buscan ayuda</li><li><span class="perk-check"><svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Agenda inteligente con recordatorios automáticos</li><li><span class="perk-check"><svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Historial clínico seguro y accesible desde cualquier lugar</li><li><span class="perk-check"><svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Sin comision en el primer mes</li></ul><a href="{% url 'usuario:psicologo_create' %}" class="ac-btn">Sumar mi práctica →</a><div class="ac-deco deco-a"></div><div class="ac-deco deco-b"></div></div></div></div></section>
+          <h1>
+            Encontr&aacute; tu psic&oacute;logo.
+            <em>Empez&aacute; esta semana.</em>
+          </h1>
 
-<section id="como-funciona" class="how-section"><div class="how-in"><div class="how-header"><h2 class="how-h">De cero a tu primera sesión en menos de 10 minutos.</h2><p class="how-p">Diseñamos cada paso para eliminar la fricción. Porque cuando alguien busca ayuda, lo último que necesita es un proceso complicado.</p></div><div class="steps-grid"><div class="step-card"><span class="step-num">1</span><div class="step-icon si-plum"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#4a2d6b" stroke-width="1.7"/><path d="M4 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#4a2d6b" stroke-width="1.7" stroke-linecap="round"/></svg></div><h3>Creás tu perfil</h3><p>Simple, guiado, sin tecnicismos. Solo lo necesario para conectarte con el profesional ideal.</p></div><div class="step-card"><span class="step-num">2</span><div class="step-icon si-teal"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#1a8c7a" stroke-width="1.7"/><path d="M8 11l2 2 4-4" stroke="#1a8c7a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Elegís tu psicólogo</h3><p>Filtrá por especialidad y disponibilidad. Perfiles reales con foto y reseñas verificadas.</p></div><div class="step-card"><span class="step-num">3</span><div class="step-icon si-rose"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="16" rx="3" stroke="#d94f6e" stroke-width="1.7"/><path d="M7 2v4M15 2v4M3 10h16" stroke="#d94f6e" stroke-width="1.7" stroke-linecap="round"/></svg></div><h3>Reservás tu turno</h3><p>Elegís día y hora. La primera consulta es gratuita. Sin sorpresas, sin compromisos previos.</p></div><div class="step-card"><span class="step-num">4</span><div class="step-icon si-amber"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3v2M11 17v2M3 11h2M17 11h2M5.6 5.6l1.4 1.4M15 15l1.4 1.4M5.6 16.4l1.4-1.4M15 7l1.4-1.4" stroke="#e8a020" stroke-width="1.7" stroke-linecap="round"/><circle cx="11" cy="11" r="4" stroke="#e8a020" stroke-width="1.7"/></svg></div><h3>Empezás tu proceso</h3><p>Sesiones online, cómodas y privadas. Tu historial y progreso siempre organizados.</p></div></div></div></section>
+          <p>
+            Sin listas de espera interminables. Sin papeleo confuso. Solo vos, tu psicologo
+            ideal y un espacio seguro para trabajar en lo que necesitas.
+          </p>
 
-<section id="psicologos" class="featured-section"><div class="featured-top"><div><div class="featured-kicker">Profesionales</div><h2 class="featured-h">Conocé algunos de nuestros psicólogos</h2></div></div><div class="psych-grid"><div class="psych-card"><div class="psych-top"><div class="psych-av av-1">LP</div><div class="psych-meta"><div class="psych-name">Lic. Delfina Conte</div><div class="psych-spec">Psicología Clínica</div><div class="psych-rate"><span class="psych-rate-stars">★★★★★</span> <span>5.0</span> <span class="psych-rate-count">(148)</span></div></div></div><div class="psych-tags"><span class="badge badge-plum">Ansiedad</span><span class="badge badge-teal">Vínculos</span><span class="badge badge-amber">TCC</span></div><p class="psych-quote">"Me especializo en ayudar a personas a entender sus patrones y construir una vida más plena."</p><button class="psych-cta">Ver perfil completo →</button></div><div class="psych-card"><div class="psych-top"><div class="psych-av av-2">DM</div><div class="psych-meta"><div class="psych-name">Lic. Giuliana Picon</div><div class="psych-spec">Psicoanálisis</div><div class="psych-rate"><span class="psych-rate-stars">★★★★★</span> <span>4.9</span> <span class="psych-rate-count">(93)</span></div></div></div><div class="psych-tags"><span class="badge badge-teal">Depresión</span><span class="badge badge-plum">Autoestima</span><span class="badge badge-amber">Duelo</span></div><p class="psych-quote">"Trabajo desde la escucha profunda para que cada persona pueda hacer su propio recorrido."</p><button class="psych-cta">Ver perfil completo →</button></div><div class="psych-card"><div class="psych-top"><div class="psych-av av-3">SC</div><div class="psych-meta"><div class="psych-name">Lic. Sofía Castaño</div><div class="psych-spec">Infanto-Juvenil</div><div class="psych-rate"><span class="psych-rate-stars">★★★★★</span> <span>4.9</span> <span class="psych-rate-count">(211)</span></div></div></div><div class="psych-tags"><span class="badge badge-plum">Niños</span><span class="badge badge-teal">Adolescentes</span><span class="badge badge-amber">Familia</span></div><p class="psych-quote">"Cada niño tiene su propio tiempo y lenguaje. Acompañarlos en eso es lo que más me apasiona."</p><button class="psych-cta">Ver perfil completo →</button></div></div></section>
+          <div class="hero-actions">
+            <a class="btn btn--primary" href="{% url 'usuario:paciente_create' %}">Buscar psicologo</a>
+            <a class="btn btn--ghost" href="{% url 'usuario:psicologo_create' %}">&iquest;Sos psicologo/a?</a>
+          </div>
+        </div>
 
-<section class="testi-section"><div class="testi-in"><div class="testi-kicker">Historias reales</div><h2 class="testi-h">Personas que dieron el paso.<br>Y lo volvieron a dar.</h2><div class="testi-grid"><div class="testi-card"><div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div><p class="testi-q">"Llevaba meses postergando buscar ayuda. Entré a MenteClara, elegí una psicóloga y en tres días ya había tenido mi primera sesión. Me cambió la vida."</p><div class="testi-author"><div class="tav">VR</div><div><div class="testi-name">Valentina R.</div><div class="testi-role">Paciente · Córdoba · 6 meses</div></div></div></div><div class="testi-card"><div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div><p class="testi-q">"Como psicólogo, el tiempo que pasaba en burocracia era absurdo. Desde que uso MenteClara solo me enfoco en mis pacientes. La agenda y el historial son increíbles."</p><div class="testi-author"><div class="tav">DM</div><div><div class="testi-name">Lic. Diego M.</div><div class="testi-role">Psicólogo · Rosario · 2 años</div></div></div></div><div class="testi-card"><div class="testi-stars"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div><p class="testi-q">"Tenía miedo de que fuera incómodo o impersonal. Pero encontré una psicóloga que realmente me entiende. Los turnos online son más cómodos de lo que pensaba."</p><div class="testi-author"><div class="tav">MG</div><div><div class="testi-name">Martín G.</div><div class="testi-role">Paciente · Mendoza · 4 meses</div></div></div></div></div></div></section>
+        <div class="hero-media">
+          <img src="{% static 'images/fotos_inicio/foto3.jpg' %}" alt="Paciente conversando con una profesional">
+        </div>
+      </div>
 
-<section class="faq-section"><div class="faq-kicker">Preguntas frecuentes</div><h2 class="faq-h">Todo lo que querés saber antes de empezar.</h2><details open><summary>¿La primera consulta es realmente gratis? <span class="sum-icon">−</span></summary><p class="faq-body">Sí, completamente. Creemos que antes de comprometerse con un proceso terapéutico, es importante que puedas conocer al profesional y sentir si hay conexión. La primera sesión de 30 minutos no tiene costo para vos.</p></details><details><summary>¿Cómo elijo al psicólogo correcto? <span class="sum-icon">+</span></summary><p class="faq-body">Podés filtrar por especialidad, enfoque terapéutico, disponibilidad horaria y franja de precios. Cada perfil tiene reseñas reales de pacientes y una presentación del profesional.</p></details><details><summary>¿Es seguro y privado? <span class="sum-icon">+</span></summary><p class="faq-body">Totalmente. Tus datos clínicos son confidenciales y solo vos y tu psicólogo tienen acceso a ellos.</p></details><details><summary>¿Qué pasa si necesito cambiar de profesional? <span class="sum-icon">+</span></summary><p class="faq-body">Podés hacerlo cuando quieras, sin dar explicaciones. Tu historial queda guardado en tu perfil.</p></details><details><summary>¿Cuánto cuesta una sesión? <span class="sum-icon">+</span></summary><p class="faq-body">Los precios los define cada profesional y podés filtrar por rango de precios.</p></details></section>
+      <div class="hero-side">
+        <section id="como-funciona" class="card how-card">
+          <div class="section-head section-head--center">
+            <h2>&iquest;Como funciona?</h2>
+            <p>Empezar es simple, rapido y 100% online.</p>
+          </div>
 
-<div class="cta-section"><div class="cta-box"><div style="position:relative;z-index:1"><div class="cta-kicker">Empezá hoy</div><h2 class="cta-h">El mejor momento para<br>empezar tu proceso es ahora.</h2></div><div class="cta-actions"><a href="{% url 'usuario:paciente_create' %}" class="cta-btn-main">Buscar mi psicólogo →</a><a href="{% url 'usuario:psicologo_create' %}" class="cta-btn-sec">¿Sos psicólogo/a? Sumate</a></div></div></div>
-<footer class="footer"><div class="footer-in"><div class="footer-brand"><img class="footer-brand-logo" src="{% static 'images/MenteClara_sinFondo.png' %}" alt="MenteClara"></div><p class="footer-copy">© 2025 MenteClara. Plataforma de psicología digital.</p><nav class="footer-links"><a href="#">Privacidad</a><a href="#">Términos</a><a href="{% url 'login' %}">Ingresar</a></nav></div></footer>
+          <div class="steps-grid">
+            <article class="step-item">
+              <div class="step-item__icon">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M8 7h10M8 12h10M8 17h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <circle cx="5" cy="7" r="1.3" fill="currentColor"/>
+                  <circle cx="5" cy="12" r="1.3" fill="currentColor"/>
+                  <circle cx="5" cy="17" r="1.3" fill="currentColor"/>
+                </svg>
+              </div>
+              <span class="step-item__badge">1</span>
+              <h3>Contanos qu&eacute; necesitas</h3>
+              <p>Respond&eacute; algunas preguntas para entender tu situacion.</p>
+            </article>
 
-<script>document.querySelectorAll('details').forEach(d=>{d.addEventListener('toggle',()=>{const icon=d.querySelector('.sum-icon');if(icon)icon.textContent=d.open?'−':'+';});});(function(){const slider=document.querySelector('[data-hero-bg-slider]');if(!slider)return;const slides=Array.from(slider.querySelectorAll('.hero-bg-slide'));let current=0;function showSlide(index){current=(index+slides.length)%slides.length;slides.forEach((slide,i)=>slide.classList.toggle('is-active',i===current));}window.setInterval(()=>showSlide(current+1),4200);}());</script>
+            <article class="step-item">
+              <div class="step-item__icon">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <rect x="4" y="6" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M8 4v4M16 4v4M4 11h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="step-item__badge">2</span>
+              <h3>Eleg&iacute; tu psicologo</h3>
+              <p>Te mostramos perfiles ideales para vos.</p>
+            </article>
+
+            <article class="step-item">
+              <div class="step-item__icon">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 9.5A5.5 5.5 0 1 1 11.7 15H11l-3.5 2 .9-2.8A5.5 5.5 0 0 1 6 9.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <span class="step-item__badge">3</span>
+              <h3>Agenda tu sesion</h3>
+              <p>Eleg&iacute; dia y horario que mejor te convenga.</p>
+            </article>
+
+            <article class="step-item">
+              <div class="step-item__icon">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/>
+                </svg>
+              </div>
+              <span class="step-item__badge">4</span>
+              <h3>Empeza tu proceso</h3>
+              <p>Conectate por videollamada y empeza a sentirte mejor.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="profesionales" class="card pro-card">
+          <div class="pro-card__copy">
+            <h2>¿Sos psicologo/a?</h2>
+            <p>Sumate a MenteClara y potencia tu practica.</p>
+            <ul class="check-list">
+              <li>Mas visibilidad y pacientes ideales</li>
+              <li>Gestion de turnos simple y automatica</li>
+              <li>Cobros seguros y sin complicaciones</li>
+              <li>Soporte y acompanamiento constante</li>
+            </ul>
+            <a class="btn btn--light" href="{% url 'usuario:psicologo_create' %}">Quiero unirme</a>
+          </div>
+
+          <div class="pro-card__media">
+            <img src="{% static 'images/fotos_inicio/foto2.jpg' %}" alt="Profesional trabajando online">
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="feature-strip">
+      <article class="feature-strip__item">
+        <span class="feature-strip__icon">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3l7 3v5c0 4.4-2.8 8.3-7 9-4.2-.7-7-4.6-7-9V6l7-3Z" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M9.5 12.5 11 14l3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <div>
+          <strong>100% confidencial</strong>
+          <p>Tu privacidad es nuestra prioridad.</p>
+        </div>
+      </article>
+
+      <article class="feature-strip__item">
+        <span class="feature-strip__icon">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <div>
+          <strong>Sesiones online</strong>
+          <p>Desde donde estes, cuando puedas.</p>
+        </div>
+      </article>
+
+      <article class="feature-strip__item">
+        <span class="feature-strip__icon">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3 4 7v5c0 4.7 3 8.7 8 9 5-.3 8-4.3 8-9V7l-8-4Z" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m9.5 12 1.8 1.8L15.5 9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <div>
+          <strong>Psicologos verificados</strong>
+          <p>Profesionales matriculados y con experiencia.</p>
+        </div>
+      </article>
+
+      <article class="feature-strip__item">
+        <span class="feature-strip__icon">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7 10a5 5 0 1 1 9.6 2H17a3 3 0 0 1 0 6h-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M8 18h4M10 14v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <div>
+          <strong>Acompanamiento real</strong>
+          <p>No estas solo/a en este proceso.</p>
+        </div>
+      </article>
+    </section>
+
+    <section id="psicologos" class="content-grid">
+      <div class="section-intro">
+        <h2>Encontr&aacute; tu psicologo ideal</h2>
+        <p>Profesionales verificados listos para acompa&ntilde;arte.</p>
+      </div>
+
+      <div class="psych-cards">
+        <article class="psych-card">
+          <img src="https://global.tiffin.edu/img/article/perfil-de-un-psicologo.webp" alt="Licenciada Mariana Lopez">
+          <button class="card-like" type="button" aria-label="Guardar perfil">&#9825;</button>
+          <div class="psych-card__body">
+            <h3>Lic. Mariana Lopez</h3>
+            <span>Psicologia Clinica</span>
+            <p>Ansiedad · Estr&eacute;s · Autoestima</p>
+            <div class="rating-row">
+              <strong>5.0</strong>
+              <span>★★★★★</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="psych-card">
+          <img src="https://www.galileo.edu/icf/files/2024/06/001.jpg" alt="Licenciado Tomas Garcia">
+          <button class="card-like" type="button" aria-label="Guardar perfil">&#9825;</button>
+          <div class="psych-card__body">
+            <h3>Lic. Tomas Garcia</h3>
+            <span>Psicologia Clinica</span>
+            <p>Depresion · Duelo · Pareja</p>
+            <div class="rating-row">
+              <strong>5.0</strong>
+              <span>★★★★★</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="psych-card">
+          <img src="https://www.psania.com/wp-content/uploads/2020/04/10-razones-por-las-que-acudir-a-tu-psicologo-1024x539-1.jpg" alt="Licenciada Julieta Rossi">
+          <button class="card-like" type="button" aria-label="Guardar perfil">&#9825;</button>
+          <div class="psych-card__body">
+            <h3>Lic. Julieta Rossi</h3>
+            <span>Psicologia Cognitiva</span>
+            <p>Ansiedad · Mindfulness · Bienestar</p>
+            <div class="rating-row">
+              <strong>5.0</strong>
+              <span>★★★★★</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="psych-card">
+          <img src="https://www.unila.edu.mx/wp-content/uploads/2022/02/que-hacen-los-psicologos-en-las-empresas1-scaled.jpg" alt="Licenciado Martin Perez">
+          <button class="card-like" type="button" aria-label="Guardar perfil">&#9825;</button>
+          <div class="psych-card__body">
+            <h3>Lic. Martin Perez</h3>
+            <span>Psicologia Clinica</span>
+            <p>Adolescentes · Autoestima</p>
+            <div class="rating-row">
+              <strong>5.0</strong>
+              <span>★★★★★</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="section-intro">
+        <h2>Lo que dicen nuestros pacientes</h2>
+        <p>Historias reales de personas que ya empezaron su cambio.</p>
+      </div>
+
+      <div class="testimonials">
+        <article class="quote-card">
+          <div class="quote-mark">“</div>
+          <p>Encontr&eacute; a la psicologa ideal para mi. Desde la primera sesi&oacute;n me senti escuchada y comprendida.</p>
+          <div class="quote-author">
+            <span class="quote-avatar">S</span>
+            <span>Sofia, 28 a&ntilde;os</span>
+          </div>
+        </article>
+
+        <article class="quote-card">
+          <div class="quote-mark">“</div>
+          <p>La plataforma es super facil de usar y me permitio empezar terapia sin demoras.</p>
+          <div class="quote-author">
+            <span class="quote-avatar">A</span>
+            <span>Andres, 35 a&ntilde;os</span>
+          </div>
+        </article>
+
+        <article class="quote-card">
+          <div class="quote-mark">“</div>
+          <p>Hoy me siento mejor conmigo misma y tengo herramientas para seguir creciendo.</p>
+          <div class="quote-author">
+            <span class="quote-avatar">V</span>
+            <span>Valentina, 24 a&ntilde;os</span>
+          </div>
+        </article>
+
+        <div class="slider-dots" aria-hidden="true">
+          <span class="slider-dots__item is-active"></span>
+          <span class="slider-dots__item"></span>
+          <span class="slider-dots__item"></span>
+          <span class="slider-dots__item"></span>
+        </div>
+      </div>
+    </section>
+
+    <section id="recursos" class="content-grid content-grid--bottom">
+      <div class="resources-block">
+        <div class="section-intro">
+          <h2>Recursos para tu bienestar</h2>
+          <p>Articulos y herramientas para acompa&ntilde;arte en tu proceso.</p>
+        </div>
+
+        <div class="resource-cards">
+          <article class="resource-card">
+            <img src="{% static 'images/fotos_inicio/foto1.jpg' %}" alt="Tecnicas para calmar la ansiedad">
+            <div class="resource-card__body">
+              <div class="resource-meta">
+                <span class="resource-tag">Ansiedad</span>
+                <span>12 Mayo, 2026</span>
+              </div>
+              <h3>5 tecnicas para calmar la ansiedad en momentos dificiles</h3>
+            </div>
+          </article>
+
+          <article class="resource-card">
+            <img src="{% static 'images/fotos_inicio/foto3.jpg' %}" alt="Autoestima y vinculos">
+            <div class="resource-card__body">
+              <div class="resource-meta">
+                <span class="resource-tag">Autoestima</span>
+                <span>8 Mayo, 2026</span>
+              </div>
+              <h3>Como trabajar tu autoestima y mejorar tu relacion contigo mismo</h3>
+            </div>
+          </article>
+
+          <article class="resource-card">
+            <img src="{% static 'images/fotos_inicio/foto2.jpg' %}" alt="Mindfulness para el dia a dia">
+            <div class="resource-card__body">
+              <div class="resource-meta">
+                <span class="resource-tag">Bienestar</span>
+                <span>3 Mayo, 2026</span>
+              </div>
+              <h3>Mindfulness: qu&eacute; es y c&oacute;mo puede ayudarte en tu dia a dia</h3>
+            </div>
+          </article>
+        </div>
+
+      </div>
+
+      <aside class="newsletter-block">
+        <div class="newsletter-copy">
+          <h2>Recibi contenido que te hace bien</h2>
+          <p>Suscribite y recibi recursos, consejos y novedades en tu correo.</p>
+        </div>
+
+        <form class="newsletter-form">
+          <label class="sr-only" for="newsletter-email">Tu correo electr&oacute;nico</label>
+          <input id="newsletter-email" type="email" placeholder="Tu correo electronico">
+          <button type="button" aria-label="Enviar suscripcion">→</button>
+        </form>
+
+        <p class="newsletter-note">No compartimos tu informacion. Podes darte de baja cuando quieras.</p>
+
+        <div class="newsletter-envelope" aria-hidden="true">
+          <div class="newsletter-envelope__paper"></div>
+          <div class="newsletter-envelope__flap"></div>
+          <div class="newsletter-envelope__body">
+            <span>&#9829;</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__brand">
+      <img src="{% static 'images/MenteClara_sinFondo.png' %}" alt="MenteClara">
+      <p>Psicologia online que funciona.<br>Un espacio seguro para tu bienestar.</p>
+      <div class="social-list" aria-label="Redes sociales">
+        <span>ig</span>
+        <span>fb</span>
+        <span>x</span>
+        <span>in</span>
+      </div>
+    </div>
+
+    <div class="site-footer__cols">
+      <div>
+        <h3>Navegacion</h3>
+        <a href="#como-funciona">&iquest;Como funciona?</a>
+        <a href="#psicologos">Psicologos</a>
+        <a href="#profesionales">Para profesionales</a>
+        <a href="#recursos">Recursos</a>
+        <a href="{% url 'login' %}">Ingresar</a>
+      </div>
+
+      <div>
+        <h3>Legal</h3>
+        <a href="#">Terminos y condiciones</a>
+        <a href="#">Politica de privacidad</a>
+        <a href="#">Politica de cookies</a>
+        <a href="#">Preguntas frecuentes</a>
+      </div>
+
+      <div>
+        <h3>Contacto</h3>
+        <a href="mailto:hola@menteclara.com">hola@menteclara.com</a>
+        <a href="tel:+541112345678">+54 11 1234 5678</a>
+        <span>Lunes a viernes de 9 a 18 hs</span>
+      </div>
+
+      <div class="site-footer__secure">
+        <div class="secure-badge">
+          <span class="secure-badge__icon">OK</span>
+          <div>
+            <strong>Sitio seguro</strong>
+            <p>Tus datos estan protegidos con cifrado de nivel banco.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">&copy; 2026 MenteClara. Todos los derechos reservados.</div>
+  </footer>
 </body>
 </html>

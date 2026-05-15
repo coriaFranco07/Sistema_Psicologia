@@ -30,7 +30,7 @@ from .models import (
     PsicologoMetodoPago,
     PsicologoOficina,
     PsicologoPendiente,
-    PsicologoIdioma,
+    PsicologoRama,
 )
 
 
@@ -201,27 +201,84 @@ class UsuarioBaseForm(forms.ModelForm):
 
 
 class PsicologoForm(UsuarioBaseForm):
+    id_rama = forms.ModelChoiceField(
+        queryset=Rama.objects.none(),
+        label="Rama",
+        widget=forms.Select(attrs={"class": "app-select"}),
+    )
+    valor_sesion = forms.DecimalField(
+        label="Valor de sesion",
+        required=False,
+        min_value=0,
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "app-input",
+                "placeholder": "Valor sugerido por sesion",
+                "step": "0.01",
+                "min": "0",
+            }
+        ),
+    )
+
     class Meta(UsuarioBaseForm.Meta):
         model = Psicologo
-        fields = USUARIO_BASE_FIELDS + ["id_rama", "titulo"]
-        widgets = {**UsuarioBaseForm.Meta.widgets, "id_rama": forms.Select(attrs={"class": "app-select"}), "titulo": forms.ClearableFileInput(attrs={"class": "app-input", "accept": "application/pdf,.pdf"})}
+        fields = USUARIO_BASE_FIELDS + ["titulo"]
+        widgets = {
+            **UsuarioBaseForm.Meta.widgets,
+            "titulo": forms.ClearableFileInput(
+                attrs={"class": "app-input", "accept": "application/pdf,.pdf"}
+            ),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["id_rama"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
+        if self.instance and self.instance.pk and self.instance.id_rama:
+            self.fields["id_rama"].initial = self.instance.id_rama
+            self.fields["valor_sesion"].initial = self.instance.valor_sesion
+        else:
+            self.fields["valor_sesion"].initial = 0
+        self.fields["valor_sesion"].help_text = "Puedes dejarlo en 0 si todavia no quieres definir un valor."
         self.fields["titulo"].label = "Titulo"
         self.fields["titulo"].help_text = "Adjunta el titulo profesional en formato PDF. Es obligatorio para enviar la solicitud."
 
+    def save(self, commit=True):
+        psicologo = super().save(commit=False)
+        psicologo.id_rama = self.cleaned_data.get("id_rama")
+        psicologo.valor_sesion = self.cleaned_data.get("valor_sesion") or 0
+        if commit:
+            psicologo.save()
+            self.save_m2m()
+        return psicologo
+
 
 class PsicologoPendienteForm(UsuarioBaseForm):
+    ramas = forms.ModelMultipleChoiceField(
+        queryset=Rama.objects.none(),
+        label="Ramas",
+        widget=forms.CheckboxSelectMultiple,
+        help_text="Marca todas las ramas en las que quieres ofrecer atencion profesional.",
+    )
+
     class Meta(UsuarioBaseForm.Meta):
         model = PsicologoPendiente
-        fields = USUARIO_BASE_FIELDS + ["id_rama", "titulo"]
-        widgets = {**UsuarioBaseForm.Meta.widgets, "id_rama": forms.Select(attrs={"class": "app-select"}), "titulo": forms.ClearableFileInput(attrs={"class": "app-input", "accept": "application/pdf,.pdf"})}
+        fields = USUARIO_BASE_FIELDS + ["titulo"]
+        widgets = {
+            **UsuarioBaseForm.Meta.widgets,
+            "titulo": forms.ClearableFileInput(
+                attrs={"class": "app-input", "accept": "application/pdf,.pdf"}
+            ),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["id_rama"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
+        self.fields["ramas"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
+        if self.instance and self.instance.pk:
+            self.fields["ramas"].initial = [
+                rama.pk for rama in self.instance.get_ramas_pendientes()
+            ]
         self.fields["titulo"].label = "Titulo"
         self.fields["titulo"].help_text = "Adjunta el titulo profesional en formato PDF. Es obligatorio para enviar la solicitud."
 
@@ -270,9 +327,9 @@ class PsicologoPendienteForm(UsuarioBaseForm):
         solicitud = super().save(commit=False)
         solicitud.password_hash = make_password(self.cleaned_data["password1"])
         solicitud.estado = PsicologoPendiente.ESTADO_PENDIENTE
+        solicitud.set_ramas_pendientes(self.cleaned_data.get("ramas"))
         if commit:
             solicitud.save()
-            self.save_m2m()
         return solicitud
 
 
@@ -400,6 +457,88 @@ class PsicologoMetodoPagoForm(forms.ModelForm):
             metodo_pago.save()
             self.save_m2m()
         return metodo_pago
+
+
+class PsicologoRamaForm(forms.ModelForm):
+    class Meta:
+        model = PsicologoRama
+        fields = ["id_psicologo", "id_rama", "valor_sesion", "id_estado"]
+        widgets = {
+            "id_psicologo": forms.Select(attrs={"class": "app-select"}),
+            "id_rama": forms.Select(attrs={"class": "app-select"}),
+            "valor_sesion": forms.NumberInput(
+                attrs={
+                    "class": "app-input",
+                    "placeholder": "Valor por sesion",
+                    "step": "0.01",
+                    "min": "0",
+                }
+            ),
+            "id_estado": forms.Select(attrs={"class": "app-select"}),
+        }
+
+    def __init__(self, *args, user=None, psicologo=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.psicologo = psicologo
+        self.is_psicologo_user = bool(
+            self.psicologo and not (self.user and (self.user.is_staff or self.user.is_superuser))
+        )
+
+        self.fields["id_psicologo"].queryset = Psicologo.objects.order_by("nombres", "dni")
+        self.fields["id_rama"].queryset = Rama.objects.filter(flg_activo=True).order_by("dsc_rama")
+        self.fields["id_estado"].queryset = Estado.objects.filter(flg_activo=True).order_by("dsc_estado")
+        self.fields["valor_sesion"].required = False
+        self.fields["valor_sesion"].initial = self.fields["valor_sesion"].initial or 0
+        self.fields["valor_sesion"].help_text = "Puedes dejarlo en 0 si todavia no quieres definir un valor."
+
+        if self.instance and self.instance.pk and self.instance.id_psicologo_id:
+            self.fields["id_psicologo"].queryset = Psicologo.objects.filter(
+                pk=self.instance.id_psicologo_id
+            )
+            self.fields["id_psicologo"].initial = self.instance.id_psicologo
+            self.fields["id_psicologo"].disabled = True
+        elif self.is_psicologo_user:
+            self.fields["id_psicologo"].queryset = Psicologo.objects.filter(pk=self.psicologo.pk)
+            self.fields["id_psicologo"].initial = self.psicologo
+            self.fields["id_psicologo"].disabled = True
+            self.fields["id_estado"].required = False
+            self.fields["id_estado"].widget = forms.HiddenInput()
+            self.fields["id_estado"].initial = get_estado_activo()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.instance and self.instance.pk and self.fields["id_psicologo"].disabled:
+            psicologo = self.instance.id_psicologo
+        elif self.fields["id_psicologo"].disabled:
+            psicologo = self.psicologo
+        else:
+            psicologo = cleaned_data.get("id_psicologo")
+
+        rama = cleaned_data.get("id_rama")
+
+        if psicologo and rama:
+            queryset = PsicologoRama.objects.filter(id_psicologo=psicologo, id_rama=rama)
+            if self.instance.pk:
+                queryset = queryset.exclude(pk=self.instance.pk)
+            if queryset.exists():
+                raise ValidationError("Esta rama ya esta cargada para el psicologo.")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        psicologo_rama = super().save(commit=False)
+        if self.fields["id_psicologo"].disabled:
+            if self.instance and self.instance.pk:
+                psicologo_rama.id_psicologo = self.instance.id_psicologo
+            elif self.psicologo:
+                psicologo_rama.id_psicologo = self.psicologo
+        if self.is_psicologo_user:
+            psicologo_rama.id_estado = get_estado_activo()
+        if commit:
+            psicologo_rama.save()
+            self.save_m2m()
+        return psicologo_rama
 
 
 class PsicologoIdiomaForm(forms.ModelForm):
