@@ -470,13 +470,20 @@ class PsicologoRamaForm(forms.ModelForm):
             )
             self.fields["id_psicologo"].initial = self.instance.id_psicologo
             self.fields["id_psicologo"].disabled = True
+
         elif self.is_psicologo_user:
-            self.fields["id_psicologo"].queryset = Psicologo.objects.filter(pk=self.psicologo.pk)
+            self.fields["id_psicologo"].queryset = Psicologo.objects.filter(
+                pk=self.psicologo.pk
+            )
             self.fields["id_psicologo"].initial = self.psicologo
             self.fields["id_psicologo"].disabled = True
+
+        if self.is_psicologo_user:
             self.fields["id_estado"].required = False
             self.fields["id_estado"].widget = forms.HiddenInput()
-            self.fields["id_estado"].initial = get_estado_activo()
+            self.fields["id_estado"].initial = (
+                self.instance.id_estado if self.instance and self.instance.pk else get_estado_activo()
+            )
 
     def clean(self):
         cleaned_data = super().clean()
